@@ -1,0 +1,99 @@
+/* Estilo general */
+body {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    margin: 0;
+    padding: 0;
+    background: radial-gradient(circle, rgb(10, 163, 117), rgb(75, 0, 128)) ;
+}
+
+/* Encabezado */
+header {
+    color: turquoise;
+    text-align: center;
+    padding: 40px;
+    background-image: url('Imagenes/imagen7.jpg'); ;
+    background-repeat: repeat;
+    background-size: contain;
+    background-position: center;
+    border-bottom: 3px solid grey;
+}
+
+/* Flexbox para las cajas */
+.contenedor-flex {
+    display: flex;
+    flex-wrap: wrap; /* Permite que bajen las cajas si no caben */
+    justify-content: space-around;
+    padding: 20px;
+}
+
+/* Estilo general de las cajas */
+.caja {
+    width: 300px;
+    height: 450px;
+    margin: 15px;
+    padding: 15px;
+    border: 2px solid azure;
+    border-radius: 10px;
+    box-sizing: border-box;
+    text-align: center;
+    background-color: aqua;
+    box-shadow: 4px 4px 4px rgb(163, 10, 135);
+    transition: transform 0.2s;
+    flex-direction: column; /* organiza contenido verticalmente */
+    justify-content: space-between; /* separa título, imagen y footer */
+}
+
+/* Efecto al pasar el ratón */
+.caja:hover {
+    transform: scale(1.05);
+}
+
+/* Colores diferentes para cada caja */
+.caja1 {background-color:aqua;}
+.caja2 {background-color:aqua;}
+.caja3 {background-color:aqua;}
+.caja4 {background-color:aqua;}
+.caja5 {background-color:aqua;}
+.caja6 {background-color:aqua;}
+
+/* Enlaces dentro de las cajas */
+.caja a {
+    color: black;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* Contenedor de imagen para ajustarla */
+.imagen-contenedor {
+    flex: 1; /* ocupa todo el espacio disponible entre título y footer */
+    display: flex;
+    justify-content: center;/* El footer al pie de la caja*/
+    align-items: center;
+    overflow: hidden;
+}
+
+/* Imágenes dentro de las cajas */
+.caja img {
+    max-width: 200%;
+    max-height: 200%;
+    border-radius: 5px;
+}
+
+/* Footer interno de cada caja */
+.caja-footer {
+    background-color:rgba(0, 0, 0, 0.6);
+    padding: 5px;
+    border-top: 1px solid #333;
+}
+
+/* Footer general */
+footer {
+    background-color: white;
+    box-shadow: 4px 4px 4px rgb(10, 86, 163);
+    color: black;
+    text-align: center;
+    padding: 5px;
+}
+

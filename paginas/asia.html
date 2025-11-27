@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viaje a Asia -- Descubre sus destinos</title>
+    <link rel="stylesheet" href="asia.css">
+</head>
+<body>
+    <header>
+        <h1>Explora Asia</h1>
+    </header>
+    
+    <main class="contenido-pagina">
+        <section class="informacion">
+            
+            <p>
+                Asia es un continente lleno de contrastes: antiguos templos, paisajes naturales impresionantes y ciudades futuristas. 
+                Aquí te mostramos algunos de los destinos más fascinantes para descubrir su historia, espiritualidad y diversidad.
+            </p>
+        </section>
+
+        <!-- Galería de destinos-->
+        <section class="galeria-destinos">
+
+            <article class="destino">
+                <a href="estancia.html?destino=Tokio">Reservar en Asia</a>
+
+                    <img src="Asia/imagen_Tokio.jpg" alt="Tokio">
+                    <h3>Tokio, Japón</h3>
+                    <div class="formato-caja">
+                        <p>
+                            Una ciudad vibrante donde la tecnología se une con la tradición. Desde el Templo Senso-ji hasta los rascacielos de Shibuya, Tokio nunca deja de sorprender.
+                        </p>
+                    </div>
+
+            </article>
+
+            <article class="destino">
+                <a href="estancia.html?destino=Bankok">Reservar en Asia</a>
+
+                    <img src="Asia/imagen_Bankok.jpg" alt="Bankok">
+                    <h3>Bangkok, Tailandia</h3>
+                    <div class="formato-caja">
+                        <p>
+                            Con sus templos dorados, mercados flotantes y deliciosa gastronomía callejera, Bangkok es el alma espiritual y moderna de Tailandia. 
+                        </p>
+                    </div>
+
+            </article>
+
+            <article class="destino">
+                <a href="estancia.html?destino=Pekín">Reservar en Asia</a>
+
+                    <img src="Asia/imagen_Pekin.jpg" alt="Pekín">
+                    <h3>Pekín, China</h3>
+                    <div class="formato-caja">
+                        <p>
+                            Una ciudad imperial con miles de años de historia. La Ciudad Prohibida y la Gran Muralla son solo el comienzo de su legado cultural.
+                        </p>
+                    </div>
+
+            </article>
+
+            <article class="destino">
+                <a href="estancia.html?destino=Dubái">Reservar en Asia</a>
+
+                    <img src="Asia/Imagen_Dubai.jpg" alt="Dubái">
+                    <h3>Dubai, Emiratos Árabes</h3>
+                    <div class="formato-caja">
+                        <p>
+                            Una metrópolis del lujo y la innovación. Con el Burj Khalifa y sus islas artificiales, Dubái redefine el concepto de modernidad en el desierto.
+                        </p>
+                    </div>
+
+            </article>
+
+            <article class="destino">
+                <a href="estancia.html?destino=Nueva-Delhi">Reservar en Asia</a>
+
+                    <img src="Asia/imagen_Nueva_Delhi.jpg" alt="Nueva Delhi">
+                    <h3>Nueva Delhi, India</h3>
+                    <div class="formato-caja">
+                        <p>
+                            Color, espiritualidad y diversidad se mezclan en esta ciudad. Desde el Templo del Loto hasta el Fuerte Rojo, cada rincón tiene vida propia. 
+                        </p>
+                    </div>
+
+            </article>
+
+            <article class="destino">
+                <a href="estancia.html?destino=Seul">Reservar en Asia</a>
+
+                    <img src="Asia/imagen_Seul.jpg" alt="Seul">
+                    <h3>Seúl, Corea del Sur</h3>
+                    <div class="formato-caja">
+                        <p>
+                            Capital de la tecnología y la cultura pop, Seúl combina templos antiguos con una vida urbana moderna llena de energía y estilo 
+                        </p>
+                    </div>
+
+            </article>
+
+        </section>
+
+        <section class="formulario-recomendacion">
+            <form id="formulario-asia">
+
+                <label for="Nombre">Nombre</label>
+                <input type="text" id = "Nombre" placeholder="Nombre">
+                <br>  
+                <label for="Apellidos">Apellidos</label>
+                <input type="text" id = "Apellidos" placeholder="Apellidos">
+                <br>  
+                <label for="Direccion">Dirección</label>
+                <input type="text" id = "Direccion" placeholder="Dirección">
+                <br><br>
+
+                <label for="clima">¿Qué clima prefieres?</label>
+                <select name="clima" id="clima">
+                    <option value="calido">Cálido</option>
+                    <option value="templado">Templado</option>
+                    <option value="frio">Frio</option>
+                </select>
+
+                <label id="actividad">¿Qué tipo de viaje te gustaría?</label>
+                <select name="actividad" id="actividad">
+                    <option value="cultural">Cultural</option>
+                    <option value="urbano">Urbano</option>
+                    <option value="playa">Playa</option>
+                    <option value="montaña">Montaña</option>
+                </select>
+
+                <label id="presupuesto">Presupuesto aproximado</label>
+                <select name="presupuesto" id="presupuesto">
+                    <option value="alto">Alto</option>
+                    <option value="medio">Medio</option>
+                    <option value="bajo">Bajo</option>
+                </select>
+                <br>
+
+                <label for="Fecha">Elija una fecha</label>
+                <input type="date" id = "Fecha">
+                <br>
+
+                <textarea name="" id="" cols="60" rows="5">Escriba alguna sugerencia para destino</textarea>
+                <br>
+
+                <button type="button" onclick="recomendarDestino()">Ver recomendaciones</button>
+            </form>
+
+            <p id="resultado"></p>
+
+        </section>
+
+        <a href="../index1.html" class="boton-volver">Volver al inicio</a>
+
+    </main>
+
+    <footer>
+        <p> 2025 Viajes JAD | Página de Asia</p>
+    </footer>
+
+</body>
+</html>

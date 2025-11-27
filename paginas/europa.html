@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viaje a Europa - Descubre sus destinos</title>
+    <link rel="stylesheet" href="europa.css">
+</head>
+<body>
+    <header>
+        <h1>Explora Europa</h1>
+    </header>
+
+    <main class="contenido-pagina">
+        <section class="informacion">
+            
+            <p>
+                Europa es un continente lleno de historia, arte y tradiciones. Desde las calles empedradas de Roma hasta los paisajes del norte, cada rincón tiene una historia que contar.
+                A continuación te mostramos algunos de los destinos más visitados y emblemáticos. 
+            </p>
+        </section>
+
+        <!-- GALERÍA DE DESTINOS -->
+         <section class="galeria-destinos">
+
+            <article class="destino">
+
+                <a href="estancia.html?destino=España">Reservar en España</a>
+                    <img src="Europa/imagen_España.jpg" alt="España">
+                    <h3>España, Europa</h3>
+                    <div class="formato-caja">
+                        <p>
+                            España es un país lleno de historia, arte, gastronomía y paisajes increíbles. 
+                            Desde las playas del Mediterráneo hasta las montañas del norte, 
+                            pasando por ciudades vibrantes y pueblos llenos de encanto, 
+                            cada rincón tiene una historia que contar.
+                        </p>
+                    </div>
+                </a>
+            </article>
+
+            <article class="destino">
+                <a href="estancia.html?destino=París">Reservar en París</a>
+                    <img src="Europa/imagen torre eiffel.jpg" alt="París">
+                    <h3>París, Francia</h3>
+                    <div class="formato-caja">
+                        <p>
+                            Conocida como la “Ciudad de la Luz”, París deslumbra con su Torre Eiffel, el arte del Louvre y sus románticos paseos por el Sena.
+                        </p>
+                    </div>
+
+            </article>
+
+            <article class="destino">
+
+                <a href="estancia.html?destino=Roma">Reservar en Roma</a>
+                    <img src="Europa/imagen roma.png" alt="Roma">
+                    <h3>Roma, Italia</h3>
+                    <div class="formato-caja">
+                        <p>
+                            La ciudad eterna te transporta a la historia del Imperio Romano con el Coliseo, el Vaticano y la Fontana di Trevi.  
+                        </p>
+                    </div>
+
+            </article>
+
+            <article class="destino">
+                <a href="estancia.html?destino=Londres">Reservar en Londres</a>
+                    <img src="Europa/imagen londres.jpg" alt="Londres">
+                    <h3>Reino Unido, Inglaterra</h3>
+                    <div class="formato-caja">
+                        <p>
+                            Una mezcla entre lo clásico y lo moderno: el Big Ben, el London Eye y el ambiente multicultural de la ciudad te sorprenderán. 
+                        </p>
+                    </div>
+
+            </article>
+
+            <article class="destino">
+
+                <a href="estancia.html?destino=Atenas">Reservar en Atenas</a>
+                    <img src="Europa/imagen amsterdam.jpg" alt="Atenas">
+                    <h3>Atenas, Grecia</h3>
+                    <div class="formato-caja">
+                        <p>
+                            La cuna de la civilización occidental, donde el Partenón domina el horizonte y la historia se mezcla con la vida moderna.
+                        </p>
+                    </div>
+
+            </article>
+
+            <article class="destino">
+
+                <a href="estancia.html?destino=Viena">Reservar en Viena</a>
+
+                    <img src="Europa/imagen viena.jpg" alt="Viena">
+                    <h3>Viena, Austria</h3>
+                    <div class="formato-caja">
+                        <p>
+                            Elegante y musical, Viena es la capital de la música clásica. Sus palacios imperiales y cafeterías históricas evocan la grandeza del Imperio Austrohúngaro.
+                        </p>
+                    </div>
+                
+
+            </article>
+
+         </section>
+
+         <section class="formulario-recomendacion">
+            <form id="formulario-europa">
+
+                <label for="Nombre">Nombre</label>
+                <input type="text" id = "Nombre" placeholder="Nombre">
+                <br>  
+                <label for="Apellidos">Apellidos</label>
+                <input type="text" id = "Apellidos" placeholder="Apellidos">
+                <br>  
+                <label for="Direccion">Dirección</label>
+                <input type="text" id = "Direccion" placeholder="Dirección">
+                <br><br>
+
+                <label for="clima">¿Qué clima prefieres?</label>
+                <select name="clima" id="clima">
+                    <option value="calido">Cálido</option>
+                    <option value="templado">Templado</option>
+                    <option value="frio">Frio</option>
+                </select>
+
+                <label id="actividad">¿Qué tipo de viaje te gustaría?</label>
+                <select name="actividad" id="actividad">
+                    <option value="cultural">Cultural</option>
+                    <option value="urbano">Urbano</option>
+                    <option value="playa">Playa</option>
+                    <option value="montaña">Montaña</option>
+                </select>
+
+                <label id="presupuesto">Presupuesto aproximado</label>
+                <select name="presupuesto" id="presupuesto">
+                    <option value="alto">Alto</option>
+                    <option value="medio">Medio</option>
+                    <option value="bajo">Bajo</option>
+                </select>
+                <br>
+
+                <label for="Fecha">Elija una fecha</label>
+                <input type="date" id = "Fecha">
+                <br>
+
+                <textarea id="sugerencia" cols="60" rows="5" placeholder="Escriba alguna sugerencia para destino"></textarea>
+                <br>
+
+                <button type="button" onclick="recomendarDestino()">Ver recomendaciones</button>
+            </form>
+
+            <p id="resultado"></p>
+
+        </section>
+
+         <a href="../index1.html" class="boton-volver">⬅️ Volver a inicio</a>
+         
+    </main>
+
+    <footer>
+        <p>
+            2025 Viajes JAD | Página de Europa
+        </p>
+    </footer>
+    
+</body>
+
+<script src="europa.js"></script>
+
+
+</html>
