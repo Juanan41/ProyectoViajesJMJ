@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservas de viaje</title>
+    <link rel="stylesheet" href="estancia.css">
+</head>
+<body>
+
+<header>
+    <h1 id="titulo-destino">Reserva tu viaje</h1>
+</header>
+
+<main>
+    <section class="formulario-viaje">
+        <form id="formulario-viaje">
+            <input type="hidden" id="destino" value="">
+
+            <label for="hotel">Hoteles disponibles:</label>
+            <div id="hotel-opciones" class="hotel-opciones">
+            
+            </div>
+
+            <label for="avion">Vuelos disponibles:</label>
+            <select id="avion" name="avion">
+                <option value="Vuelo Económico">Vuelo Económico</option>
+                <option value="Vuelo Ejecutivo">Vuelo Ejecutivo</option>
+                <option value="Vuelo Premium">Vuelo Premium</option>
+            </select>
+
+            <button type="button" onclick="mostrarReserva()">Ver opciones seleccionadas</button>
+        </form>
+
+        <div id="resultado"></div>
+    </section>
+
+    <a href="../index1.html" class="boton-volver">⬅️Volver a inicio</a>
+    
+</main>
+
+<footer>
+    <p>2025 Viajes JAD</p>
+</footer>
+
+<script src="estancia.js"></script>
+</body>
+</html>
