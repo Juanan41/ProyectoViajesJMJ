@@ -1,4 +1,7 @@
 package com.viajes.app.destinos;
 
-public class DestinoRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface DestinoRepository extends JpaRepository<Destino,Long> {
 }
+

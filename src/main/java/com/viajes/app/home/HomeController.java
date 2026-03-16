@@ -14,6 +14,37 @@ public class HomeController {
     public String home() {
         return "index";
     }
+
+    @GetMapping("/europa")
+    public String europa() {
+        return "europa";
+    }
+
+    @GetMapping("/asia")
+    public String asia() {
+        return "asia";
+    }
+
+    @GetMapping("/africa")
+    public String africa() {
+        return "africa";
+    }
+
+    @GetMapping("/oceania")
+    public String oceania() {
+        return "oceania";
+    }
+
+    @GetMapping("/americaNorte")
+    public String americaNorte() {
+        return "americaNorte";
+    }
+
+    @GetMapping("/americaSur")
+    public String americaSur() {
+        return "americaSur";
+    }
+
 }
 
 
