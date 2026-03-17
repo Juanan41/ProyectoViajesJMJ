@@ -1,0 +1,56 @@
+<form id="formulario-africa">
+
+    <label for="Nombre">Nombre</label>
+    <input type="text" id="Nombre" placeholder="Nombre">
+    <br>
+
+    <label for="Apellidos">Apellidos</label>
+    <input type="text" id="Apellidos" placeholder="Apellidos">
+    <br>
+
+    <label for="Direccion">Dirección</label>
+    <input type="text" id="Direccion" placeholder="Dirección">
+    <br><br>
+
+    <label for="clima">¿Qué clima prefieres?</label>
+
+    <select name="clima" id="clima">
+        <option value="calido">Cálido</option>
+        <option value="templado">Templado</option>
+        <option value="frio">Frio</option>
+    </select>
+
+    <label>¿Qué tipo de viaje te gustaría?</label>
+
+    <select name="actividad">
+        <option value="cultural">Cultural</option>
+        <option value="urbano">Urbano</option>
+        <option value="playa">Playa</option>
+        <option value="montaña">Montaña</option>
+    </select>
+
+    <label>Presupuesto aproximado</label>
+
+    <select name="presupuesto">
+        <option value="alto">Alto</option>
+        <option value="medio">Medio</option>
+        <option value="bajo">Bajo</option>
+    </select>
+
+    <br>
+
+    <label for="Fecha">Elija una fecha</label>
+    <input type="date" id="Fecha">
+    <br>
+
+    <textarea cols="60" rows="5" placeholder="Escriba alguna sugerencia para destino"></textarea>
+
+    <br>
+
+    <button type="button" onclick="recomendarDestino()">
+        Ver recomendaciones
+    </button>
+
+</form>
+
+<script th:src="@{/js/africa.js}"></script>

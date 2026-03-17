@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Reserva de viaje</title>
+
+    <link rel="stylesheet" th:href="@{/css/estancia.css}">
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+    <<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<header>
+    <h1>✈️ Reserva tu viaje</h1>
+</header>
+
+<main>
+
+    <!-- DESTINO DINÁMICO -->
+    <h2>Destino seleccionado:</h2>
+    <h3 th:text="${destino}"></h3>
+
+    <section class="formulario-viaje">
+
+        <form>
+
+            <!-- oculto pero con valor dinámico -->
+            <input type="hidden" id="destino" th:value="${destino}">
+
+            <label>Hoteles disponibles:</label>
+            <div class="hotel-opciones">
+                <p>Hotel 3⭐</p>
+                <p>Hotel 4⭐</p>
+                <p>Hotel 5⭐</p>
+            </div>
+
+            <label>Vuelos:</label>
+            <select>
+                <option>Vuelo Económico</option>
+                <option>Vuelo Ejecutivo</option>
+                <option>Vuelo Premium</option>
+            </select>
+
+            <button type="button">Confirmar reserva</button>
+
+        </form>
+
+    </section>
+
+    <!-- VOLVER -->
+    <a th:href="@{/}" class="boton-volver">⬅️ Volver</a>
+
+</main>
+
+<footer>
+    <p>© 2025 Viajes JMJ</p>
+</footer>
+
+<script th:src="@{/js/estancia.js}"></script>
+
+</body>
+</html>

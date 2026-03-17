@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Viaje a Asia</title>
+    <link rel="stylesheet" th:href="@{/css/asia.css}">
+</head>
+
+<body>
+
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<header>
+    <h1>🌏 Explora Asia</h1>
+</header>
+
+<main class="contenido-pagina">
+
+    <section class="informacion">
+        <p>
+            Asia es un continente lleno de contrastes: templos, naturaleza y ciudades futuristas.
+        </p>
+    </section>
+
+    <!-- GALERÍA -->
+    <section class="galeria-destinos">
+
+        <article class="destino">
+            <img th:src="@{/imagenes/fondos/Asia/imagen_Tokio.jpg}">
+            <h3>Tokio</h3>
+            <a th:href="@{/estancia(destino='Tokio')}">Reservar</a>
+        </article>
+
+        <article class="destino">
+            <img th:src="@{/imagenes/fondos/Asia/imagen_Bankok.jpg}">
+            <h3>Bangkok</h3>
+            <a th:href="@{/estancia(destino='Bangkok')}">Reservar</a>
+        </article>
+
+        <article class="destino">
+            <img th:src="@{/imagenes/fondos/Asia/imagen_Pekin.jpg}">
+            <h3>Pekín</h3>
+            <a th:href="@{/estancia(destino='Pekin')}">Reservar</a>
+        </article>
+
+        <article class="destino">
+            <img th:src="@{/imagenes/fondos/Asia/imagen_Dubai.jpg}">
+            <h3>Dubái</h3>
+            <a th:href="@{/estancia(destino='Dubai')}">Reservar</a>
+        </article>
+
+        <article class="destino">
+            <img th:src="@{/imagenes/fondos/Asia/imagen_Nueva_Delhi.jpg}">
+            <h3>Nueva Delhi</h3>
+            <a th:href="@{/estancia(destino='NuevaDelhi')}">Reservar</a>
+        </article>
+
+        <article class="destino">
+            <img th:src="@{/imagenes/fondos/Asia/imagen_Seul.jpg}">
+            <h3>Seúl</h3>
+            <a th:href="@{/estancia(destino='Seul')}">Reservar</a>
+        </article>
+
+    </section>
+
+    <!-- ACTIVIDADES -->
+    <section class="actividades">
+        <h2>🎯 Actividades en Asia</h2>
+        <ul>
+            <li>🏯 Visitar templos históricos</li>
+            <li>🍜 Probar gastronomía local</li>
+            <li>🛍️ Mercados tradicionales</li>
+            <li>🌄 Paisajes naturales</li>
+            <li>🏙️ Ciudades futuristas</li>
+        </ul>
+    </section>
+
+    <!-- FORMULARIO -->
+    <section class="formulario-recomendacion">
+        <form>
+            <input type="text" placeholder="Nombre">
+            <input type="text" placeholder="Apellidos">
+            <button type="button">Ver recomendaciones</button>
+        </form>
+    </section>
+
+    <a th:href="@{/}" class="boton-volver">⬅️ Volver</a>
+
+</main>
+
+<footer>
+    <p>© 2025 Viajes JMJ | Asia</p>
+</footer>
+
+</body>
+</html>

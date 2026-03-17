@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viaje a Oceanía - Naturaleza y Aventura</title>
+
+    <link rel="stylesheet" th:href="@{/css/oceania.css}">
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<header>
+    <h1>🌏 Explora Oceanía</h1>
+</header>
+
+<main class="contenido-pagina">
+
+    <!-- INFORMACIÓN -->
+    <section class="informacion">
+        <p>
+            Oceanía es un paraíso natural de islas, playas, montañas y arrecifes.
+            Desde las modernas ciudades australianas hasta los paisajes tropicales del Pacífico,
+            este continente ofrece experiencias únicas y una conexión directa con la naturaleza.
+        </p>
+    </section>
+
+    <!-- GALERÍA -->
+    <section class="galeria-destinos">
+
+        <article class="destino">
+            <img th:src="@{/imagenes/fondos/Oceania/imagen_Sidney.jpg}" alt="Sidney">
+            <h3>Sidney, Australia</h3>
+            <p>Ópera de Sidney, playas y cultura urbana.</p>
+        </article>
+
+        <article class="destino">
+            <img th:src="@{/imagenes/fondos/Oceania/imagen_Melbourne.jpg}" alt="Melbourne">
+            <h3>Melbourne</h3>
+            <p>Arte, cultura y vida cosmopolita.</p>
+        </article>
+
+        <article class="destino">
+            <img th:src="@{/imagenes/fondos/Oceania/imagen_Auckland.jpg}" alt="Auckland">
+            <h3>Auckland</h3>
+            <p>Volcanes, naturaleza y aventura.</p>
+        </article>
+
+        <article class="destino">
+            <img th:src="@{/imagenes/fondos/Oceania/imagen_Fiyi.jpg}" alt="Fiyi">
+            <h3>Fiyi</h3>
+            <p>Playas paradisíacas y relax total.</p>
+        </article>
+
+        <article class="destino">
+            <img th:src="@{/imagenes/fondos/Oceania/imagen_Bora_Bora.jpg}" alt="Bora Bora">
+            <h3>Bora Bora</h3>
+            <p>Destino romántico por excelencia.</p>
+        </article>
+
+        <article class="destino">
+            <img th:src="@{/imagenes/fondos/Oceania/imagen_Perth.jpg}" alt="Perth">
+            <h3>Perth</h3>
+            <p>Ciudad moderna con naturaleza salvaje.</p>
+        </article>
+
+    </section>
+
+    <!-- ACTIVIDADES -->
+    <section class="actividades">
+        <h2>🌴 Actividades en Oceanía</h2>
+        <ul>
+            <li>🏄‍♂️ Surf en Australia</li>
+            <li>🤿 Buceo en la Gran Barrera de Coral</li>
+            <li>🥾 Senderismo en Nueva Zelanda</li>
+            <li>🏝️ Relax en playas de Fiyi</li>
+            <li>🚤 Excursiones en islas tropicales</li>
+        </ul>
+    </section>
+
+    <!-- FORMULARIO -->
+    <section class="formulario-recomendacion">
+
+        <form id="formulario-oceania">
+
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" placeholder="Nombre">
+
+            <label for="apellidos">Apellidos</label>
+            <input type="text" id="apellidos" placeholder="Apellidos">
+
+            <label for="direccion">Dirección</label>
+            <input type="text" id="direccion" placeholder="Dirección">
+
+            <label for="clima">Clima</label>
+            <select id="clima">
+                <option value="calido">Cálido</option>
+                <option value="templado">Templado</option>
+                <option value="frio">Frío</option>
+            </select>
+
+            <label for="actividad">Tipo de viaje</label>
+            <select id="actividad">
+                <option value="cultural">Cultural</option>
+                <option value="urbano">Urbano</option>
+                <option value="playa">Playa</option>
+                <option value="montaña">Montaña</option>
+            </select>
+
+            <label for="presupuesto">Presupuesto</label>
+            <select id="presupuesto">
+                <option value="alto">Alto</option>
+                <option value="medio">Medio</option>
+                <option value="bajo">Bajo</option>
+            </select>
+
+            <label for="fecha">Fecha</label>
+            <input type="date" id="fecha">
+
+            <textarea cols="50" rows="4" placeholder="Sugerencias..."></textarea>
+
+            <button type="button">Ver recomendaciones</button>
+
+        </form>
+
+        <p id="resultado"></p>
+
+    </section>
+
+    <!-- BOTÓN VOLVER -->
+    <a th:href="@{/}" class="boton-volver">⬅️ Volver a inicio</a>
+
+</main>
+
+<footer>
+    <p>© 2025 Viajes JMJ | Oceanía</p>
+</footer>
+
+</body>
+</html>

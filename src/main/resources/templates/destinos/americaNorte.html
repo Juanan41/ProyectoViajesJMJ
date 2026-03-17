@@ -1,23 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>>Viaje a América del Sur - Naturaleza y Cultura</title>
-    <link rel="stylesheet" href="americaSur.css">
+    <title>Viaje a América del Norte - Cultura y Modernidad</title>
+    <link rel="stylesheet" th:href="@{/css/americaNorte.css}">
 </head>
 <body>
+
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
     <header>
-        <h1>Explora Ámerica del Sur</h1>
+        <h1>Explora Ámerica del Norte</h1>
     </header>
 
     <main class="contenido-pagina">
         <section class="informacion">
             
             <p>
-                América del Sur es un continente lleno de contrastes: desde la selva amazónica hasta los Andes, 
-                pasando por playas paradisíacas y ciudades llenas de historia. 
-                Descubre la alegría, la gastronomía y los paisajes más impresionantes del mundo.
+                América del Norte combina grandes metrópolis, maravillas naturales y culturas únicas. 
+                Desde las luces de Nueva York hasta las playas de México y los lagos de Canadá, 
+                este continente ofrece infinitas experiencias. 
             </p>
         </section>
 
@@ -27,69 +30,68 @@
 
             <article class="destino">
 
-                <img src="americaSur/imagen_Rio_Janeiro.jpg" alt="Rio_Janeiro">
-                <h3>Rio de Janeiro, Brasil</h3>
+                <img src="americaNorte/imagen_Nueva_York.jpg" alt="Nueva_York">
+                <h3>Nueva York, EEUU</h3>
                 <p>
-                   Famosa por el Cristo Redentor, el Pan de Azúcar y sus playas de Copacabana e Ipanema. 
-                    Una ciudad vibrante llena de ritmo y alegría. 
+                   La ciudad que nunca duerme. Con la Estatua de la Libertad, Times Square y Central Park, Nueva York es el corazón cultural del mundo. 
                 </p>
 
             </article>
 
             <article class="destino">
 
-                <img src="americaSur/imagen_Buenos_Aires.jpg" alt="Buenos_Aires">
-                <h3>Buenos Aires, Argentina</h3>
+                <img src="americaNorte/imagen_Ciudad_Mexico.jpg" alt="Ciudad_Mexico">
+                <h3>Ciudad de México, México</h3>
                 <p>
-                    La capital del tango. Con su arquitectura europea y sus cafés históricos, Buenos Aires combina cultura y pasión.
+                    Una capital llena de historia, gastronomía y color. Desde el Zócalo hasta los canales de Xochimilco, cada rincón cuenta una historia.
                 </p>
 
             </article>
 
             <article class="destino">
 
-                <img src="americaSur/imagen_Machupichu.jpg" alt="Machupichu">
-                <h3>Machupichu, Perú</h3>
+                <img src="americaNorte/imagen_Toronto.jpg" alt="Toronto">
+                <h3>Toronto, Canadá</h3>
                 <p>
-                    Una de las maravillas del mundo moderno. El legado de los incas entre montañas y nubes en pleno corazón del Perú.
+                    Una ciudad multicultural y moderna, famosa por su torre CN y su proximidad a las Cataratas del Niágara. Una joya del norte.
                 </p>
 
             </article>
 
             <article class="destino">
 
-                <img src="americaSur/imagen_Cartagena.jpg" alt="Cartagena">
-                <h3>Cartagena, Colombia</h3>
+                <img src="americaNorte/imagen_San_Francisco.jpg" alt="San_Francisco">
+                <h3>San Francisco, EEUU</h3>
                 <p>
-                    Ciudad colonial a orillas del Caribe. Sus murallas, colores y ambiente tropical la hacen un destino inolvidable.
+                    Con el Golden Gate y sus tranvías clásicos, esta ciudad californiana combina historia, tecnología y vistas inolvidables.
                 </p>
 
             </article>
 
             <article class="destino">
 
-                <img src="americaSur/imagen_Santiago_Chile.jpg" alt="Santiago_Chile">
-                <h3>Santiago de Chile, Chile</h3>
+                <img src="americaNorte/imagen_Cancun.jpg" alt="Cancun">
+                <h3>Cancun, México</h3>
                 <p>
-                    Una metrópoli moderna rodeada por la Cordillera de los Andes. Ideal para combinar ciudad, nieve y naturaleza.
+                    Playas de arena blanca y aguas cristalinas. Cancún es uno de los destinos turísticos más famosos del Caribe mexicano.
                 </p>
 
             </article>
 
             <article class="destino">
 
-                <img src="americaSur/imagen_Monte_Video.jpg" alt="Montevideo">
-                <h3>Montevideo, Uruguay</h3>
+                <img src="americaNorte/imagen_Chicago.jpg" alt="Chicago">
+                <h3>Chicago, EEUU</h3>
                 <p>
-                    Tranquila y encantadora, Montevideo mezcla playas, historia y una gran calidad de vida junto al Río de la Plata.
+                    Ciudad de arquitectura impresionante a orillas del Lago Michigan. Conocida por su música, museos y el famoso Cloud Gate.
                 </p>
 
             </article>
-
+            
         </section>
 
         <section class="formulario-recomendacion">
-            <form id="formulario-americaSur">
+            <form id="formulario-americaNorte">
 
                 <label for="Nombre">Nombre</label>
                 <input type="text" id = "Nombre" placeholder="Nombre">
@@ -144,7 +146,7 @@
 
     <footer>
         <p>
-            2025 Viajes JAD | Página de America del Sur
+            2025 Viajes JAD | Página de America del Norte
         </p>
     </footer>
     

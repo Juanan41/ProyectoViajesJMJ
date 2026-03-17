@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Viaje a Europa</title>
+    <link rel="stylesheet" th:href="@{/css/europa.css}">
+</head>
+
+<body>
+
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+<header>
+    <h1>🌍 Explora Europa</h1>
+</header>
+
+<main class="contenido-pagina">
+
+    <section class="informacion">
+        <p>
+            Europa es un continente lleno de historia, arte y cultura.
+        </p>
+    </section>
+
+    <!-- GALERÍA -->
+    <section class="galeria-destinos">
+
+        <article class="destino">
+            <img th:src="@{/imagenes/fondos/Europa/imagen_espana.jpg}">
+            <h3>España</h3>
+            <a th:href="@{/estancia(destino='Espana')}">Reservar</a>
+        </article>
+
+        <article class="destino">
+            <img th:src="@{/imagenes/fondos/Europa/imagen_paris.jpg}">
+            <h3>París</h3>
+            <a th:href="@{/estancia(destino='Paris')}">Reservar</a>
+        </article>
+
+        <article class="destino">
+            <img th:src="@{/imagenes/fondos/Europa/imagen_roma.jpg}">
+            <h3>Roma</h3>
+            <a th:href="@{/estancia(destino='Roma')}">Reservar</a>
+        </article>
+
+        <article class="destino">
+            <img th:src="@{/imagenes/fondos/Europa/imagen_londres.jpg}">
+            <h3>Londres</h3>
+            <a th:href="@{/estancia(destino='Londres')}">Reservar</a>
+        </article>
+
+        <article class="destino">
+            <img th:src="@{/imagenes/fondos/Europa/imagen_atenas.jpg}">
+            <h3>Atenas</h3>
+            <a th:href="@{/estancia(destino='Atenas')}">Reservar</a>
+        </article>
+
+        <article class="destino">
+            <img th:src="@{/imagenes/fondos/Europa/imagen_viena.jpg}">
+            <h3>Viena</h3>
+            <a th:href="@{/estancia(destino='Viena')}">Reservar</a>
+        </article>
+
+    </section>
+
+    <!-- ACTIVIDADES -->
+    <section class="actividades">
+        <h2>🎯 Actividades en Europa</h2>
+        <ul>
+            <li>🏛️ Visitar monumentos históricos</li>
+            <li>🍝 Gastronomía local</li>
+            <li>🎨 Museos y arte</li>
+            <li>🚆 Viajar entre países</li>
+            <li>🏞️ Naturaleza</li>
+        </ul>
+    </section>
+
+    <!-- FORMULARIO -->
+    <section class="formulario-recomendacion">
+        <form>
+            <input type="text" placeholder="Nombre">
+            <input type="text" placeholder="Apellidos">
+            <button type="button">Ver recomendaciones</button>
+        </form>
+    </section>
+
+    <a th:href="@{/}" class="boton-volver">⬅️ Volver</a>
+
+</main>
+
+<footer>
+    <p>© 2025 Viajes JAD | Europa</p>
+</footer>
+
+<script th:src="@{/js/europa.js}"></script>
+
+</body>
+</html>
