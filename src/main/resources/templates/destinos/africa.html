@@ -1,56 +1,155 @@
-<form id="formulario-africa">
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 
-    <label for="Nombre">Nombre</label>
-    <input type="text" id="Nombre" placeholder="Nombre">
-    <br>
+<head>
+    <meta charset="UTF-8">
+    <title>Viaje a África</title>
+    <link rel="stylesheet" th:href="@{/css/africa.css}">
+</head>
 
-    <label for="Apellidos">Apellidos</label>
-    <input type="text" id="Apellidos" placeholder="Apellidos">
-    <br>
+<body>
 
-    <label for="Direccion">Dirección</label>
-    <input type="text" id="Direccion" placeholder="Dirección">
-    <br><br>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
 
-    <label for="clima">¿Qué clima prefieres?</label>
+<header>
+    <h1>🌍 Explora África</h1>
+</header>
 
-    <select name="clima" id="clima">
-        <option value="calido">Cálido</option>
-        <option value="templado">Templado</option>
-        <option value="frio">Frio</option>
-    </select>
+<main class="contenido-pagina">
 
-    <label>¿Qué tipo de viaje te gustaría?</label>
+    <section class="informacion">
+        <p>
+            África es un continente lleno de naturaleza, cultura y aventura.
+        </p>
+    </section>
 
-    <select name="actividad">
-        <option value="cultural">Cultural</option>
-        <option value="urbano">Urbano</option>
-        <option value="playa">Playa</option>
-        <option value="montaña">Montaña</option>
-    </select>
+    <!-- GALERÍA -->
+    <section class="galeria-destinos">
 
-    <label>Presupuesto aproximado</label>
+        <article class="destino">
+            <img th:src="@{/imagenes/fondos/Africa/imagen_El_Cairo.jpg}">
+            <h3>El Cairo</h3>
+            <a th:href="@{/estancia(destino='ElCairo')}">Reservar</a>
+        </article>
 
-    <select name="presupuesto">
-        <option value="alto">Alto</option>
-        <option value="medio">Medio</option>
-        <option value="bajo">Bajo</option>
-    </select>
+        <article class="destino">
+            <img th:src="@{/imagenes/fondos/Africa/imagen_Marrakech.jpg}">
+            <h3>Marrakech</h3>
+            <a th:href="@{/estancia(destino='Marrakech')}">Reservar</a>
+        </article>
 
-    <br>
+        <article class="destino">
+            <img th:src="@{/imagenes/fondos/Africa/imagen_Nairobi.jpg}">
+            <h3>Nairobi</h3>
+            <a th:href="@{/estancia(destino='Nairobi')}">Reservar</a>
+        </article>
 
-    <label for="Fecha">Elija una fecha</label>
-    <input type="date" id="Fecha">
-    <br>
+        <article class="destino">
+            <img th:src="@{/imagenes/fondos/Africa/imagen_Zanzibar.jpg}">
+            <h3>Zanzibar</h3>
+            <a th:href="@{/estancia(destino='Zanzibar')}">Reservar</a>
+        </article>
 
-    <textarea cols="60" rows="5" placeholder="Escriba alguna sugerencia para destino"></textarea>
+        <article class="destino">
+            <img th:src="@{/imagenes/fondos/Africa/imagen_Desierto_Sahara.jpg}">
+            <h3>Sahara</h3>
+            <a th:href="@{/estancia(destino='Sahara')}">Reservar</a>
+        </article>
 
-    <br>
+        <article class="destino">
+            <img th:src="@{/imagenes/fondos/Africa/Imagen_Ciudad_del_Cabo.jpg}">
+            <h3>Ciudad del Cabo</h3>
+            <a th:href="@{/estancia(destino='CiudadDelCabo')}">Reservar</a>
+        </article>
 
-    <button type="button" onclick="recomendarDestino()">
-        Ver recomendaciones
-    </button>
+    </section>
 
-</form>
+    <!-- ACTIVIDADES -->
+    <section class="actividades">
+        <h2>🎯 Actividades en África</h2>
+        <ul>
+            <li>🦁 Safari en la sabana</li>
+            <li>🏜️ Ruta por el desierto del Sahara</li>
+            <li>🏺 Visitar pirámides de Egipto</li>
+            <li>🏝️ Relajarse en playas de Zanzibar</li>
+            <li>⛰️ Escalar el Kilimanjaro</li>
+        </ul>
+    </section>
 
-<script th:src="@{/js/africa.js}"></script>
+    <!-- FORMULARIO -->
+    <section class="formulario-recomendacion">
+
+        <form id="formulario-africa">
+
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" placeholder="Nombre">
+            <br>
+
+            <label for="apellidos">Apellidos</label>
+            <input type="text" id="apellidos" placeholder="Apellidos">
+            <br>
+
+            <label for="direccion">Dirección</label>
+            <input type="text" id="direccion" placeholder="Dirección">
+            <br><br>
+
+            <label for="clima">¿Qué clima prefieres?</label>
+            <select id="clima">
+                <option value="calido">Cálido</option>
+                <option value="templado">Templado</option>
+                <option value="frio">Frío</option>
+            </select>
+
+            <br><br>
+
+            <label for="actividad">¿Qué tipo de viaje?</label>
+            <select id="actividad">
+                <option value="cultural">Cultural</option>
+                <option value="urbano">Urbano</option>
+                <option value="playa">Playa</option>
+                <option value="montaña">Montaña</option>
+            </select>
+
+            <br><br>
+
+            <label for="presupuesto">Presupuesto</label>
+            <select id="presupuesto">
+                <option value="alto">Alto</option>
+                <option value="medio">Medio</option>
+                <option value="bajo">Bajo</option>
+            </select>
+
+            <br><br>
+
+            <textarea id="sugerencia" placeholder="Escriba alguna sugerencia para destino"></textarea>
+
+            <br><br>
+
+            <button type="button" onclick="recomendarDestino()">
+                Ver recomendaciones
+            </button>
+
+        </form>
+
+        <p id="resultado"></p>
+
+    </section>
+
+
+    <a th:href="@{/}" class="boton-volver">
+        ⬅️ Volver al inicio
+    </a>
+
+</main>
+
+
+<footer>
+
+    <p>
+        2025 Viajes JMJ | Página de África
+    </p>
+
+</footer>
+
+</body>
+</html>
