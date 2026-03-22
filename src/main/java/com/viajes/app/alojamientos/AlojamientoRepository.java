@@ -1,4 +1,6 @@
 package com.viajes.app.alojamientos;
 
-public class AlojamientoRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface AlojamientoRepository extends JpaRepository<Alojamiento, Long> {
 }

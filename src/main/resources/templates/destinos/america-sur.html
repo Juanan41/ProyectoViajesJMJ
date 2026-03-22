@@ -3,8 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Viaje a África</title>
-    <link rel="stylesheet" th:href="@{/css/africa.css}">
+    <title>Viaje a América del Sur</title>
+    <link rel="stylesheet" th:href="@{/css/americaSur.css}">
 </head>
 
 <body>
@@ -12,14 +12,16 @@
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
 <header>
-    <h1>🌍 Explora África</h1>
+    <h1>🌎 Explora América del Sur</h1>
 </header>
 
 <main class="contenido-pagina">
 
     <section class="informacion">
         <p>
-            África es un continente lleno de naturaleza, cultura y aventura.
+            América del Sur es un continente lleno de contrastes: desde la selva amazónica hasta los Andes,
+            pasando por playas paradisíacas y ciudades llenas de historia.
+            Descubre la alegría, la gastronomía y los paisajes más impresionantes del mundo.
         </p>
     </section>
 
@@ -27,64 +29,65 @@
     <section class="galeria-destinos">
 
         <article class="destino">
-            <img th:src="${img0}" alt="Cairo">
-            <h3>El Cairo</h3>
-            <a th:href="@{/estancia(destino='ElCairo')}">Reservar</a>
+            <img th:src="${img0}" alt="Río de Janeiro">
+            <h3>Río de Janeiro</h3>
+            <a th:href="@{/estancia(destino='RioJaneiro')}">Reservar</a>
         </article>
 
         <article class="destino">
-            <img th:src="${img1}" alt="Marrakech">
-            <h3>Marrakech</h3>
-            <a th:href="@{/estancia(destino='Marrakech')}">Reservar</a>
+            <img th:src="${img1}" alt="Buenos Aires">
+            <h3>Buenos Aires</h3>
+            <a th:href="@{/estancia(destino='BuenosAires')}">Reservar</a>
         </article>
 
         <article class="destino">
-            <img th:src="${img2}" alt="Nairobi">
-            <h3>Nairobi</h3>
-            <a th:href="@{/estancia(destino='Nairobi')}">Reservar</a>
+            <img th:src="${img2}" alt="Machu Picchu">
+            <h3>Machu Picchu</h3>
+            <a th:href="@{/estancia(destino='MachuPicchu')}">Reservar</a>
         </article>
 
         <article class="destino">
-            <img th:src="${img3}" alt="Zanzibar">
-            <h3>Zanzibar</h3>
-            <a th:href="@{/estancia(destino='Zanzibar')}">Reservar</a>
+            <img th:src="${img3}" alt="Cartagena">
+            <h3>Cartagena</h3>
+            <a th:href="@{/estancia(destino='Cartagena')}">Reservar</a>
         </article>
 
         <article class="destino">
-            <img th:src="${img4}" alt="Sahara">
-            <h3>Sahara</h3>
-            <a th:href="@{/estancia(destino='Sahara')}">Reservar</a>
+            <img th:src="${img4}" alt="Santiago de Chile">
+            <h3>Santiago de Chile</h3>
+            <a th:href="@{/estancia(destino='SantiagoChile')}">Reservar</a>
         </article>
 
         <article class="destino">
-            <img th:src="${img5}" alt="Ciudad del Cabo">
-            <h3>Ciudad del Cabo</h3>
-            <a th:href="@{/estancia(destino='CiudadDelCabo')}">Reservar</a>
+            <img th:src="${img5}" alt="Montevideo">
+            <h3>Montevideo</h3>
+            <a th:href="@{/estancia(destino='Montevideo')}">Reservar</a>
         </article>
 
     </section>
 
     <!-- ACTIVIDADES -->
     <section class="actividades">
-        <h2>🎯 Actividades en África</h2>
+        <h2>🎯 Actividades en América del Sur</h2>
         <ul>
-            <li>🦁 Safari en la sabana</li>
-            <li>🏜️ Ruta por el desierto del Sahara</li>
-            <li>🏺 Visitar pirámides de Egipto</li>
-            <li>🏝️ Relajarse en playas de Zanzibar</li>
-            <li>⛰️ Escalar el Kilimanjaro</li>
+            <li>🌄 Visitar Machu Picchu y la cultura inca</li>
+            <li>🏝️ Disfrutar de playas en Brasil</li>
+            <li>🌆 Recorrer ciudades como Buenos Aires o Río</li>
+            <li>🌿 Explorar la selva amazónica</li>
+            <li>⛰️ Aventuras en los Andes</li>
+            <li>💃 Vivir el tango y la cultura latinoamericana</li>
         </ul>
     </section>
 
     <!-- FORMULARIO -->
     <section class="formulario-recomendacion">
 
-        <form id="formulario-africa" th:action="@{/viaje/solicitar}" method="post">
+        <form th:action="@{/viaje/solicitar}" method="post">
 
-            <input type="hidden" name="continente" value="África">
+            <input type="hidden" name="continente" value="América del Sur">
 
             <label for="nombre">Nombre</label>
-            <input type="text" id="nombre"  name="nombre" placeholder="Nombre" required>
+            <input type="text" id="nombre" name="nombre" placeholder="Nombre" required>
 
             <label for="apellidos">Apellidos</label>
             <input type="text" id="apellidos" name="apellidos" placeholder="Apellidos" required>
@@ -117,20 +120,13 @@
                 <option value="bajo">Bajo</option>
             </select>
 
+            <textarea name="sugerencia" placeholder="Escriba alguna sugerencia"></textarea>
 
-            <textarea id="sugerencia" name="sugerencia" placeholder="Escriba alguna sugerencia para destino"></textarea>
-
-
-            <button type="submit">
-                Ver recomendaciones
-            </button>
+            <button type="submit">Ver recomendaciones</button>
 
         </form>
 
-        <p id="resultado"></p>
-
     </section>
-
 
     <a th:href="@{/}" class="boton-volver">
         ⬅️ Volver al inicio
@@ -138,13 +134,10 @@
 
 </main>
 
-
 <footer>
-
     <p>
-        2025 Viajes JMJ | Página de África
+        2025 Viajes JMJ | Página de América del Sur
     </p>
-
 </footer>
 
 </body>

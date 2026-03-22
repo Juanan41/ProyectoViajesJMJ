@@ -1,59 +1,82 @@
 package com.viajes.app.home;
 
+import com.viajes.app.api.UnsplashService;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class HomeController {
 
-    public HomeController() {
+    private final UnsplashService unsplashService;
+
+    public HomeController(UnsplashService unsplashService) {
+        this.unsplashService = unsplashService;
         System.out.println(">>> HomeController CARGADO <<<");
     }
 
+    // HOME
     @GetMapping("/")
     public String home() {
         return "index";
     }
 
-    @GetMapping("/europa")
-    public String europa() {
-        return "destinos/europa";
+    // CONTINENTES (DINÁMICO)
+    @GetMapping("/{continente}")
+    public String continente(@PathVariable String continente, Model model) {
+
+        switch (continente) {
+
+            case "europa":
+                cargarImagenes(model,
+                        "Spain", "Paris", "Rome", "London", "Athens", "Vienna");
+                break;
+
+            case "asia":
+                cargarImagenes(model,
+                        "Tokyo", "Bangkok", "Beijing", "Dubai", "New Delhi", "Seoul");
+                break;
+
+            case "africa":
+                cargarImagenes(model,
+                        "El Cairo", "Marrakech", "Nairobi", "Zanzibar", "Sahara desert", "Cape Town");
+                break;
+
+            case "oceania":
+                cargarImagenes(model,
+                        "Sydney", "Melbourne", "Auckland", "Fiji", "Bora Bora", "Perth");
+                break;
+
+            case "america-norte":
+                cargarImagenes(model,
+                        "New York", "Mexico City", "Toronto", "San Francisco", "Cancun", "Chicago");
+                break;
+
+            case "america-sur":
+                cargarImagenes(model,
+                        "Rio de Janeiro", "Buenos Aires", "Machu Picchu", "Cartagena Colombia", "Santiago Chile", "Montevideo");
+                break;
+
+            default:
+                return "redirect:/";
+        }
+
+        return "destinos/" + continente;
     }
 
-    @GetMapping("/asia")
-    public String asia() {
-        return "destinos/asia";
+    // MÉTODO AUXILIAR (REUTILIZABLE)
+    private void cargarImagenes(Model model, String... ciudades) {
+
+        for (int i = 0; i < ciudades.length; i++) {
+            model.addAttribute("img" + i, unsplashService.obtenerImagen(ciudades[i]));
+        }
     }
 
-    @GetMapping("/africa")
-    public String africa() {
-        return "destinos/africa";
-    }
-
-    @GetMapping("/oceania")
-    public String oceania() {
-        return "destinos/oceania";
-    }
-
-    @GetMapping("/america-norte")
-    public String americaNorte() {
-        return "destinos/americaNorte";
-    }
-
-    @GetMapping("/america-sur")
-    public String americaSur() {
-        return "destinos/americaSur";
-    }
-
+    // ESTANCIA
     @GetMapping("/estancia")
-    public String estancia(@RequestParam String destino,Model model) {
+    public String estancia(@RequestParam String destino, Model model) {
 
-        model.addAttribute("destino" ,destino);
+        model.addAttribute("destino", destino);
         return "destinos/estancia";
     }
-
 }
-
-

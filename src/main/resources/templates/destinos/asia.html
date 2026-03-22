@@ -27,37 +27,37 @@
     <section class="galeria-destinos">
 
         <article class="destino">
-            <img th:src="@{/imagenes/fondos/Asia/imagen_Tokio.jpg}">
+            <img th:src="${img0}" alt="Tokio">
             <h3>Tokio</h3>
             <a th:href="@{/estancia(destino='Tokio')}">Reservar</a>
         </article>
 
         <article class="destino">
-            <img th:src="@{/imagenes/fondos/Asia/imagen_Bankok.jpg}">
+            <img th:src="${img1}" alt="Bangkok">
             <h3>Bangkok</h3>
             <a th:href="@{/estancia(destino='Bangkok')}">Reservar</a>
         </article>
 
         <article class="destino">
-            <img th:src="@{/imagenes/fondos/Asia/imagen_Pekin.jpg}">
+            <img th:src="${img2}" alt="Pekín">
             <h3>Pekín</h3>
             <a th:href="@{/estancia(destino='Pekin')}">Reservar</a>
         </article>
 
         <article class="destino">
-            <img th:src="@{/imagenes/fondos/Asia/imagen_Dubai.jpg}">
+            <img th:src="${img3}" alt="Dubái">
             <h3>Dubái</h3>
             <a th:href="@{/estancia(destino='Dubai')}">Reservar</a>
         </article>
 
         <article class="destino">
-            <img th:src="@{/imagenes/fondos/Asia/imagen_Nueva_Delhi.jpg}">
+            <img th:src="${img4}" alt="Nueva Delhi">
             <h3>Nueva Delhi</h3>
             <a th:href="@{/estancia(destino='NuevaDelhi')}">Reservar</a>
         </article>
 
         <article class="destino">
-            <img th:src="@{/imagenes/fondos/Asia/imagen_Seul.jpg}">
+            <img th:src="${img5}" alt="Seúl">
             <h3>Seúl</h3>
             <a th:href="@{/estancia(destino='Seul')}">Reservar</a>
         </article>
@@ -78,14 +78,56 @@
 
     <!-- FORMULARIO -->
     <section class="formulario-recomendacion">
-        <form>
-            <input type="text" placeholder="Nombre">
-            <input type="text" placeholder="Apellidos">
-            <button type="button">Ver recomendaciones</button>
+
+        <form th:action="@{/viaje/solicitar}" method="post">
+
+            <input type="hidden" name="continente" value="Asia">
+
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" name="nombre" placeholder="Tu nombre" required>
+
+            <label for="apellidos">Apellidos</label>
+            <input type="text" id="apellidos" name="apellidos" placeholder="Tus apellidos" required>
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="ejemplo@email.com" required>
+
+            <label for="direccion">Dirección</label>
+            <input type="text" id="direccion" name="direccion" placeholder="Calle, número, ciudad">
+
+            <label for="clima">¿Qué clima prefieres?</label>
+            <select id="clima" name="clima">
+                <option value="calido">Cálido</option>
+                <option value="templado">Templado</option>
+                <option value="frio">Frío</option>
+            </select>
+
+            <label for="actividad">¿Qué tipo de viaje?</label>
+            <select id="actividad" name="actividad">
+                <option value="cultural">Cultural</option>
+                <option value="urbano">Urbano</option>
+                <option value="playa">Playa</option>
+                <option value="montaña">Montaña</option>
+            </select>
+
+            <label for="presupuesto">Presupuesto</label>
+            <select id="presupuesto" name="presupuesto">
+                <option value="alto">Alto</option>
+                <option value="medio">Medio</option>
+                <option value="bajo">Bajo</option>
+            </select>
+
+            <label for="sugerencia">Sugerencias</label>
+            <textarea id="sugerencia" name="sugerencia" placeholder="Cuéntanos qué tipo de viaje te gustaría"></textarea>
+
+            <button type="submit">Ver recomendaciones</button>
+
         </form>
+
     </section>
 
-    <a th:href="@{/}" class="boton-volver">⬅️ Volver</a>
+
+    <a th:href="@{/}" class="boton-volver">⬅️ Volver al inicio</a>
 
 </main>
 

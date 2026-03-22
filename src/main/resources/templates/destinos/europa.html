@@ -26,37 +26,37 @@
     <section class="galeria-destinos">
 
         <article class="destino">
-            <img th:src="@{/imagenes/fondos/Europa/imagen_espana.jpg}">
+            <img th:src="${img0}" alt="España">
             <h3>España</h3>
             <a th:href="@{/estancia(destino='Espana')}">Reservar</a>
         </article>
 
         <article class="destino">
-            <img th:src="@{/imagenes/fondos/Europa/imagen_paris.jpg}">
+            <img th:src="${img1}" alt="París">
             <h3>París</h3>
             <a th:href="@{/estancia(destino='Paris')}">Reservar</a>
         </article>
 
         <article class="destino">
-            <img th:src="@{/imagenes/fondos/Europa/imagen_roma.jpg}">
+            <img th:src="${img2}" alt="Roma">
             <h3>Roma</h3>
             <a th:href="@{/estancia(destino='Roma')}">Reservar</a>
         </article>
 
         <article class="destino">
-            <img th:src="@{/imagenes/fondos/Europa/imagen_londres.jpg}">
+            <img th:src="${img3}" alt="Londres">
             <h3>Londres</h3>
             <a th:href="@{/estancia(destino='Londres')}">Reservar</a>
         </article>
 
         <article class="destino">
-            <img th:src="@{/imagenes/fondos/Europa/imagen_atenas.jpg}">
+            <img th:src="${img4}" alt="Atenas">
             <h3>Atenas</h3>
             <a th:href="@{/estancia(destino='Atenas')}">Reservar</a>
         </article>
 
         <article class="destino">
-            <img th:src="@{/imagenes/fondos/Europa/imagen_viena.jpg}">
+            <img th:src="${img5}" alt="Viena">
             <h3>Viena</h3>
             <a th:href="@{/estancia(destino='Viena')}">Reservar</a>
         </article>
@@ -77,11 +77,52 @@
 
     <!-- FORMULARIO -->
     <section class="formulario-recomendacion">
-        <form>
-            <input type="text" placeholder="Nombre">
-            <input type="text" placeholder="Apellidos">
-            <button type="button">Ver recomendaciones</button>
+
+        <form th:action="@{/viaje/solicitar}" method="post">
+
+            <input type="hidden" name="continente" value="Europa">
+
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" name="nombre" placeholder="Tu nombre" required>
+
+            <label for="apellidos">Apellidos</label>
+            <input type="text" id="apellidos" name="apellidos" placeholder="Tus apellidos" required>
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="ejemplo@email.com" required>
+
+            <label for="direccion">Dirección</label>
+            <input type="text" id="direccion" name="direccion" placeholder="Calle, número, ciudad">
+
+            <label for="clima">¿Qué clima prefieres?</label>
+            <select id="clima" name="clima">
+                <option value="calido">Cálido</option>
+                <option value="templado">Templado</option>
+                <option value="frio">Frío</option>
+            </select>
+
+            <label for="actividad">¿Qué tipo de viaje?</label>
+            <select id="actividad" name="actividad">
+                <option value="cultural">Cultural</option>
+                <option value="urbano">Urbano</option>
+                <option value="playa">Playa</option>
+                <option value="montaña">Montaña</option>
+            </select>
+
+            <label for="presupuesto">Presupuesto</label>
+            <select id="presupuesto" name="presupuesto">
+                <option value="alto">Alto</option>
+                <option value="medio">Medio</option>
+                <option value="bajo">Bajo</option>
+            </select>
+
+            <label for="sugerencia">Sugerencias</label>
+            <textarea id="sugerencia" name="sugerencia" placeholder="Cuéntanos qué tipo de viaje te gustaría"></textarea>
+
+            <button type="submit">Ver recomendaciones</button>
+
         </form>
+
     </section>
 
     <a th:href="@{/}" class="boton-volver">⬅️ Volver</a>

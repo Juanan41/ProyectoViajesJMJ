@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Alojamientos</title>
+</head>
+<body>
+
+<h1>Listado de alojamientos</h1>
+
+<table border="1">
+    <tr>
+        <th>Nombre</th>
+        <th>Ciudad</th>
+        <th>País</th>
+        <th>Tipo</th>
+        <th>Precio</th>
+    </tr>
+
+    <tr th:each="a : ${alojamientos}">
+        <td th:text="${a.nombre}"></td>
+        <td th:text="${a.ciudad}"></td>
+        <td th:text="${a.pais}"></td>
+        <td th:text="${a.tipo}"></td>
+        <td th:text="${a.precioPorNoche}"></td>
+    </tr>
+</table>
+
+</body>
+</html>
