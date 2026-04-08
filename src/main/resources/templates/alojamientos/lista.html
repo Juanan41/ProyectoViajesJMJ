@@ -16,13 +16,38 @@
         <th>Precio</th>
     </tr>
 
-    <tr th:each="a : ${alojamientos}">
-        <td th:text="${a.nombre}"></td>
-        <td th:text="${a.ciudad}"></td>
-        <td th:text="${a.pais}"></td>
-        <td th:text="${a.tipo}"></td>
-        <td th:text="${a.precioPorNoche}"></td>
-    </tr>
+    <th:block th:each="a : ${alojamientos}">
+
+        <!-- FILA ALOJAMIENTO -->
+        <tr>
+            <td th:text="${a.nombre}"></td>
+            <td th:text="${a.ciudad}"></td>
+            <td th:text="${a.pais}"></td>
+            <td th:text="${a.tipo}"></td>
+            <td th:text="${a.precioPorNoche}"></td>
+        </tr>
+
+        <!-- 🔥 FILA HABITACIONES -->
+        <tr>
+            <td colspan="5">
+
+                <div th:if="${a.habitaciones != null}">
+                    <strong>Habitaciones:</strong>
+
+                    <div th:each="h : ${a.habitaciones}">
+                        🛏️ <span th:text="${h.tipo}"></span> |
+                        👥 <span th:text="${h.capacidad}"></span> personas |
+                        💶 <span th:text="${h.precioPorNoche}"></span> € |
+                        🍽️ <span th:text="${h.regimen.nombreBonito}"></span>
+                    </div>
+
+                </div>
+
+            </td>
+        </tr>
+
+    </th:block>
+
 </table>
 
 </body>

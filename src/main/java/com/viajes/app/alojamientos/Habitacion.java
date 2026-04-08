@@ -1,5 +1,6 @@
 package com.viajes.app.alojamientos;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
@@ -12,7 +13,9 @@ public class Habitacion {
     private Long id;
 
     @NotBlank
-    private String tipo; // individual, doble, suite...
+    private String tipo;// individual, doble, suite...
+
+    private String imagenUrl;
 
     @Positive
     private int capacidad;
@@ -23,6 +26,7 @@ public class Habitacion {
     @Enumerated(EnumType.STRING)
     private Regimen regimen;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "alojamiento_id")
     private Alojamiento alojamiento;
@@ -44,6 +48,14 @@ public class Habitacion {
 
     public Long getId() {
         return id;
+    }
+
+    public String getImagenUrl() {
+        return imagenUrl;
+    }
+
+    public void setImagenUrl(String imagenUrl) {
+        this.imagenUrl = imagenUrl;
     }
 
     public String getTipo() {

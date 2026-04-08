@@ -29,7 +29,7 @@ public class HomeController {
 
             case "europa":
                 cargarImagenes(model,
-                        "Spain", "Paris", "Rome", "London", "Athens", "Vienna");
+                        "Madrid", "Paris", "Rome", "London", "Athens", "Vienna");
                 break;
 
             case "asia":

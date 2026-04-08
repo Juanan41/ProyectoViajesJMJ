@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Reserva confirmada</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: linear-gradient(to right, #00c6ff, #0072ff);
+            text-align: center;
+            color: white;
+        }
+
+        .card {
+            background: white;
+            color: black;
+            padding: 30px;
+            margin: 40px auto;
+            border-radius: 15px;
+            width: 600px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        img {
+            width: 100%;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .bloque {
+            margin-top: 20px;
+        }
+
+        .boton {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #0072ff;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+        }
+    </style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+    <h1>✅ Reserva confirmada</h1>
+
+    <p th:text="${mensaje}"></p>
+
+    <!-- DESTINO -->
+    <div class="bloque">
+        <h3>📍 Destino</h3>
+        <p th:text="${destino}"></p>
+    </div>
+
+    <!-- VUELO -->
+    <div class="bloque">
+        <h3>✈️ Vuelo</h3>
+        <p th:text="${vuelo}"></p>
+        <img th:src="${imgVuelo}">
+    </div>
+
+    <!-- HOTEL -->
+    <div class="bloque">
+        <h3>🏨 Hotel</h3>
+        <p th:text="${hotel}"></p>
+        <img th:src="${imgHotel}">
+    </div>
+
+    <!-- HABITACIÓN -->
+    <div class="bloque">
+        <h3>🛏️ Habitación</h3>
+
+        <p><strong>Tipo:</strong> <span th:text="${habitacion.tipo}"></span></p>
+        <p><strong>Capacidad:</strong> <span th:text="${habitacion.capacidad}"></span> personas</p>
+        <p><strong>Precio:</strong> <span th:text="${habitacion.precioPorNoche}"></span> € / noche</p>
+        <p><strong>Régimen:</strong> <span th:text="${habitacion.regimen.nombreBonito}"></span></p>
+
+        <img th:src="${imgHabitacion}">
+    </div>
+
+    <a href="/" class="boton">⬅️ Volver al inicio</a>
+
+</div>
+
+</body>
+</html>

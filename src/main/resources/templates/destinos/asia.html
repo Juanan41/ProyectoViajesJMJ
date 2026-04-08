@@ -13,6 +13,10 @@
 
 <header>
     <h1>🌏 Explora Asia</h1>
+    <a th:href="@{/alojamientos/nuevo}" class="btn">
+        ➕ Añadir alojamiento
+    </a>
+
 </header>
 
 <main class="contenido-pagina">
@@ -79,7 +83,7 @@
     <!-- FORMULARIO -->
     <section class="formulario-recomendacion">
 
-        <form th:action="@{/viaje/solicitar}" method="post">
+        <form th:action="@{/recomendar}" method="post">
 
             <input type="hidden" name="continente" value="Asia">
 
@@ -103,11 +107,11 @@
             </select>
 
             <label for="actividad">¿Qué tipo de viaje?</label>
-            <select id="actividad" name="actividad">
+            <select id="actividad" name="tipo">
                 <option value="cultural">Cultural</option>
                 <option value="urbano">Urbano</option>
                 <option value="playa">Playa</option>
-                <option value="montaña">Montaña</option>
+                <option value="montana">Montaña</option>
             </select>
 
             <label for="presupuesto">Presupuesto</label>

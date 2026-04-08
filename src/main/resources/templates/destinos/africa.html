@@ -79,9 +79,9 @@
     <!-- FORMULARIO -->
     <section class="formulario-recomendacion">
 
-        <form id="formulario-africa" th:action="@{/viaje/solicitar}" method="post">
+        <form id="formulario-africa" th:action="@{/recomendar}" method="post">
 
-            <input type="hidden" name="continente" value="África">
+            <input type="hidden" name="continente" value="Africa">
 
             <label for="nombre">Nombre</label>
             <input type="text" id="nombre"  name="nombre" placeholder="Nombre" required>
@@ -103,11 +103,12 @@
             </select>
 
             <label for="actividad">¿Qué tipo de viaje?</label>
-            <select id="actividad" name="actividad">
+            <select id="actividad" name="tipo">
                 <option value="cultural">Cultural</option>
                 <option value="urbano">Urbano</option>
                 <option value="playa">Playa</option>
                 <option value="montaña">Montaña</option>
+                <option value="aventura">Aventura</option>
             </select>
 
             <label for="presupuesto">Presupuesto</label>

@@ -85,7 +85,7 @@
     <!-- FORMULARIO -->
     <section class="formulario-recomendacion">
 
-        <form th:action="@{/viaje/solicitar}" method="post">
+        <form th:action="@{/recomendar}" method="post">
 
             <input type="hidden" name="continente" value="Oceanía">
 
@@ -109,7 +109,7 @@
             </select>
 
             <label for="actividad">¿Qué tipo de viaje?</label>
-            <select id="actividad" name="actividad">
+            <select id="actividad" name="tipo">
                 <option value="cultural">Cultural</option>
                 <option value="urbano">Urbano</option>
                 <option value="playa">Playa</option>

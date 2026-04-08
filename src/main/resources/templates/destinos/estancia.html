@@ -11,7 +11,7 @@
 <body>
 
 <!-- NAVBAR -->
-    <<div th:replace="~{fragments/navbar :: navbar}"></div>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
 
 <header>
     <h1>✈️ Reserva tu viaje</h1>
@@ -25,26 +25,26 @@
 
     <section class="formulario-viaje">
 
-        <form>
+        <form th:action="@{/reservar}" method="post">
 
             <!-- oculto pero con valor dinámico -->
-            <input type="hidden" id="destino" th:value="${destino}">
+            <input type="hidden" name="destino" th:value="${destino}">
 
             <label>Hoteles disponibles:</label>
-            <div class="hotel-opciones">
-                <p>Hotel 3⭐</p>
-                <p>Hotel 4⭐</p>
-                <p>Hotel 5⭐</p>
-            </div>
-
-            <label>Vuelos:</label>
-            <select>
-                <option>Vuelo Económico</option>
-                <option>Vuelo Ejecutivo</option>
-                <option>Vuelo Premium</option>
+            <select name="hotel">
+                <option value="3">Hotel 3⭐</option>
+                <option value="4">Hotel 4⭐</option>
+                <option value="5">Hotel 5⭐</option>
             </select>
 
-            <button type="button">Confirmar reserva</button>
+            <label>Vuelos:</label>
+            <select name="vuelo">
+                <option value="economico">Vuelo Económico</option>
+                <option value="ejecutivo">Vuelo Ejecutivo</option>
+                <option value="premium">Vuelo Premium</option>
+            </select>
+
+            <button type="submit">Confirmar reserva</button>
 
         </form>
 
