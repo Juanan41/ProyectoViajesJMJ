@@ -728,6 +728,86 @@ precioTotal = (noches * precioHabitacion) + transporte
 
 ---
 
+
+Sistema de reservas dinámico por destino
+
+Se ha implementado un sistema de reservas que permite acceder directamente a los alojamientos disponibles desde cada continente sin necesidad de pasar por el recomendador.
+
+🚀 Nueva funcionalidad
+Acceso directo a reservas desde las páginas de continentes:
+/reservar/{destino}
+Ejemplos:
+/reservar/El Cairo
+/reservar/Marrakech
+/reservar/Zanzibar
+Integración completa entre frontend (Thymeleaf) y backend (Spring Boot)
+🏨 Datos dinámicos desde base de datos
+
+Se ha eliminado el uso de datos estáticos en el controlador.
+
+Antes:
+
+Hoteles definidos manualmente en el código
+
+Ahora:
+
+Los datos se obtienen directamente de la base de datos mediante JPA
+
+Relación de entidades:
+
+Habitacion → Alojamiento → Destino → Continente
+
+Esto permite una estructura escalable y realista.
+
+📊 Agrupación automática por hotel
+
+Las habitaciones se agrupan dinámicamente en el backend:
+
+Map<String, List<Habitacion>> habitacionesPorHotel
+
+En el frontend se muestran como desplegables por hotel, mejorando la organización visual.
+
+🖼️ Sistema de imágenes dinámicas
+
+Se han integrado imágenes dinámicas mediante:
+
+API de Unsplash para:
+Destinos
+Hoteles
+Transporte
+Imágenes específicas por tipo de habitación:
+Suite
+Individual
+Doble
+
+Esto aporta una experiencia visual más realista similar a plataformas como Booking.
+
+🎯 Experiencia de usuario (UX)
+Selección dinámica de habitaciones
+Vista previa de imagen en tiempo real
+Cálculo automático de precio:
+Número de noches
+Tipo de transporte
+Auto-selección de primera habitación disponible
+🧠 Arquitectura utilizada
+Patrón MVC:
+Controller
+Service
+Repository
+Persistencia con Spring Data JPA:
+Relaciones @ManyToOne y @OneToMany
+Renderizado dinámico con Thymeleaf
+📌 Resultado final
+
+El sistema permite:
+
+✔ Navegar por continentes
+✔ Acceder directamente a reservas
+✔ Mostrar hoteles reales desde base de datos
+✔ Seleccionar habitaciones dinámicamente
+✔ Calcular precios automáticamente
+✔ Disfrutar de una experiencia visual moderna
+
 ## 🔄 Flujo frontend → backend
 
 1. Usuario selecciona datos
