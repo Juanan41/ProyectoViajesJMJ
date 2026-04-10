@@ -101,7 +101,7 @@ public class ViajeController {
 
             // 🔥 SUGERENCIA (PRIORIDAD)
             if (sugerencia.contains("romantico") || sugerencia.contains("pareja")) {
-                destino = "Paris";
+                destino = "París";
             }
             else if (sugerencia.contains("historia")) {
                 destino = "Roma";
@@ -121,12 +121,12 @@ public class ViajeController {
                 destino = "Ibiza";
             }
             else if (form.getTipo().equals("cultural") && form.getPresupuesto().equals("alto")) {
-                destino = "Paris";
+                destino = "París";
             }
 
             // 🔽  CÓDIGO ORIGINAL
             else if (form.getTipo().equals("cultural") && form.getPresupuesto().equals("alto")) {
-                destino = "Paris";
+                destino = "París";
             }
             else if (form.getTipo().equals("cultural")) {
                 destino = "Roma";
@@ -397,7 +397,7 @@ public class ViajeController {
 
         // ================= INFO DESTINOS EUROPA =================
 
-        if (destino.equalsIgnoreCase("Paris")) {
+        if (destino.equalsIgnoreCase("París")) {
             descripcion = "La ciudad del amor, arte, cultura y gastronomía.";
             precio = "2300€";
 
@@ -600,6 +600,28 @@ public class ViajeController {
 
         List<Habitacion> habitaciones = habitacionService.buscarPorDestino(destino);
 
+        // 🔥 DEBUG REAL
+        System.out.println("========== DEBUG ==========");
+        System.out.println("DESTINO BUSCADO: " + destino);
+        System.out.println("TOTAL HABITACIONES: " + habitaciones.size());
+
+        for (Habitacion h : habitaciones) {
+
+            if (h.getAlojamiento() == null) {
+                System.out.println("❌ Habitacion SIN alojamiento");
+            } else {
+                System.out.println("🏨 Hotel: " + h.getAlojamiento().getNombre());
+
+                if (h.getAlojamiento().getDestino() == null) {
+                    System.out.println("❌ SIN destino");
+                } else {
+                    System.out.println("📍 Destino BD: " + h.getAlojamiento().getDestino().getNombre());
+                }
+            }
+        }
+
+        System.out.println("========== FIN DEBUG ==========");
+
         System.out.println("DESTINO: " + destino);
         System.out.println("HABITACIONES ENCONTRADAS: " + habitaciones.size());
 
@@ -727,5 +749,51 @@ public class ViajeController {
     public List<Habitacion> obtenerHabitacionesPorHotel(@PathVariable String hotelNombre) {
 
         return habitacionService.buscarPorHotelNombre(hotelNombre);
+    }
+    @GetMapping("/reservar/{destino}")
+    public String reservarDirecto(@PathVariable String destino, Model model) {
+
+        // 🔥 INFO BÁSICA (puedes mejorar luego)
+        model.addAttribute("destino", destino);
+        model.addAttribute("descripcion", "Destino seleccionado manualmente");
+        model.addAttribute("precio", "--");
+
+        // 🔥 IMÁGENES
+        model.addAttribute("imagen", unsplashService.obtenerImagen(destino + " city skyline"));
+        model.addAttribute("imgHotel", unsplashService.obtenerImagen(destino + " hotel"));
+        model.addAttribute("imgHabitacion", unsplashService.obtenerImagen("hotel room"));
+
+        // 🔥 HABITACIONES REALES
+        List<Habitacion> habitaciones = habitacionService.buscarPorDestino(destino);
+
+        Map<String, List<Habitacion>> habitacionesPorHotel = new HashMap<>();
+
+        for (Habitacion h : habitaciones) {
+
+            if (h.getAlojamiento() == null) continue;
+
+            // 🔥 MISMO BLOQUE QUE EN /recomendar
+            String imagen;
+
+            if (h.getTipo().equalsIgnoreCase("Suite")) {
+                imagen = "https://images.unsplash.com/photo-1566665797739-1674de7a421a";
+            } else if (h.getTipo().equalsIgnoreCase("Individual")) {
+                imagen = "https://images.unsplash.com/photo-1618773928121-c32242e63f39";
+            } else {
+                imagen = "https://images.unsplash.com/photo-1590490360182-c33d57733427";
+            }
+
+            h.setImagenUrl(imagen); // 💥 ESTO ES LO QUE TE FALTA
+
+            String nombreHotel = h.getAlojamiento().getNombre();
+
+            habitacionesPorHotel
+                    .computeIfAbsent(nombreHotel, k -> new ArrayList<>())
+                    .add(h);
+        }
+
+        model.addAttribute("habitacionesPorHotel", habitacionesPorHotel);
+
+        return "viajes/resultado"; // 🔥 reutilizas tu vista buena
     }
 }

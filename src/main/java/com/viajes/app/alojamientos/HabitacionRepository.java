@@ -13,8 +13,10 @@ public interface HabitacionRepository extends JpaRepository<Habitacion, Long> {
     List<Habitacion> findByAlojamiento_Nombre(String nombre);
 
     @Query("""
-SELECT h FROM Habitacion h
-JOIN h.alojamiento a
-""")
+    SELECT h FROM Habitacion h
+    JOIN h.alojamiento a
+    JOIN a.destino d
+    WHERE LOWER(d.nombre) LIKE LOWER(CONCAT('%', :destino, '%'))
+    """)
     List<Habitacion> findByDestinoReal(@Param("destino") String destino);
 }
