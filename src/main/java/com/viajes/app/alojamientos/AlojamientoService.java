@@ -16,6 +16,10 @@ public class AlojamientoService {
     public List<Alojamiento> obtenerTodos() {
         return repository.findAll();
     }
+    // Obtener por nombre de destino
+    public List<Alojamiento> buscarPorDestinoNombre(String destinoNombre) {
+        return repository.findByDestinoNombre(destinoNombre);
+    }
 
     // Guardar alojamiento
     public Alojamiento guardar(Alojamiento alojamiento) {

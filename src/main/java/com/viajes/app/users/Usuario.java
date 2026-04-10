@@ -1,10 +1,18 @@
 package com.viajes.app.users;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.viajes.app.reservas.Reserva;
 import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "usuarios")
 public class Usuario {
+
+    @OneToMany(mappedBy = "usuario")
+    @JsonIgnore
+    private List<Reserva> reservas;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

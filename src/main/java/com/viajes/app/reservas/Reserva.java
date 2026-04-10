@@ -1,6 +1,7 @@
 package com.viajes.app.reservas;
 
 import com.viajes.app.alojamientos.Habitacion;
+import com.viajes.app.users.Usuario;
 import jakarta.persistence.*;
 
 @Entity
@@ -11,56 +12,28 @@ public class Reserva {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String destino;
+    @Enumerated(EnumType.STRING)
+    private TransporteTipo transporte;
 
-    private String hotel;
-
-    private String vuelo;
-
-    // 🔥 RELACIÓN CON HABITACIÓN
     @ManyToOne
     @JoinColumn(name = "habitacion_id")
     private Habitacion habitacion;
 
-    // CONSTRUCTOR VACÍO
-    public Reserva() {
-    }
+    @ManyToOne
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
 
-    // GETTERS Y SETTERS
+    public Reserva() {}
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
 
-    public String getDestino() {
-        return destino;
-    }
+    public TransporteTipo getTransporte() { return transporte; }
 
-    public void setDestino(String destino) {
-        this.destino = destino;
-    }
+    public void setTransporte(TransporteTipo transporte) { this.transporte = transporte; }
 
-    public String getHotel() {
-        return hotel;
-    }
+    public Habitacion getHabitacion() { return habitacion; }
+    public void setHabitacion(Habitacion habitacion) { this.habitacion = habitacion; }
 
-    public void setHotel(String hotel) {
-        this.hotel = hotel;
-    }
-
-    public String getVuelo() {
-        return vuelo;
-    }
-
-    public void setVuelo(String vuelo) {
-        this.vuelo = vuelo;
-    }
-
-    public Habitacion getHabitacion() {
-        return habitacion;
-    }
-
-    public void setHabitacion(Habitacion habitacion) {
-        this.habitacion = habitacion;
-    }
+    public Usuario getUsuario() { return usuario; }
+    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
 }

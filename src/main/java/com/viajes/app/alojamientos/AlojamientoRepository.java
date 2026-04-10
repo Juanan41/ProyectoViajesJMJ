@@ -7,6 +7,10 @@ import java.util.List;
 public interface AlojamientoRepository extends JpaRepository<Alojamiento, Long> {
 
     List<Alojamiento> findByCiudad(String ciudad);
+
     List<Alojamiento> findByPais(String pais);
+
     List<Alojamiento> findByTipo(String tipo);
+
+    List<Alojamiento> findByDestinoNombre(String nombre);
 }

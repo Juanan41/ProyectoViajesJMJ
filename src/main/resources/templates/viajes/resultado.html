@@ -45,10 +45,18 @@
 
 <form th:action="@{/reservar}" method="post">
 
-    <input type="hidden" name="destino" th:value="${destino}">
-    <input type="hidden" name="vuelo" value="economico">
+    <!-- SELECCIÓN HOTEL -->
+    <input type="hidden" name="hotel" id="hotelSeleccionado" required>
 
     <!-- 🏨 HOTELES -->
+    <h3>📅 Fechas del viaje</h3>
+
+    <label>Entrada:</label>
+    <input type="date" id="fechaEntrada" min="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" onchange="recalcularDesdeFechas()">
+
+    <label>Salida:</label>
+    <input type="date" id="fechaSalida" onchange="recalcularDesdeFechas()">
+
     <h3>🏨 Elige hotel y habitación:</h3>
 
     <div id="hoteles">
@@ -77,16 +85,15 @@
             margin-top:5px;
         ">
 
-                <!-- SELECCIÓN HOTEL -->
-                <input type="radio" name="hotel" th:value="${entry.key}" required hidden>
+
 
                 <!-- HABITACIONES -->
                 <div th:each="h : ${entry.value}">
                     <label>
-                        <input type="radio"
-                               name="habitacionId"
+                        <input type="radio" name="habitacionId"
                                th:value="${h.id}"
                                th:data-img="${h.imagenUrl}"
+                               th:data-precio="${h.precioPorNoche}"
                                required>
 
                         🛏️ <span th:text="${h.tipo}"></span> |
@@ -123,6 +130,24 @@
              onmouseover="this.style.transform='scale(1.05)'"
              onmouseout="this.style.transform='scale(1)'">
     </div>
+    <div>
+        <input type="hidden" name="destino" th:value="${destino}">
+        <h3>🚆 Elige transporte:</h3>
+        <label>💰 Presupuesto transporte:</label>
+        <select id="presupuestoTransporte" name="presupuestoTransporte">
+            <option value="100">Económico (100€)</option>
+            <option value="300">Medio (300€)</option>
+            <option value="700">Premium (700€)</option>
+        </select>
+
+        <select name="transporte" required>
+            <option value="AVION">✈️ Avión</option>
+            <option value="TREN">🚆 Tren</option>
+            <option value="BARCO">🚢 Barco</option>
+        </select>
+    </div>
+
+    <input type="hidden" name="noches" id="nochesHidden">
 
     <button style="margin-top:20px;">✈️ Reservar este viaje</button>
 
@@ -144,6 +169,8 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
 
+            document.getElementById("presupuestoTransporte").addEventListener("change", recalcularDesdeFechas);
+
             const radios = document.querySelectorAll('input[name="habitacionId"]');
             const img = document.getElementById('previewHabitacion');
 
@@ -156,20 +183,61 @@
                     img.src = nuevaImg;
 
                     // 💰 PRECIO DINÁMICO
-                    const texto = this.parentElement.innerText;
-                    const numeros = texto.match(/\d+/g);
+                    // 💰 PRECIO DINÁMICO PRO
 
-                    if (numeros) {
-                        const precio = numeros[numeros.length - 1];
-                        document.getElementById("precioTotal").innerText = precio + " €";
+                    const precioNoche = parseFloat(this.getAttribute("data-precio"));
+
+                    const fechaEntrada = document.getElementById("fechaEntrada").value;
+                    const fechaSalida = document.getElementById("fechaSalida").value;
+
+                    if (!fechaEntrada || !fechaSalida) {
+                        document.getElementById("precioTotal").innerText = "Selecciona fechas";
+                        return;
                     }
+
+                    const inicio = new Date(fechaEntrada);
+                    const fin = new Date(fechaSalida);
+
+                    const diffTime = fin - inicio;
+                    const noches = diffTime / (1000 * 60 * 60 * 24);
+
+                    document.getElementById("nochesHidden").value = noches;
+
+                    if (noches <= 0) {
+                        document.getElementById("precioTotal").innerText = "Fechas inválidas";
+                        return;
+                    }
+
+                    const transporte = parseFloat(document.getElementById("presupuestoTransporte").value);
+                    const total = (noches * precioNoche) + transporte;
+
+                    document.getElementById("precioTotal").innerText =
+                        noches + " noches - " + total + "€";
 
                     // 🏨 SELECCIONAR HOTEL AUTOMÁTICO
                     const contenedor = this.closest('.contenido-hotel');
-                    const hotelRadio = contenedor.querySelector('input[name="hotel"]');
-                    hotelRadio.checked = true;
+
+
+                    // 🔥 sacar nombre del hotel
+                    const nombreHotel = contenedor.previousElementSibling.innerText.trim();
+
+                    // 🔥 guardarlo en el hidden
+                    document.getElementById("hotelSeleccionado").value = nombreHotel;
                 });
             });
+             // 🔥 AUTO SELECCIÓN PRO
+                    const primerHotel = document.querySelector('.contenido-hotel');
+                    if (primerHotel) {
+                        primerHotel.style.display = 'block';
+
+                        const primeraHabitacion = primerHotel.querySelector('input[name="habitacionId"]');
+                        if (primeraHabitacion) {
+                            primeraHabitacion.checked = true;
+                            setTimeout(() => {
+                                primeraHabitacion.dispatchEvent(new Event('change'));
+                            }, 50);
+                        }
+                    }
 
         });
 
@@ -182,8 +250,48 @@
             const contenido = element.nextElementSibling;
             contenido.style.display = 'block';
             contenido.style.animation = 'fadeIn 0.3s ease';
+            element.style.background = '#0056cc'; // 🔥 resaltado
         }
+        // 📆RECALCULAR FECHA
+        function recalcularDesdeFechas() {
+
+            const habitacionSeleccionada = document.querySelector('input[name="habitacionId"]:checked');
+
+            if (!habitacionSeleccionada) return;
+
+            const precioNoche = parseFloat(habitacionSeleccionada.getAttribute("data-precio"));
+
+            const fechaEntrada = document.getElementById("fechaEntrada").value;
+            const fechaSalida = document.getElementById("fechaSalida").value;
+
+            if (!fechaEntrada || !fechaSalida) {
+                document.getElementById("precioTotal").innerText = "Selecciona fechas";
+                return;
+            }
+
+            const inicio = new Date(fechaEntrada);
+            const fin = new Date(fechaSalida);
+
+            const diffTime = fin - inicio;
+            const noches = diffTime / (1000 * 60 * 60 * 24);
+
+            if (noches <= 0) {
+                document.getElementById("precioTotal").innerText = "Fechas inválidas";
+                return;
+            }
+
+            const transporte = parseFloat(document.getElementById("presupuestoTransporte").value);
+            const total = (noches * precioNoche) + transporte;
+
+            document.getElementById("precioTotal").innerText =
+                noches + " noches - " + total + "€";
+
+
+        }
+
+
     </script>
+
 
 <a href="/">Volver</a>
 

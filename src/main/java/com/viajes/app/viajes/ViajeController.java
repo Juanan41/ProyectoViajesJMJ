@@ -1,10 +1,12 @@
 package com.viajes.app.viajes;
 
+import com.viajes.app.alojamientos.AlojamientoService;
 import com.viajes.app.alojamientos.Habitacion;
 import com.viajes.app.alojamientos.HabitacionService;
 import com.viajes.app.api.UnsplashService;
 import com.viajes.app.reservas.Reserva;
 import com.viajes.app.reservas.ReservaService;
+import com.viajes.app.reservas.TransporteTipo;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -20,12 +22,17 @@ public class ViajeController {
     private final UnsplashService unsplashService;
     private final HabitacionService habitacionService;
     private final ReservaService reservaService;
+    private final AlojamientoService alojamientoService;
 
     public ViajeController(UnsplashService unsplashService,
-                           HabitacionService habitacionService,ReservaService reservaService) {
+                           HabitacionService habitacionService,
+                           ReservaService reservaService,
+                           AlojamientoService alojamientoService) {
+
         this.unsplashService = unsplashService;
         this.habitacionService = habitacionService;
         this.reservaService = reservaService;
+        this.alojamientoService = alojamientoService;
     }
 
 
@@ -139,11 +146,11 @@ public class ViajeController {
         }
 
         // ================= AMERICA NORTE =================
-        else if (form.getContinente().equalsIgnoreCase("AmericaNorte")) {
+        else if (form.getContinente().equalsIgnoreCase("America Norte")) {
 
             // 🔥 SUGERENCIA (PRIORIDAD)
             if (sugerencia.contains("lujo") || sugerencia.contains("rascacielos")) {
-                destino = "NuevaYork";
+                destino = "Nueva York";
             }
             else if (sugerencia.contains("playa") || sugerencia.contains("fiesta")) {
                 destino = "Miami";
@@ -152,7 +159,7 @@ public class ViajeController {
                 destino = "Colorado";
             }
             else if (sugerencia.contains("cine") || sugerencia.contains("hollywood")) {
-                destino = "LosAngeles";
+                destino = "Los Angeles";
             }
             else if (sugerencia.contains("ciudad") || sugerencia.contains("urbano")) {
                 destino = "Chicago";
@@ -160,7 +167,7 @@ public class ViajeController {
 
             // 🔥 COMBINACIONES INTELIGENTES
             else if (form.getTipo().equals("urbano") && form.getPresupuesto().equals("alto")) {
-                destino = "NuevaYork";
+                destino = "Nueva York";
             }
             else if (form.getTipo().equals("playa") && form.getClima().equals("calido")) {
                 destino = "Miami";
@@ -168,7 +175,7 @@ public class ViajeController {
 
             // 🔽 CÓDIGO ORIGINAL
             else if (form.getTipo().equals("urbano") && form.getPresupuesto().equals("alto")) {
-                destino = "NuevaYork";
+                destino = "Nueva York";
             }
             else if (form.getTipo().equals("urbano")) {
                 destino = "Chicago";
@@ -180,22 +187,22 @@ public class ViajeController {
                 destino = "Colorado";
             }
             else {
-                destino = "LosAngeles";
+                destino = "Los Angeles";
             }
         }
 
         // ================= AMERICA SUR =================
-        else if (form.getContinente().equalsIgnoreCase("AmericaSur")) {
+        else if (form.getContinente().equalsIgnoreCase("America Sur")) {
 
             // 🔥 SUGERENCIA (PRIORIDAD)
             if (sugerencia.contains("playa") || sugerencia.contains("fiesta")) {
-                destino = "RioDeJaneiro";
+                destino = "Rio De Janeiro";
             }
             else if (sugerencia.contains("historia") || sugerencia.contains("inca")) {
-                destino = "MachuPicchu";
+                destino = "Machu Picchu";
             }
             else if (sugerencia.contains("cultura") || sugerencia.contains("tango")) {
-                destino = "BuenosAires";
+                destino = "Buenos Aires";
             }
             else if (sugerencia.contains("caribe") || sugerencia.contains("relax")) {
                 destino = "Cartagena";
@@ -209,24 +216,24 @@ public class ViajeController {
 
             // 🔥 COMBINACIONES INTELIGENTES
             else if (form.getTipo().equals("playa") && form.getClima().equals("calido")) {
-                destino = "RioDeJaneiro";
+                destino = "Rio De Janeiro";
             }
             else if (form.getTipo().equals("montana")) {
-                destino = "MachuPicchu";
+                destino = "Machu Picchu";
             }
             else if (form.getTipo().equals("cultural")) {
-                destino = "BuenosAires";
+                destino = "Buenos Aires";
             }
 
             // 🔽 CÓDIGO ORIGINAL
             else if (form.getTipo().equals("playa")) {
-                destino = "RioDeJaneiro";
+                destino = "Rio De Janeiro";
             }
             else if (form.getTipo().equals("montana")) {
-                destino = "MachuPicchu";
+                destino = "Machu Picchu";
             }
             else if (form.getTipo().equals("cultural")) {
-                destino = "BuenosAires";
+                destino = "Buenos Aires";
             }
             else {
                 destino = "Chile";
@@ -238,7 +245,7 @@ public class ViajeController {
 
             // 🔥 SUGERENCIA (PRIORIDAD)
             if (sugerencia.contains("piramides") || sugerencia.contains("historia")) {
-                destino = "ElCairo";
+                destino = "El Cairo";
             }
             else if (sugerencia.contains("mercados") || sugerencia.contains("cultura")) {
                 destino = "Marrakech";
@@ -253,7 +260,7 @@ public class ViajeController {
                 destino = "Sahara";
             }
             else if (sugerencia.contains("ciudad") || sugerencia.contains("moderno")) {
-                destino = "CiudadDelCabo";
+                destino = "Ciudad Del Cabo";
             }
 
             // 🔥 COMBINACIONES INTELIGENTES
@@ -261,10 +268,10 @@ public class ViajeController {
                 destino = "Zanzibar";
             }
             else if (form.getTipo().equals("montana")) {
-                destino = "CiudadDelCabo";
+                destino = "Ciudad Del Cabo";
             }
             else if (form.getTipo().equals("cultural")) {
-                destino = "ElCairo";
+                destino = "El Cairo";
             }
 
             // 🔽 CÓDIGO ORIGINAL
@@ -275,7 +282,7 @@ public class ViajeController {
                 destino = "Zanzibar";
             }
             else if (form.getTipo().equals("cultural")) {
-                destino = "ElCairo";
+                destino = "El Cairo";
             }
             else {
                 destino = "Marrakech";
@@ -287,7 +294,7 @@ public class ViajeController {
 
             // 🔥 SUGERENCIA (PRIORIDAD)
             if (sugerencia.contains("romantico") || sugerencia.contains("pareja")) {
-                destino = "BoraBora";
+                destino = "Bora Bora";
             }
             else if (sugerencia.contains("playa") || sugerencia.contains("relax")) {
                 destino = "Fiji";
@@ -307,7 +314,7 @@ public class ViajeController {
 
             // 🔥 COMBINACIONES INTELIGENTES
             else if (form.getTipo().equals("playa") && form.getPresupuesto().equals("alto")) {
-                destino = "BoraBora";
+                destino = "Bora Bora";
             }
             else if (form.getTipo().equals("playa")) {
                 destino = "Fiji";
@@ -441,7 +448,7 @@ public class ViajeController {
 
         // ================= INFO DESTINOS AMERICA NORTE =================
 
-        if (destino.equalsIgnoreCase("NuevaYork")) {
+        if (destino.equalsIgnoreCase("Nueva York")) {
             descripcion = "La ciudad que nunca duerme, rascacielos y cultura urbana.";
             precio = "2800€";
 
@@ -473,7 +480,7 @@ public class ViajeController {
             hoteles.add("Colorado Ski Resort");
             hoteles.add("Aspen Luxury Stay");
         }
-        else if (destino.equalsIgnoreCase("LosAngeles")) {
+        else if (destino.equalsIgnoreCase("Los Angeles")) {
             descripcion = "Cine, playas y estilo de vida californiano.";
             precio = "2500€";
 
@@ -484,7 +491,7 @@ public class ViajeController {
 
         // ================= INFO DESTINOS AMERICA SUR =================
 
-        if (destino.equalsIgnoreCase("RioDeJaneiro")) {
+        if (destino.equalsIgnoreCase("Rio De Janeiro")) {
             descripcion = "Playas, carnaval y paisajes icónicos como el Cristo Redentor.";
             precio = "1900€";
 
@@ -500,7 +507,7 @@ public class ViajeController {
             hoteles.add("Machu Picchu Lodge");
             hoteles.add("Sacred Valley Resort");
         }
-        else if (destino.equalsIgnoreCase("BuenosAires")) {
+        else if (destino.equalsIgnoreCase("Buenos Aires")) {
             descripcion = "Cultura, tango y gastronomía argentina.";
             precio = "1600€";
 
@@ -535,7 +542,7 @@ public class ViajeController {
             hoteles.add("Blue Ocean Hotel");
             hoteles.add("Paradise Island Resort");
         }
-        else if (destino.equalsIgnoreCase("ElCairo")) {
+        else if (destino.equalsIgnoreCase("El Cairo")) {
             descripcion = "Historia antigua: pirámides y templos.";
             precio = "1500€";
 
@@ -543,7 +550,7 @@ public class ViajeController {
             hoteles.add("Nile View Resort");
             hoteles.add("Pyramids Luxury Stay");
         }
-        else if (destino.equalsIgnoreCase("Marruecos")) {
+        else if (destino.equalsIgnoreCase("Marrakech")) {
             descripcion = "Mercados, desierto y cultura árabe.";
             precio = "1200€";
 
@@ -591,8 +598,16 @@ public class ViajeController {
         model.addAttribute("imgHabitacion", unsplashService.obtenerImagen("hotel room"));
         model.addAttribute("imagen", unsplashService.obtenerImagen(destino + " city skyline"));
 
-        List<Habitacion> habitaciones = habitacionService
-                .buscarPorDestino(destino);
+        List<Habitacion> habitaciones = habitacionService.buscarPorDestino(destino);
+
+        System.out.println("DESTINO: " + destino);
+        System.out.println("HABITACIONES ENCONTRADAS: " + habitaciones.size());
+
+        for (Habitacion h : habitaciones) {
+            if (h.getAlojamiento() != null) {
+                System.out.println("HOTEL: " + h.getAlojamiento().getNombre());
+            }
+        }
 
 // 🔥 AGRUPACIÓN AUTOMÁTICA (PRO)
         Map<String, List<Habitacion>> habitacionesPorHotel = new HashMap<>();
@@ -660,36 +675,53 @@ public class ViajeController {
     public String reservar(@RequestParam String destino,
                            @RequestParam String hotel,
                            @RequestParam Long habitacionId,
-                           @RequestParam String vuelo,
+                           @RequestParam String transporte,
+                           @RequestParam int presupuestoTransporte,
+                           @RequestParam(required = false) int noches,
                            Model model) {
 
         model.addAttribute("mensaje", "Reserva confirmada para " + destino);
 
         model.addAttribute("destino", destino);
         model.addAttribute("hotel", hotel);
-        model.addAttribute("vuelo", vuelo);
+        model.addAttribute("transporte", transporte);
 
-        model.addAttribute("imgVuelo", unsplashService.obtenerImagen("airplane window"));
+        // 🔥 IMÁGENES
+        String imagenTransporte;
+
+        if (transporte.equalsIgnoreCase("AVION")) {
+            imagenTransporte = "airplane window";
+        } else if (transporte.equalsIgnoreCase("TREN")) {
+            imagenTransporte = "train travel";
+        } else {
+            imagenTransporte = "cruise ship";
+        }
+
+        model.addAttribute("imgTransporte", unsplashService.obtenerImagen(imagenTransporte));
         model.addAttribute("imgHotel", unsplashService.obtenerImagen(destino + " luxury hotel"));
         model.addAttribute("imgHabitacion", unsplashService.obtenerImagen("hotel room luxury"));
 
-        Habitacion habitacionSeleccionada =
-                habitacionService.buscarPorId(habitacionId);
-
+        // 🔥 HABITACIÓN
+        Habitacion habitacionSeleccionada = habitacionService.buscarPorId(habitacionId);
         model.addAttribute("habitacion", habitacionSeleccionada);
 
-        Reserva reserva = new Reserva();
+        // 🔥 PRECIO
+        double precioHabitacion = habitacionSeleccionada.getPrecioPorNoche();
+        double total = (precioHabitacion * noches) + presupuestoTransporte;
 
-        reserva.setDestino(destino);
-        reserva.setHotel(hotel);
-        reserva.setVuelo(vuelo);
+        model.addAttribute("noches", noches);
+        model.addAttribute("precioTransporte", presupuestoTransporte);
+        model.addAttribute("precioTotal", total);
+
+        // 💾 GUARDAR
+        Reserva reserva = new Reserva();
+        reserva.setTransporte(TransporteTipo.valueOf(transporte));
         reserva.setHabitacion(habitacionSeleccionada);
 
         reservaService.guardar(reserva);
 
         return "viajes/confirmacion";
     }
-
     @GetMapping("/api/habitaciones/{hotelNombre}")
     @ResponseBody
     public List<Habitacion> obtenerHabitacionesPorHotel(@PathVariable String hotelNombre) {

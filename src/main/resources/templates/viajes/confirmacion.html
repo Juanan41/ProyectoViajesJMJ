@@ -60,11 +60,17 @@
         <p th:text="${destino}"></p>
     </div>
 
-    <!-- VUELO -->
+    <!-- TRANSPORTE -->
     <div class="bloque">
-        <h3>✈️ Vuelo</h3>
-        <p th:text="${vuelo}"></p>
-        <img th:src="${imgVuelo}">
+        <h3>
+            <span th:if="${transporte == 'AVION'}">✈️</span>
+            <span th:if="${transporte == 'TREN'}">🚆</span>
+            <span th:if="${transporte == 'BARCO'}">🚢</span>
+            Transporte
+        </h3>
+
+        <p th:text="${transporte}"></p>
+        <img th:src="${imgTransporte}">
     </div>
 
     <!-- HOTEL -->
@@ -84,6 +90,21 @@
         <p><strong>Régimen:</strong> <span th:text="${habitacion.regimen.nombreBonito}"></span></p>
 
         <img th:src="${imgHabitacion}">
+    </div>
+
+    <!-- RESUMEN -->
+    <div class="bloque">
+        <h3>💰 Resumen del viaje</h3>
+
+        <p><strong>Noches:</strong> <span th:text="${noches}"></span></p>
+
+        <p><strong>Transporte:</strong>
+            <span th:text="${precioTransporte}"></span> €
+        </p>
+
+        <p><strong>Total:</strong>
+            <span th:text="${precioTotal}"></span> €
+        </p>
     </div>
 
     <a href="/" class="boton">⬅️ Volver al inicio</a>

@@ -7,40 +7,40 @@ import java.util.List;
 @Service
 public class HabitacionService {
 
-    private final HabitacionRepository repository;
+    private final HabitacionRepository habitacionRepository;
 
-    public HabitacionService(HabitacionRepository repository) {
-        this.repository = repository;
+    public HabitacionService(HabitacionRepository habitacionRepository) {
+        this.habitacionRepository = habitacionRepository;
     }
 
-    // 🔍 Buscar por ID (CLAVE)
+    // 🔍 Buscar por ID
     public Habitacion buscarPorId(Long id) {
-        return repository.findById(id)
+        return habitacionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Habitación no encontrada"));
     }
 
     // 📋 Listar todas
     public List<Habitacion> obtenerTodas() {
-        return repository.findAll();
+        return habitacionRepository.findAll();
     }
 
     // 🏨 Buscar por alojamiento
     public List<Habitacion> buscarPorAlojamiento(Long alojamientoId) {
-        return repository.findByAlojamientoId(alojamientoId);
+        return habitacionRepository.findByAlojamientoId(alojamientoId);
     }
 
-    // 🏨 Buscar por destino
+    // 🏨 Buscar por destino (EL IMPORTANTE)
     public List<Habitacion> buscarPorDestino(String destino) {
-        return repository.findByDestino(destino);
+        return habitacionRepository.findByDestinoReal(destino);
     }
 
     // 🏨 Buscar por nombre de hotel
     public List<Habitacion> buscarPorHotelNombre(String hotelNombre) {
-        return repository.findByAlojamiento_Nombre(hotelNombre);
+        return habitacionRepository.findByAlojamiento_Nombre(hotelNombre);
     }
 
     // 💾 Guardar
     public Habitacion guardar(Habitacion habitacion) {
-        return repository.save(habitacion);
+        return habitacionRepository.save(habitacion);
     }
 }

@@ -1,5 +1,6 @@
 package com.viajes.app.alojamientos;
 
+import com.viajes.app.destinos.Destino;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -36,6 +37,10 @@ public class Alojamiento {
     @Positive
     @Column(nullable = false)
     private Double precioPorNoche;
+
+    @ManyToOne
+    @JoinColumn(name = "destino_id", nullable = false)
+    private Destino destino;
 
     @OneToMany(mappedBy = "alojamiento", cascade = CascadeType.ALL)
     @JsonIgnore
@@ -98,6 +103,10 @@ public class Alojamiento {
     public void setPrecioPorNoche(Double precioPorNoche) {
         this.precioPorNoche = precioPorNoche;
     }
+
+    public Destino getDestino() { return destino; }
+
+    public void setDestino(Destino destino) { this.destino = destino; }
 
     public List<Habitacion> getHabitaciones() {
         return habitaciones;
