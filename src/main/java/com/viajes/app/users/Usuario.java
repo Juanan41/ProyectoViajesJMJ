@@ -1,44 +1,32 @@
 package com.viajes.app.users;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.viajes.app.reservas.Reserva;
 import jakarta.persistence.*;
-
-import java.util.List;
 
 @Entity
 @Table(name = "usuarios")
 public class Usuario {
 
-    @OneToMany(mappedBy = "usuario")
-    @JsonIgnore
-    private List<Reserva> reservas;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false, unique = true)
     private String username;
 
-    @Column(nullable = false)
-    @JsonIgnore
-    private String password;
-
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
-    private String role;
+    @Column(nullable = false)
+    private String password;
+
+    @Enumerated(EnumType.STRING)
+    private Rol role;
 
     public Usuario() {
     }
 
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getUsername() {
@@ -49,14 +37,6 @@ public class Usuario {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -65,11 +45,19 @@ public class Usuario {
         this.email = email;
     }
 
-    public String getRole() {
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Rol getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Rol role) {
         this.role = role;
     }
 }
