@@ -22,9 +22,10 @@ public class Usuario {
     private String username;
 
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private String email;
 
     private String role;

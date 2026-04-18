@@ -1,23 +1,42 @@
 package com.viajes.app.reservas.dto;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 public class ReservaResponseDto {
 
     private Long id;
     private String destino;
     private String hotel;
-    private String vuelo;
+    private String transporte;
     private String tipoHabitacion;
+    private LocalDate fechaInicio;
+    private LocalDate fechaFin;
+    private Double precioTotal;
+    private String estado;
+    private LocalDateTime fechaReserva;
 
-    // CONSTRUCTOR
-    public ReservaResponseDto(Long id, String destino, String hotel, String vuelo, String tipoHabitacion) {
+    public ReservaResponseDto(Long id,
+                              String destino,
+                              String hotel,
+                              String transporte,
+                              String tipoHabitacion,
+                              LocalDate fechaInicio,
+                              LocalDate fechaFin,
+                              Double precioTotal,
+                              String estado,
+                              LocalDateTime fechaReserva) {
         this.id = id;
         this.destino = destino;
         this.hotel = hotel;
-        this.vuelo = vuelo;
+        this.transporte = transporte;
         this.tipoHabitacion = tipoHabitacion;
+        this.fechaInicio = fechaInicio;
+        this.fechaFin = fechaFin;
+        this.precioTotal = precioTotal;
+        this.estado = estado;
+        this.fechaReserva = fechaReserva;
     }
-
-    // GETTERS
 
     public Long getId() {
         return id;
@@ -31,11 +50,31 @@ public class ReservaResponseDto {
         return hotel;
     }
 
-    public String getVuelo() {
-        return vuelo;
+    public String getTransporte() {
+        return transporte;
     }
 
     public String getTipoHabitacion() {
         return tipoHabitacion;
+    }
+
+    public LocalDate getFechaInicio() {
+        return fechaInicio;
+    }
+
+    public LocalDate getFechaFin() {
+        return fechaFin;
+    }
+
+    public Double getPrecioTotal() {
+        return precioTotal;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public LocalDateTime getFechaReserva() {
+        return fechaReserva;
     }
 }

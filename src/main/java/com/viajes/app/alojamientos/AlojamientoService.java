@@ -20,7 +20,9 @@ public class AlojamientoService {
     public List<Alojamiento> buscarPorDestinoNombre(String destinoNombre) {
         return repository.findByDestinoNombre(destinoNombre);
     }
-
+    public List<Alojamiento> getAlojamientosPorDestino(Long destinoId) {
+        return repository.findByDestinoId(destinoId);
+    }
     // Guardar alojamiento
     public Alojamiento guardar(Alojamiento alojamiento) {
         return repository.save(alojamiento);

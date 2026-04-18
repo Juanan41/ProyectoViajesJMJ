@@ -1,3 +1,11 @@
+
+-- =====================
+-- 🌍 ROLES
+-- =====================
+INSERT INTO usuarios (username, email, password, role) VALUES
+('Juan Antonio', 'juan@viajes.com', '$2a$10$cNbNdxo49Ei00ifujZ5nH.JzUrhhH5J.jpOxrrcEy1TaeY1i/vz3q', 'ADMIN'),
+('Miguel', 'miguel@viajes.com', '$2a$10$cNbNdxo49Ei00ifujZ5nH.JzUrhhH5J.jpOxrrcEy1TaeY1i/vz3q', 'ADMIN'),
+('Joel', 'joel@viajes.com', '$2a$10$cNbNdxo49Ei00ifujZ5nH.JzUrhhH5J.jpOxrrcEy1TaeY1i/vz3q', 'ADMIN');
 -- =====================
 -- 🌍 CONTINENTES
 -- =====================
@@ -12,232 +20,165 @@ INSERT INTO continente (nombre) VALUES
 -- =====================
 -- 🌏 DESTINOS EUROPA
 -- =====================
-INSERT INTO destinos (nombre, descripcion, precio, continente_id) VALUES
-('España', 'Cultura, gastronomía y diversidad', 1700, 1),
-('París', 'Ciudad del amor, arte y moda', 2300, 1),
-('Roma', 'Historia romana y cultura italiana', 1800, 1),
-('Londres', 'Ciudad moderna con historia', 2200, 1),
-('Atenas', 'Cuna de la civilización griega', 1600, 1),
-('Viena', 'Elegancia, música y cultura imperial', 1900, 1);
+INSERT INTO destinos (nombre, descripcion, precio, pais, continente_id) VALUES
+('España', 'Cultura, gastronomía y diversidad', 1700, 'España', 1),
+('París', 'Ciudad del amor, arte y moda', 2300, 'Francia', 1),
+('Roma', 'Historia romana y cultura italiana', 1800, 'Italia', 1),
+('Londres', 'Ciudad moderna con historia', 2200, 'Reino Unido', 1),
+('Atenas', 'Cuna de la civilización griega', 1600, 'Grecia', 1),
+('Viena', 'Elegancia, música y cultura imperial', 1900, 'Austria', 1);
 -- =====================
 -- 🌏 DESTINOS ASIA
 -- =====================
-INSERT INTO destinos (nombre, descripcion, precio, continente_id) VALUES
-('Tokio', 'Tecnología avanzada, cultura tradicional y vida urbana vibrante', 2200, 2),
-('Bangkok', 'Templos, mercados y vida nocturna exótica', 1400, 2),
-('Pekín', 'Historia imperial, cultura china y monumentos icónicos', 1700, 2),
-('Dubái', 'Lujo, rascacielos y experiencias en el desierto', 2500, 2),
-('Nueva Delhi', 'Cultura milenaria, gastronomía y contrastes urbanos', 1600, 2),
-('Seúl', 'Tecnología, cultura moderna y tradición coreana', 2000, 2);
+INSERT INTO destinos (nombre, descripcion, precio, pais, continente_id) VALUES
+('Tokio', 'Tecnología avanzada, cultura tradicional y vida urbana vibrante', 2200, 'Japón', 2),
+('Bangkok', 'Templos, mercados y vida nocturna exótica', 1400, 'Tailandia', 2),
+('Pekín', 'Historia imperial, cultura china y monumentos icónicos', 1700, 'China', 2),
+('Dubái', 'Lujo, rascacielos y experiencias en el desierto', 2500, 'Emiratos Árabes Unidos', 2),
+('Nueva Delhi', 'Cultura milenaria, gastronomía y contrastes urbanos', 1600, 'India', 2),
+('Seúl', 'Tecnología, cultura moderna y tradición coreana', 2000, 'Corea del Sur', 2);
 -- =====================
 -- 🌍 DESTINOS ÁFRICA
 -- =====================
-INSERT INTO destinos (nombre, descripcion, precio, continente_id) VALUES
-('El Cairo', 'Historia antigua, pirámides y cultura egipcia', 1500, 3),
-('Marrakech', 'Mercados tradicionales, cultura marroquí y arquitectura exótica', 1200, 3),
-('Nairobi', 'Safari africano y naturaleza salvaje', 2000, 3),
-('Zanzibar', 'Playas paradisíacas y aguas cristalinas', 1800, 3),
-('Sahara', 'Aventura en el desierto y paisajes únicos', 1400, 3),
-('Ciudad del Cabo', 'Naturaleza, montaña y costa espectacular', 2200, 3);
+INSERT INTO destinos (nombre, descripcion, precio, pais, continente_id) VALUES
+('El Cairo', 'Historia antigua, pirámides y cultura egipcia', 1500, 'Egipto', 3),
+('Marrakech', 'Mercados tradicionales, cultura marroquí y arquitectura exótica', 1200, 'Marruecos', 3),
+('Nairobi', 'Safari africano y naturaleza salvaje', 2000, 'Kenia', 3),
+('Zanzibar', 'Playas paradisíacas y aguas cristalinas', 1800, 'Tanzania', 3),
+('Sahara', 'Aventura en el desierto y paisajes únicos', 1400, 'Marruecos', 3),
+('Ciudad del Cabo', 'Naturaleza, montaña y costa espectacular', 2200, 'Sudáfrica', 3);
 -- =====================
 -- 🌏 DESTINOS OCEANÍA
 -- =====================
-INSERT INTO destinos (nombre, descripcion, precio, continente_id) VALUES
-('Sidney', 'Ópera icónica, playas y cultura urbana australiana', 2600, 4),
-('Melbourne', 'Arte, cultura y vida cosmopolita', 2400, 4),
-('Auckland', 'Volcanes, naturaleza y aventura', 2300, 4),
-('Fiyi', 'Playas paradisíacas y relax total', 3000, 4),
-('Bora Bora', 'Destino romántico con aguas turquesas y lujo', 3500, 4),
-('Perth', 'Ciudad moderna con naturaleza salvaje', 2200, 4);
+INSERT INTO destinos (nombre, descripcion, precio, pais, continente_id) VALUES
+('Sidney', 'Ópera icónica, playas y cultura urbana australiana', 2600, 'Australia', 4),
+('Melbourne', 'Arte, cultura y vida cosmopolita', 2400, 'Australia', 4),
+('Auckland', 'Volcanes, naturaleza y aventura', 2300, 'Nueva Zelanda', 4),
+('Fiyi', 'Playas paradisíacas y relax total', 3000, 'Fiyi', 4),
+('Bora Bora', 'Destino romántico con aguas turquesas y lujo', 3500, 'Polinesia Francesa', 4),
+('Perth', 'Ciudad moderna con naturaleza salvaje', 2200, 'Australia', 4);
 -- =====================
 -- 🌎 DESTINOS AMÉRICA DEL NORTE
 -- =====================
-INSERT INTO destinos (nombre, descripcion, precio, continente_id) VALUES
-('Nueva York', 'Rascacielos, cultura urbana y la ciudad que nunca duerme', 2800, 5),
-('Ciudad de México', 'Historia, cultura y gastronomía mexicana', 1700, 5),
-('Toronto', 'Ciudad moderna con multiculturalidad y rascacielos', 2400, 5),
-('San Francisco', 'Puentes icónicos, tecnología y cultura alternativa', 2600, 5),
-('Cancún', 'Playas paradisíacas y relax en el Caribe', 2200, 5),
-('Chicago', 'Arquitectura, música y ambiente urbano', 2300, 5);
+INSERT INTO destinos (nombre, descripcion, precio, pais, continente_id) VALUES
+('Nueva York', 'Rascacielos, cultura urbana y la ciudad que nunca duerme', 2800, 'Estados Unidos', 5),
+('Ciudad de México', 'Historia, cultura y gastronomía mexicana', 1700, 'México', 5),
+('Toronto', 'Ciudad moderna con multiculturalidad y rascacielos', 2400, 'Canadá', 5),
+('San Francisco', 'Puentes icónicos, tecnología y cultura alternativa', 2600, 'Estados Unidos', 5),
+('Cancún', 'Playas paradisíacas y relax en el Caribe', 2200, 'México', 5),
+('Chicago', 'Arquitectura, música y ambiente urbano', 2300, 'Estados Unidos', 5);
 -- =====================
 -- 🌎 DESTINOS AMÉRICA DEL SUR
 -- =====================
-INSERT INTO destinos (nombre, descripcion, precio, continente_id) VALUES
-('Rio de Janeiro', 'Playas, carnaval y paisajes icónicos como el Cristo Redentor', 1900, 6),
-('Buenos Aires', 'Cultura, tango y gastronomía argentina', 1600, 6),
-('Machu Picchu', 'Historia inca y maravilla del mundo en los Andes', 2100, 6),
-('Cartagena', 'Ciudad colonial con playas y encanto caribeño', 1800, 6),
-('Santiago de Chile', 'Ciudad moderna rodeada de montañas y naturaleza', 2000, 6),
-('Montevideo', 'Ciudad costera tranquila con cultura y relax', 1700, 6);
+INSERT INTO destinos (nombre, descripcion, precio, pais, continente_id) VALUES
+('Rio de Janeiro', 'Playas, carnaval y paisajes icónicos como el Cristo Redentor', 1900, 'Brasil', 6),
+('Buenos Aires', 'Cultura, tango y gastronomía argentina', 1600, 'Argentina', 6),
+('Machu Picchu', 'Historia inca y maravilla del mundo en los Andes', 2100, 'Perú', 6),
+('Cartagena', 'Ciudad colonial con playas y encanto caribeño', 1800, 'Colombia', 6),
+('Santiago de Chile', 'Ciudad moderna rodeada de montañas y naturaleza', 2000, 'Chile', 6),
+('Montevideo', 'Ciudad costera tranquila con cultura y relax', 1700, 'Uruguay', 6);
 
 -- =====================
 -- 🏨 ALOJAMIENTOS EUROPA
 -- =====================
-INSERT INTO alojamientos (nombre, ciudad, pais, tipo, precio_por_noche, destino_id) VALUES
+INSERT INTO alojamientos (nombre, ciudad, pais, tipo, precio_por_noche, destino_id, created_at, updated_at) VALUES
+('Madrid Central Hotel', 'Madrid', 'España', 'HOTEL', 150, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Barcelona Beach Resort', 'Barcelona', 'España', 'RESORT', 180, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Paris Luxury Hotel', 'París', 'Francia', 'HOTEL', 220, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Eiffel View Stay', 'París', 'Francia', 'HOTEL', 200, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Roma Centro Hotel', 'Roma', 'Italia', 'HOTEL', 170, 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Colosseum View Stay', 'Roma', 'Italia', 'HOTEL', 160, 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('London Central Hotel', 'Londres', 'Reino Unido', 'HOTEL', 210, 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Big Ben View Stay', 'Londres', 'Reino Unido', 'HOTEL', 190, 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Athens Acropolis Hotel', 'Atenas', 'Grecia', 'HOTEL', 140, 5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Greek Paradise Stay', 'Atenas', 'Grecia', 'HOTEL', 130, 5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Vienna Palace Hotel', 'Viena', 'Austria', 'HOTEL', 180, 6, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Danube Riverside Stay', 'Viena', 'Austria', 'HOTEL', 170, 6, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
--- ESPAÑA (1)
-('Madrid Central Hotel', 'Madrid', 'España', 'Hotel', 150, 1),
-('Barcelona Beach Resort', 'Barcelona', 'España', 'Resort', 180, 1),
-
--- PARÍS (2)
-('Paris Luxury Hotel', 'París', 'Francia', 'Hotel', 220, 2),
-('Eiffel View Stay', 'París', 'Francia', 'Hotel', 200, 2),
-
--- ROMA (3)
-('Roma Centro Hotel', 'Roma', 'Italia', 'Hotel', 170, 3),
-('Colosseum View Stay', 'Roma', 'Italia', 'Hotel', 160, 3),
-
--- LONDRES (4)
-('London Central Hotel', 'Londres', 'UK', 'Hotel', 210, 4),
-('Big Ben View Stay', 'Londres', 'UK', 'Hotel', 190, 4),
-
--- ATENAS (5)
-('Athens Acropolis Hotel', 'Atenas', 'Grecia', 'Hotel', 140, 5),
-('Greek Paradise Stay', 'Atenas', 'Grecia', 'Hotel', 130, 5),
-
--- VIENA (6)
-('Vienna Palace Hotel', 'Viena', 'Austria', 'Hotel', 180, 6),
-('Danube Riverside Stay', 'Viena', 'Austria', 'Hotel', 170, 6);
 -- =====================
 -- 🏨 ALOJAMIENTOS ASIA
 -- =====================
-INSERT INTO alojamientos (nombre, ciudad, pais, tipo, precio_por_noche, destino_id) VALUES
+INSERT INTO alojamientos (nombre, ciudad, pais, tipo, precio_por_noche, destino_id, created_at, updated_at) VALUES
+('Tokyo Central Hotel', 'Tokio', 'Japón', 'HOTEL', 210, 7, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Shinjuku Skyline Resort', 'Tokio', 'Japón', 'RESORT', 240, 7, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Bangkok Palace Hotel', 'Bangkok', 'Tailandia', 'HOTEL', 130, 8, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Chao Phraya Riverside Resort', 'Bangkok', 'Tailandia', 'RESORT', 160, 8, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Beijing Imperial Hotel', 'Pekín', 'China', 'HOTEL', 150, 9, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Forbidden City Stay', 'Pekín', 'China', 'HOTEL', 140, 9, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Dubai Luxury Tower Hotel', 'Dubái', 'Emiratos Árabes Unidos', 'HOTEL', 300, 10, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Burj View Resort', 'Dubái', 'Emiratos Árabes Unidos', 'RESORT', 350, 10, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Delhi Heritage Hotel', 'Nueva Delhi', 'India', 'HOTEL', 120, 11, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Lotus Garden Stay', 'Nueva Delhi', 'India', 'HOTEL', 110, 11, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Seoul City Hotel', 'Seúl', 'Corea del Sur', 'HOTEL', 180, 12, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Han River View Resort', 'Seúl', 'Corea del Sur', 'RESORT', 210, 12, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
--- TOKIO (7)
-('Tokyo Central Hotel', 'Tokio', 'Japón', 'Hotel', 210, 7),
-('Shinjuku Skyline Resort', 'Tokio', 'Japón', 'Resort', 240, 7),
-
--- BANGKOK (8)
-('Bangkok Palace Hotel', 'Bangkok', 'Tailandia', 'Hotel', 130, 8),
-('Chao Phraya Riverside Resort', 'Bangkok', 'Tailandia', 'Resort', 160, 8),
-
--- PEKÍN (9)
-('Beijing Imperial Hotel', 'Pekín', 'China', 'Hotel', 150, 9),
-('Forbidden City Stay', 'Pekín', 'China', 'Hotel', 140, 9),
-
--- DUBÁI (10)
-('Dubai Luxury Tower Hotel', 'Dubái', 'EAU', 'Hotel', 300, 10),
-('Burj View Resort', 'Dubái', 'EAU', 'Resort', 350, 10),
-
--- NUEVA DELHI (11)
-('Delhi Heritage Hotel', 'Nueva Delhi', 'India', 'Hotel', 120, 11),
-('Lotus Garden Stay', 'Nueva Delhi', 'India', 'Hotel', 110, 11),
-
--- SEÚL (12)
-('Seoul City Hotel', 'Seúl', 'Corea del Sur', 'Hotel', 180, 12),
-('Han River View Resort', 'Seúl', 'Corea del Sur', 'Resort', 210, 12);
 -- =====================
 -- 🏨 ALOJAMIENTOS ÁFRICA
 -- =====================
-INSERT INTO alojamientos (nombre, ciudad, pais, tipo, precio_por_noche, destino_id) VALUES
+INSERT INTO alojamientos (nombre, ciudad, pais, tipo, precio_por_noche, destino_id, created_at, updated_at) VALUES
+('Cairo Pyramids Hotel', 'El Cairo', 'Egipto', 'HOTEL', 140, 13, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Nile View Resort', 'El Cairo', 'Egipto', 'RESORT', 170, 13, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Marrakech Riad Hotel', 'Marrakech', 'Marruecos', 'HOTEL', 120, 14, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Atlas Mountain Resort', 'Marrakech', 'Marruecos', 'RESORT', 150, 14, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Safari Lodge Nairobi', 'Nairobi', 'Kenia', 'HOTEL', 180, 15, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Savannah Adventure Resort', 'Nairobi', 'Kenia', 'RESORT', 210, 15, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Zanzibar Beach Hotel', 'Zanzibar', 'Tanzania', 'HOTEL', 200, 16, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Ocean Paradise Resort', 'Zanzibar', 'Tanzania', 'RESORT', 240, 16, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Desert Camp Sahara', 'Sahara', 'Marruecos', 'HOTEL', 100, 17, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Dunes Luxury Camp', 'Sahara', 'Marruecos', 'RESORT', 130, 17, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Cape Town City Hotel', 'Ciudad del Cabo', 'Sudáfrica', 'HOTEL', 190, 18, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Table Mountain View Resort', 'Ciudad del Cabo', 'Sudáfrica', 'RESORT', 220, 18, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
--- EL CAIRO (13)
-('Cairo Pyramids Hotel', 'El Cairo', 'Egipto', 'Hotel', 140, 13),
-('Nile View Resort', 'El Cairo', 'Egipto', 'Resort', 170, 13),
-
--- MARRAKECH (14)
-('Marrakech Riad Hotel', 'Marrakech', 'Marruecos', 'Hotel', 120, 14),
-('Atlas Mountain Resort', 'Marrakech', 'Marruecos', 'Resort', 150, 14),
-
--- NAIROBI (15)
-('Safari Lodge Nairobi', 'Nairobi', 'Kenia', 'Hotel', 180, 15),
-('Savannah Adventure Resort', 'Nairobi', 'Kenia', 'Resort', 210, 15),
-
--- ZANZIBAR (16)
-('Zanzibar Beach Hotel', 'Zanzibar', 'Tanzania', 'Hotel', 200, 16),
-('Ocean Paradise Resort', 'Zanzibar', 'Tanzania', 'Resort', 240, 16),
-
--- SAHARA (17)
-('Desert Camp Sahara', 'Sahara', 'Marruecos', 'Hotel', 100, 17),
-('Dunes Luxury Camp', 'Sahara', 'Marruecos', 'Resort', 130, 17),
-
--- CIUDAD DEL CABO (18)
-('Cape Town City Hotel', 'Ciudad del Cabo', 'Sudáfrica', 'Hotel', 190, 18),
-('Table Mountain View Resort', 'Ciudad del Cabo', 'Sudáfrica', 'Resort', 220, 18);
 -- =====================
 -- 🏨 ALOJAMIENTOS OCEANÍA
 -- =====================
-INSERT INTO alojamientos (nombre, ciudad, pais, tipo, precio_por_noche, destino_id) VALUES
+INSERT INTO alojamientos (nombre, ciudad, pais, tipo, precio_por_noche, destino_id, created_at, updated_at) VALUES
+('Sydney Harbour Hotel', 'Sidney', 'Australia', 'HOTEL', 240, 19, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Bondi Beach Resort', 'Sidney', 'Australia', 'RESORT', 280, 19, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Melbourne City Hotel', 'Melbourne', 'Australia', 'HOTEL', 220, 20, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Yarra River Resort', 'Melbourne', 'Australia', 'RESORT', 260, 20, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Auckland Sky Hotel', 'Auckland', 'Nueva Zelanda', 'HOTEL', 210, 21, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Harbour View Resort', 'Auckland', 'Nueva Zelanda', 'RESORT', 250, 21, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Fiji Island Hotel', 'Fiyi', 'Fiyi', 'HOTEL', 300, 22, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Coral Reef Resort', 'Fiyi', 'Fiyi', 'RESORT', 350, 22, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Bora Bora Luxury Villas', 'Bora Bora', 'Polinesia Francesa', 'HOTEL', 400, 23, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Overwater Bungalow Resort', 'Bora Bora', 'Polinesia Francesa', 'RESORT', 450, 23, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Perth City Hotel', 'Perth', 'Australia', 'HOTEL', 200, 24, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Sunset Coast Resort', 'Perth', 'Australia', 'RESORT', 230, 24, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
--- SIDNEY (19)
-('Sydney Harbour Hotel', 'Sidney', 'Australia', 'Hotel', 240, 19),
-('Bondi Beach Resort', 'Sidney', 'Australia', 'Resort', 280, 19),
-
--- MELBOURNE (20)
-('Melbourne City Hotel', 'Melbourne', 'Australia', 'Hotel', 220, 20),
-('Yarra River Resort', 'Melbourne', 'Australia', 'Resort', 260, 20),
-
--- AUCKLAND (21)
-('Auckland Sky Hotel', 'Auckland', 'Nueva Zelanda', 'Hotel', 210, 21),
-('Harbour View Resort', 'Auckland', 'Nueva Zelanda', 'Resort', 250, 21),
-
--- FIYI (22)
-('Fiji Island Hotel', 'Fiyi', 'Fiyi', 'Hotel', 300, 22),
-('Coral Reef Resort', 'Fiyi', 'Fiyi', 'Resort', 350, 22),
-
--- BORA BORA (23)
-('Bora Bora Luxury Villas', 'Bora Bora', 'Polinesia Francesa', 'Hotel', 400, 23),
-('Overwater Bungalow Resort', 'Bora Bora', 'Polinesia Francesa', 'Resort', 450, 23),
-
--- PERTH (24)
-('Perth City Hotel', 'Perth', 'Australia', 'Hotel', 200, 24),
-('Sunset Coast Resort', 'Perth', 'Australia', 'Resort', 230, 24);
 -- =====================
 -- 🏨 ALOJAMIENTOS AMÉRICA DEL NORTE
 -- =====================
-INSERT INTO alojamientos (nombre, ciudad, pais, tipo, precio_por_noche, destino_id) VALUES
+INSERT INTO alojamientos (nombre, ciudad, pais, tipo, precio_por_noche, destino_id, created_at, updated_at) VALUES
+('Manhattan Central Hotel', 'Nueva York', 'Estados Unidos', 'HOTEL', 300, 25, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Times Square Luxury Resort', 'Nueva York', 'Estados Unidos', 'RESORT', 350, 25, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Mexico City Downtown Hotel', 'Ciudad de México', 'México', 'HOTEL', 150, 26, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Zócalo Heritage Resort', 'Ciudad de México', 'México', 'RESORT', 180, 26, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Toronto City Hotel', 'Toronto', 'Canadá', 'HOTEL', 220, 27, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('CN Tower View Resort', 'Toronto', 'Canadá', 'RESORT', 260, 27, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('San Francisco Bay Hotel', 'San Francisco', 'Estados Unidos', 'HOTEL', 250, 28, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Golden Gate Resort', 'San Francisco', 'Estados Unidos', 'RESORT', 290, 28, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Cancun Beach Hotel', 'Cancún', 'México', 'HOTEL', 240, 29, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Caribbean Paradise Resort', 'Cancún', 'México', 'RESORT', 300, 29, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Chicago Downtown Hotel', 'Chicago', 'Estados Unidos', 'HOTEL', 210, 30, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Lake Michigan Resort', 'Chicago', 'Estados Unidos', 'RESORT', 250, 30, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
--- NUEVA YORK (25)
-('Manhattan Central Hotel', 'Nueva York', 'USA', 'Hotel', 300, 25),
-('Times Square Luxury Resort', 'Nueva York', 'USA', 'Resort', 350, 25),
-
--- CIUDAD DE MÉXICO (26)
-('Mexico City Downtown Hotel', 'Ciudad de México', 'México', 'Hotel', 150, 26),
-('Zócalo Heritage Resort', 'Ciudad de México', 'México', 'Resort', 180, 26),
-
--- TORONTO (27)
-('Toronto City Hotel', 'Toronto', 'Canadá', 'Hotel', 220, 27),
-('CN Tower View Resort', 'Toronto', 'Canadá', 'Resort', 260, 27),
-
--- SAN FRANCISCO (28)
-('San Francisco Bay Hotel', 'San Francisco', 'USA', 'Hotel', 250, 28),
-('Golden Gate Resort', 'San Francisco', 'USA', 'Resort', 290, 28),
-
--- CANCÚN (29)
-('Cancun Beach Hotel', 'Cancún', 'México', 'Hotel', 240, 29),
-('Caribbean Paradise Resort', 'Cancún', 'México', 'Resort', 300, 29),
-
--- CHICAGO (30)
-('Chicago Downtown Hotel', 'Chicago', 'USA', 'Hotel', 210, 30),
-('Lake Michigan Resort', 'Chicago', 'USA', 'Resort', 250, 30);
 -- =====================
 -- 🏨 ALOJAMIENTOS AMÉRICA DEL SUR
 -- =====================
-INSERT INTO alojamientos (nombre, ciudad, pais, tipo, precio_por_noche, destino_id) VALUES
-
--- RIO DE JANEIRO (31)
-('Rio Beach Hotel', 'Rio de Janeiro', 'Brasil', 'Hotel', 200, 31),
-('Copacabana Resort', 'Rio de Janeiro', 'Brasil', 'Resort', 250, 31),
-
--- BUENOS AIRES (32)
-('Buenos Aires Central Hotel', 'Buenos Aires', 'Argentina', 'Hotel', 150, 32),
-('Tango City Resort', 'Buenos Aires', 'Argentina', 'Resort', 180, 32),
-
--- MACHU PICCHU (33)
-('Cusco Mountain Hotel', 'Cusco', 'Perú', 'Hotel', 180, 33),
-('Inca Trail Resort', 'Cusco', 'Perú', 'Resort', 220, 33),
-
--- CARTAGENA (34)
-('Cartagena Colonial Hotel', 'Cartagena', 'Colombia', 'Hotel', 170, 34),
-('Caribbean Sunset Resort', 'Cartagena', 'Colombia', 'Resort', 210, 34),
-
--- SANTIAGO DE CHILE (35)
-('Santiago City Hotel', 'Santiago de Chile', 'Chile', 'Hotel', 190, 35),
-('Andes View Resort', 'Santiago de Chile', 'Chile', 'Resort', 230, 35),
-
--- MONTEVIDEO (36)
-('Montevideo Coastal Hotel', 'Montevideo', 'Uruguay', 'Hotel', 160, 36),
-('Rio de la Plata Resort', 'Montevideo', 'Uruguay', 'Resort', 200, 36);
+INSERT INTO alojamientos (nombre, ciudad, pais, tipo, precio_por_noche, destino_id, created_at, updated_at) VALUES
+('Rio Beach Hotel', 'Rio de Janeiro', 'Brasil', 'HOTEL', 200, 31, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Copacabana Resort', 'Rio de Janeiro', 'Brasil', 'RESORT', 250, 31, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Buenos Aires Central Hotel', 'Buenos Aires', 'Argentina', 'HOTEL', 150, 32, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Tango City Resort', 'Buenos Aires', 'Argentina', 'RESORT', 180, 32, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Cusco Mountain Hotel', 'Cusco', 'Perú', 'HOTEL', 180, 33, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Inca Trail Resort', 'Cusco', 'Perú', 'RESORT', 220, 33, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Cartagena Colonial Hotel', 'Cartagena', 'Colombia', 'HOTEL', 170, 34, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Caribbean Sunset Resort', 'Cartagena', 'Colombia', 'RESORT', 210, 34, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Santiago City Hotel', 'Santiago de Chile', 'Chile', 'HOTEL', 190, 35, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Andes View Resort', 'Santiago de Chile', 'Chile', 'RESORT', 230, 35, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Montevideo Coastal Hotel', 'Montevideo', 'Uruguay', 'HOTEL', 160, 36, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Rio de la Plata Resort', 'Montevideo', 'Uruguay', 'RESORT', 200, 36, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 -- =====================
 -- 🛏️ HABITACIONES EUROPA
 -- =====================
@@ -256,7 +197,22 @@ INSERT INTO habitacion (tipo, capacidad, precio_por_noche, regimen, alojamiento_
 -- ROMA (5,6)
 ('Doble', 2, 180, 'MEDIA_PENSION', 5, ''),
 ('Suite', 2, 300, 'PENSION_COMPLETA', 5, ''),
-('Individual', 1, 120, 'SOLO_ALOJAMIENTO', 6, '');
+('Individual', 1, 120, 'SOLO_ALOJAMIENTO', 6, ''),
+
+-- LONDRES (7,8)
+('Doble', 2, 220, 'DESAYUNO', 7, ''),
+('Suite', 2, 380, 'PENSION_COMPLETA', 7, ''),
+('Individual', 1, 160, 'SOLO_ALOJAMIENTO', 8, ''),
+
+-- ATENAS (9,10)
+('Doble', 2, 170, 'MEDIA_PENSION', 9, ''),
+('Suite', 2, 280, 'PENSION_COMPLETA', 9, ''),
+('Individual', 1, 110, 'SOLO_ALOJAMIENTO', 10, ''),
+
+-- VIENA (11,12)
+('Doble', 2, 210, 'DESAYUNO', 11, ''),
+('Suite', 2, 340, 'MEDIA_PENSION', 11, ''),
+('Individual', 1, 140, 'SOLO_ALOJAMIENTO', 12, '');
 
 -- =====================
 -- 🛏️ HABITACIONES ASIA

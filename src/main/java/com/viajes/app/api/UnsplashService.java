@@ -18,19 +18,25 @@ public class UnsplashService {
 
         RestTemplate restTemplate = new RestTemplate();
 
-        String urlCompleta = URL + destino + "&client_id=" + accessKey;
+        String destinoEncoded = destino.replace(" ", "%20");
+        String urlCompleta = URL + destinoEncoded + " hotel travel&client_id=" + accessKey;
 
-        String response = restTemplate.getForObject(urlCompleta, String.class);
+        try {
+            String response = restTemplate.getForObject(urlCompleta, String.class);
 
-        JSONObject json = new JSONObject(response);
-        JSONArray results = json.getJSONArray("results");
+            JSONObject json = new JSONObject(response);
+            JSONArray results = json.getJSONArray("results");
 
-        if (results.length() > 0) {
-            JSONObject primera = results.getJSONObject(0);
-            JSONObject urls = primera.getJSONObject("urls");
-            return urls.getString("regular");
+            if (results.length() > 0) {
+                JSONObject primera = results.getJSONObject(0);
+                JSONObject urls = primera.getJSONObject("urls");
+                return urls.getString("regular");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        return "";
+        return "https://picsum.photos/300/200";
     }
 }

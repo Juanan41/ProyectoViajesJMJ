@@ -1,10 +1,11 @@
 package com.viajes.app.alojamientos;
 
 import com.viajes.app.destinos.Destino;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,28 +30,45 @@ public class Alojamiento {
     @Column(nullable = false)
     private String pais;
 
-    @NotBlank
+    @NotNull
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String tipo; // hotel, apartamento, resort...
+    private TipoAlojamiento tipo;
 
     @NotNull
     @Positive
     @Column(nullable = false)
-    private Double precioPorNoche;
+    private BigDecimal precioPorNoche;
 
     @ManyToOne
     @JoinColumn(name = "destino_id", nullable = false)
     private Destino destino;
 
-    @OneToMany(mappedBy = "alojamiento", cascade = CascadeType.ALL)
-    @JsonIgnore
+    @OneToMany(mappedBy = "alojamiento", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Habitacion> habitaciones = new ArrayList<>();
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    public void prePersist() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 
     // CONSTRUCTORES
     public Alojamiento() {
     }
 
-    public Alojamiento(String nombre, String ciudad, String pais, String tipo, Double precioPorNoche) {
+    public Alojamiento(String nombre, String ciudad, String pais, TipoAlojamiento tipo, BigDecimal precioPorNoche) {
         this.nombre = nombre;
         this.ciudad = ciudad;
         this.pais = pais;
@@ -62,6 +80,10 @@ public class Alojamiento {
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getNombre() {
@@ -88,19 +110,19 @@ public class Alojamiento {
         this.pais = pais;
     }
 
-    public String getTipo() {
+    public TipoAlojamiento getTipo() {
         return tipo;
     }
 
-    public void setTipo(String tipo) {
+    public void setTipo(TipoAlojamiento tipo) {
         this.tipo = tipo;
     }
 
-    public Double getPrecioPorNoche() {
+    public BigDecimal getPrecioPorNoche() {
         return precioPorNoche;
     }
 
-    public void setPrecioPorNoche(Double precioPorNoche) {
+    public void setPrecioPorNoche(BigDecimal precioPorNoche) {
         this.precioPorNoche = precioPorNoche;
     }
 
@@ -114,6 +136,16 @@ public class Alojamiento {
 
     public void setHabitaciones(List<Habitacion> habitaciones) {
         this.habitaciones = habitaciones;
+    }
+
+    public void addHabitacion(Habitacion h) {
+        habitaciones.add(h);
+        h.setAlojamiento(this);
+    }
+
+    public void removeHabitacion(Habitacion h) {
+        habitaciones.remove(h);
+        h.setAlojamiento(null);
     }
 
     @Override

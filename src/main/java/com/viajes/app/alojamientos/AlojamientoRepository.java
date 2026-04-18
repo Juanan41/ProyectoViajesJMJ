@@ -13,4 +13,6 @@ public interface AlojamientoRepository extends JpaRepository<Alojamiento, Long> 
     List<Alojamiento> findByTipo(String tipo);
 
     List<Alojamiento> findByDestinoNombre(String nombre);
+
+    List<Alojamiento> findByDestinoId(Long destinoId);
 }
