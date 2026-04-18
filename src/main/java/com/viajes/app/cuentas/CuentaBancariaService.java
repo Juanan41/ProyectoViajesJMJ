@@ -36,6 +36,10 @@ public class CuentaBancariaService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El IBAN es obligatorio");
         }
 
+        if (cuentaBancariaRepository.findByIban(ibanNormalizado).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ese IBAN ya está registrado");
+        }
+
         if (dto.getTitular() == null || dto.getTitular().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El titular es obligatorio");
         }
@@ -73,6 +77,12 @@ public class CuentaBancariaService {
         if (ibanNormalizado.isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El IBAN es obligatorio");
         }
+
+        cuentaBancariaRepository.findByIban(ibanNormalizado)
+                .filter(c -> !c.getId().equals(cuenta.getId()))
+                .ifPresent(c -> {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ese IBAN ya está registrado");
+                });
 
         if (dto.getTitular() == null || dto.getTitular().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El titular es obligatorio");

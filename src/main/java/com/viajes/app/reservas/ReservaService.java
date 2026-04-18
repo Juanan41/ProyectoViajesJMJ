@@ -47,6 +47,10 @@ public class ReservaService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La fecha de fin debe ser posterior a la de inicio");
         }
 
+        if (dto.getTransporte() == null || dto.getTransporte().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El transporte es obligatorio");
+        }
+
         TransporteTipo transporte;
         try {
             transporte = TransporteTipo.valueOf(dto.getTransporte().toUpperCase());
@@ -72,7 +76,7 @@ public class ReservaService {
     }
 
     public List<ReservaResponseDto> obtenerReservasDeUsuario(String emailUsuario) {
-        return reservaRepository.findByUsuarioEmail(emailUsuario)
+        return reservaRepository.findByUsuarioEmailOrderByFechaReservaDesc(emailUsuario)
                 .stream()
                 .map(this::mapToDto)
                 .toList();
@@ -88,6 +92,10 @@ public class ReservaService {
     public ReservaResponseDto cancelarReserva(Long id, String emailUsuario) {
         Reserva reserva = reservaRepository.findByIdAndUsuarioEmail(id, emailUsuario)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reserva no encontrada"));
+
+        if ("CANCELADA".equalsIgnoreCase(reserva.getEstado())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La reserva ya está cancelada");
+        }
 
         reserva.setEstado("CANCELADA");
 
