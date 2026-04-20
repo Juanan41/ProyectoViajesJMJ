@@ -21,15 +21,15 @@ public class DestinoService {
         this.unsplashService = unsplashService;
     }
 
-    // ✅ LISTAR (DTO)
     public List<DestinoDTO> listarDestinos() {
+        System.out.println("TOTAL DESTINOS EN BD: " + destinoRepository.count());
+
         return destinoRepository.findAll()
                 .stream()
                 .map(destino -> {
 
                     String imagen = destino.getImagen();
 
-                    // 🔥 Si no tiene imagen → la generamos
                     if (imagen == null || imagen.isEmpty()) {
                         imagen = unsplashService.obtenerImagen(destino.getNombre());
                     }
