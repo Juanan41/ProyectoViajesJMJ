@@ -54,7 +54,7 @@ class AuthServiceTest {
                 .thenReturn(Optional.of(usuario));
         when(passwordEncoder.matches("1234", "hash123"))
                 .thenReturn(true);
-        when(jwtService.generateToken(usuario))
+        when(jwtService.generateToken("cliente1@viajes.com"))
                 .thenReturn("token-falso");
 
         LoginResponse response = authService.login(request);
@@ -67,7 +67,7 @@ class AuthServiceTest {
 
         verify(usuarioRepository).findByEmail("cliente1@viajes.com");
         verify(passwordEncoder).matches("1234", "hash123");
-        verify(jwtService).generateToken(usuario);
+        verify(jwtService).generateToken("cliente1@viajes.com");
     }
 
     @Test
@@ -86,7 +86,7 @@ class AuthServiceTest {
 
         verify(usuarioRepository).findByEmail("noexiste@viajes.com");
         verify(passwordEncoder, never()).matches(any(), any());
-        verify(jwtService, never()).generateToken(any(Usuario.class));
+        verify(jwtService, never()).generateToken(anyString());
     }
 
     @Test
@@ -114,7 +114,7 @@ class AuthServiceTest {
 
         verify(usuarioRepository).findByEmail("cliente1@viajes.com");
         verify(passwordEncoder).matches("mal123", "hash123");
-        verify(jwtService, never()).generateToken(any(Usuario.class));
+        verify(jwtService, never()).generateToken(anyString());
     }
 
     @Test
@@ -144,7 +144,7 @@ class AuthServiceTest {
         assertEquals("clienteNuevo", response.getUsername());
         assertEquals("nuevo@viajes.com", response.getEmail());
         assertEquals("USER", response.getRole());
-        assertEquals("Usuario registrado correctamente", response.getMensaje());
+        assertEquals("Usuario registrado correctamente", response.getMessage());
 
         ArgumentCaptor<Usuario> captor = ArgumentCaptor.forClass(Usuario.class);
         verify(usuarioRepository).save(captor.capture());

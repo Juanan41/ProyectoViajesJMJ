@@ -2,12 +2,12 @@ package com.viajes.app.cuentas;
 
 import com.viajes.app.cuentas.dto.CuentaBancariaRequestDto;
 import com.viajes.app.cuentas.dto.CuentaBancariaResponseDto;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/cuenta-bancaria")
+@RequestMapping("/api/cuentas")
 public class CuentaBancariaRestController {
 
     private final CuentaBancariaService cuentaBancariaService;
@@ -17,27 +17,30 @@ public class CuentaBancariaRestController {
     }
 
     @PostMapping
-    public CuentaBancariaResponseDto crearCuenta(@RequestBody CuentaBancariaRequestDto dto) {
-        return cuentaBancariaService.crearCuenta(dto, getEmailAutenticado());
+    @ResponseStatus(HttpStatus.CREATED)
+    public CuentaBancariaResponseDto crearCuenta(@RequestBody CuentaBancariaRequestDto dto,
+                                                 Authentication authentication) {
+        String emailUsuario = authentication.getName();
+        return cuentaBancariaService.crearCuenta(dto, emailUsuario);
     }
 
-    @GetMapping("/mia")
-    public CuentaBancariaResponseDto obtenerMiCuenta() {
-        return cuentaBancariaService.obtenerMiCuenta(getEmailAutenticado());
+    @GetMapping("/me")
+    public CuentaBancariaResponseDto obtenerMiCuenta(Authentication authentication) {
+        String emailUsuario = authentication.getName();
+        return cuentaBancariaService.obtenerMiCuenta(emailUsuario);
     }
 
-    @PutMapping
-    public CuentaBancariaResponseDto actualizarCuenta(@RequestBody CuentaBancariaRequestDto dto) {
-        return cuentaBancariaService.actualizarCuenta(dto, getEmailAutenticado());
+    @PutMapping("/me")
+    public CuentaBancariaResponseDto actualizarCuenta(@RequestBody CuentaBancariaRequestDto dto,
+                                                      Authentication authentication) {
+        String emailUsuario = authentication.getName();
+        return cuentaBancariaService.actualizarCuenta(dto, emailUsuario);
     }
 
-    @DeleteMapping
-    public void eliminarCuenta() {
-        cuentaBancariaService.eliminarCuenta(getEmailAutenticado());
-    }
-
-    private String getEmailAutenticado() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication.getName();
+    @DeleteMapping("/me")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void eliminarCuenta(Authentication authentication) {
+        String emailUsuario = authentication.getName();
+        cuentaBancariaService.eliminarCuenta(emailUsuario);
     }
 }

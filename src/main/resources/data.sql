@@ -2,17 +2,29 @@
 -- =====================
 -- 🌍 ROLES
 -- =====================
-INSERT INTO usuarios (username, email, password, role)
-VALUES ('Juan Antonio', 'juan@viajes.com', '$2a$10$cNbNdxo49Ei00ifujZ5nH.JzUrhhH5J.jpOxrrcEy1TaeY1i/vz3q', 'ADMIN')
-    ON CONFLICT (email) DO NOTHING;
+INSERT INTO usuarios (username, email, password, role, saldo)
+VALUES ('Juan Antonio', 'juan@viajes.com', '$2a$10$cNbNdxo49Ei00ifujZ5nH.JzUrhhH5J.jpOxrrcEy1TaeY1i/vz3q', 'ADMIN', 5000.00)
+    ON CONFLICT (email) DO UPDATE
+                               SET username = EXCLUDED.username,
+                               password = EXCLUDED.password,
+                               role = EXCLUDED.role,
+                               saldo = EXCLUDED.saldo;
 
-INSERT INTO usuarios (username, email, password, role)
-VALUES ('Miguel', 'miguel@viajes.com', '$2a$10$cNbNdxo49Ei00ifujZ5nH.JzUrhhH5J.jpOxrrcEy1TaeY1i/vz3q', 'ADMIN')
-    ON CONFLICT (email) DO NOTHING;
+INSERT INTO usuarios (username, email, password, role, saldo)
+VALUES ('Miguel', 'miguel@viajes.com', '$2a$10$cNbNdxo49Ei00ifujZ5nH.JzUrhhH5J.jpOxrrcEy1TaeY1i/vz3q', 'ADMIN', 5000.00)
+    ON CONFLICT (email) DO UPDATE
+                               SET username = EXCLUDED.username,
+                               password = EXCLUDED.password,
+                               role = EXCLUDED.role,
+                               saldo = EXCLUDED.saldo;
 
-INSERT INTO usuarios (username, email, password, role)
-VALUES ('Joel', 'joel@viajes.com', '$2a$10$cNbNdxo49Ei00ifujZ5nH.JzUrhhH5J.jpOxrrcEy1TaeY1i/vz3q', 'ADMIN')
-    ON CONFLICT (email) DO NOTHING;
+INSERT INTO usuarios (username, email, password, role, saldo)
+VALUES ('Joel', 'joel@viajes.com', '$2a$10$cNbNdxo49Ei00ifujZ5nH.JzUrhhH5J.jpOxrrcEy1TaeY1i/vz3q', 'ADMIN', 5000.00)
+    ON CONFLICT (email) DO UPDATE
+                               SET username = EXCLUDED.username,
+                               password = EXCLUDED.password,
+                               role = EXCLUDED.role,
+                               saldo = EXCLUDED.saldo;
 -- =====================
 -- 🌍 CONTINENTES
 -- =====================
