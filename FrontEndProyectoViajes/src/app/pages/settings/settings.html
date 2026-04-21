@@ -1,0 +1,105 @@
+<div *ngIf="!user" class="flex-1 flex items-center justify-center">
+  <p class="text-gray-400">{{ 'Por favor, inicia sesión para ver la configuración.' | translate }}</p>
+</div>
+
+<div *ngIf="user" class="flex-1 w-full max-w-3xl mx-auto p-4 py-8">
+  <h1 class="text-3xl font-bold mb-8">{{ 'Configuración' | translate }}</h1>
+
+  <div class="space-y-8">
+    <!-- Ajustes del Usuario -->
+    <section class="bg-[rgb(23,25,25)] p-6 md:p-8 rounded-2xl border border-gray-800 shadow-xl">
+      <h2 class="text-xl font-semibold mb-6">{{ 'Información Personal' | translate }}</h2>
+
+      <form (submit)="handleSave($event)" class="space-y-6">
+        <div class="flex flex-col md:flex-row gap-6 items-start">
+          <!-- Foto -->
+          <div class="flex flex-col items-center gap-3">
+            <div (click)="triggerFileInput()"
+              class="w-24 h-24 bg-gray-700 rounded-full flex items-center justify-center border-2 border-dashed border-gray-500 hover:border-white transition-colors cursor-pointer group relative overflow-hidden">
+              <ng-container *ngIf="user.avatarUrl; else noAvatar">
+                <img loading="lazy" [src]="user.avatarUrl" alt="Avatar" class="w-full h-full object-cover" />
+              </ng-container>
+              <ng-template #noAvatar>
+                <span class="text-3xl text-gray-400 group-hover:opacity-0 transition-opacity">
+                  {{ name ? name.charAt(0) : '' }}
+                </span>
+              </ng-template>
+
+              <div
+                class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <lucide-icon [name]="CameraIcon" class="w-6 h-6 text-white"></lucide-icon>
+              </div>
+            </div>
+            <input type="file" #fileInputRef (change)="handleImageUpload($event)" accept="image/*" class="hidden" />
+            <span class="text-xs text-gray-400">{{ 'Cambiar foto' | translate }}</span>
+          </div>
+
+          <!-- Inputs -->
+          <div class="flex-1 space-y-4 w-full">
+            <div>
+              <label class="text-sm font-medium text-gray-300 block mb-1">{{ 'Nombre' | translate }}</label>
+              <input type="text" [(ngModel)]="name" name="name"
+                class="w-full bg-[rgb(33,36,37)] text-white border border-gray-700 rounded-lg px-4 py-2.5 focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all" />
+            </div>
+
+            <div>
+              <label class="text-sm font-medium text-gray-300 block mb-1">{{ 'Email' | translate }}</label>
+              <input type="email" [(ngModel)]="email" name="email"
+                class="w-full bg-[rgb(33,36,37)] text-white border border-gray-700 rounded-lg px-4 py-2.5 focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all" />
+            </div>
+
+            <div>
+              <label class="text-sm font-medium text-gray-300 block mb-1">{{ 'Nueva Contraseña' | translate }}</label>
+              <input type="password" [(ngModel)]="password" name="password"
+                [placeholder]="'Dejar en blanco para mantener actual' | translate"
+                class="w-full bg-[rgb(33,36,37)] text-white border border-gray-700 rounded-lg px-4 py-2.5 focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all placeholder-gray-500" />
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-4 pt-4 border-t border-gray-800">
+          <span *ngIf="saved" class="text-green-400 text-sm">{{ '¡Cambios guardados!' | translate }}</span>
+          <button type="submit"
+            class="bg-white text-black font-semibold rounded-lg px-6 py-2.5 hover:bg-gray-200 transition-colors">
+            {{ 'Guardar cambios' | translate }}
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Tarjetas -->
+    <section class="bg-[rgb(23,25,25)] p-6 md:p-8 rounded-2xl border border-gray-800 shadow-xl">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-xl font-semibold">{{ 'Métodos de Pago' | translate }}</h2>
+          <p class="text-gray-400 text-sm mt-1">{{ 'Gestiona tus tarjetas para ingresos y reservas.' | translate }}</p>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <div *ngFor="let card of cards"
+          class="bg-[rgb(33,36,37)] border border-gray-700 rounded-xl p-4 flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-8 bg-gray-800 rounded flex items-center justify-center border border-gray-600">
+              <lucide-icon [name]="CreditCardIcon" class="w-5 h-5 text-gray-400"></lucide-icon>
+            </div>
+            <div>
+              <p class="font-medium text-white">•••• •••• •••• {{ card.last4 }}</p>
+              <p class="text-xs text-gray-400">{{ 'Expira:' | translate }} {{ card.expiry }}</p>
+            </div>
+          </div>
+          <button (click)="removeCard(card.id)" class="text-gray-500 hover:text-red-400 transition-colors p-2">
+            <lucide-icon [name]="Trash2Icon" class="w-4 h-4"></lucide-icon>
+          </button>
+        </div>
+
+        <a routerLink="/add-card"
+          class="w-full border-2 border-dashed border-gray-700 rounded-xl p-6 flex flex-col items-center justify-center text-gray-400 hover:text-white hover:border-gray-500 hover:bg-gray-800/50 transition-all cursor-pointer group">
+          <lucide-icon [name]="CreditCardIcon"
+            class="w-8 h-8 mb-2 group-hover:scale-110 transition-transform"></lucide-icon>
+          <span class="font-medium">{{ 'Añadir nueva tarjeta' | translate }}</span>
+        </a>
+      </div>
+    </section>
+  </div>
+</div>

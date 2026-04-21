@@ -1,0 +1,259 @@
+<div *ngIf="!hotel" class="flex-1 flex flex-col items-center justify-center">
+  <p class="text-gray-400 mb-4"> {{ 'Alojamiento no encontrado.' | translate }} </p>
+  <a routerLink="/profile" class="text-white hover:underline flex items-center gap-2">
+    <lucide-icon [name]="ArrowLeftIcon" class="w-4 h-4"></lucide-icon> {{ 'Volver al perfil' | translate }} </a>
+</div>
+
+<div *ngIf="hotel" class="flex-1 w-full bg-[rgb(23,25,25)] min-h-screen">
+  <!-- Imagne -->
+  <div class="relative w-full h-[50vh] md:h-[60vh]">
+    <img loading="lazy" [src]="hotel.image" [alt]="hotel.name" class="w-full h-full object-cover" />
+    <div
+      class="absolute inset-0 bg-gradient-to-t from-[rgb(23,25,25)] via-[rgb(23,25,25)]/40 to-transparent flex items-end">
+      <div class="max-w-5xl mx-auto px-4 w-full pb-10">
+        <a routerLink="/profile"
+          class="inline-flex items-center gap-2 text-white bg-black/40 hover:bg-black/60 px-4 py-2 rounded-full backdrop-blur-md transition-colors mb-6 text-sm">
+          <lucide-icon [name]="ArrowLeftIcon" class="w-4 h-4"></lucide-icon> {{ 'Volver a mis viajes' | translate }}
+        </a>
+        <div class="flex items-center gap-2 mb-2">
+          <lucide-icon *ngFor="let _ of getArray(hotel.rating)" [name]="StarIcon"
+            class="w-5 h-5 fill-yellow-500 text-yellow-500"></lucide-icon>
+        </div>
+        <h1 class="text-4xl md:text-6xl font-bold text-white mb-3 tracking-tight">{{ hotel.name | translate }}</h1>
+        <p class="text-gray-300 flex items-center gap-2 text-lg">
+          <lucide-icon [name]="MapPinIcon" class="w-5 h-5"></lucide-icon> {{ city?.name | translate }}, {{ country?.name
+          | translate }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 lg:grid-cols-4 gap-8">
+    <!-- Detalles -->
+    <div class="lg:col-span-3 space-y-10">
+      <section>
+        <h2 class="text-2xl font-semibold mb-4 text-white"> {{ 'Acerca del hotel' | translate }} </h2>
+        <p class="text-gray-400 leading-relaxed text-lg">
+          {{ hotel.description | translate }}
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-semibold mb-6 text-white"> {{ 'Comodidades principales' | translate }} </h2>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex items-center gap-3 text-gray-300 bg-[rgb(33,36,37)] p-4 rounded-xl border border-gray-800">
+            <lucide-icon [name]="WifiIcon" class="w-5 h-5 text-gray-400"></lucide-icon>
+            <span> {{ 'Wifi gratuito' | translate }} </span>
+          </div>
+          <div class="flex items-center gap-3 text-gray-300 bg-[rgb(33,36,37)] p-4 rounded-xl border border-gray-800">
+            <lucide-icon [name]="WindIcon" class="w-5 h-5 text-gray-400"></lucide-icon>
+            <span> {{ 'Aire acondicionado' | translate }} </span>
+          </div>
+          <div class="flex items-center gap-3 text-gray-300 bg-[rgb(33,36,37)] p-4 rounded-xl border border-gray-800">
+            <lucide-icon [name]="CoffeeIcon" class="w-5 h-5 text-gray-400"></lucide-icon>
+            <span> {{ 'Desayuno incluido' | translate }} </span>
+          </div>
+          <div class="flex items-center gap-3 text-gray-300 bg-[rgb(33,36,37)] p-4 rounded-xl border border-gray-800">
+            <lucide-icon [name]="BedDoubleIcon" class="w-5 h-5 text-gray-400"></lucide-icon>
+            <span> {{ 'Camas King size' | translate }} </span>
+          </div>
+        </div>
+      </section>
+
+      <section *ngIf="hotel.additionalPhotos && hotel.additionalPhotos.length > 0">
+        <h2 class="text-2xl font-semibold mb-6 text-white"> {{ 'Galería' | translate }} </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <img loading="lazy" *ngFor="let photo of hotel.additionalPhotos" [src]="photo"
+            class="w-full h-64 object-cover rounded-xl border border-gray-800" alt="Galeria hotel" />
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-semibold mb-6 text-white"> {{ 'Reseñas' | translate }} </h2>
+
+        <div *ngIf="hotel.reviews" class="space-y-4 mb-8">
+          <div *ngIf="hotel.reviews.length === 0" class="text-gray-400"> {{ 'No hay reseñas todavía.' | translate }}
+          </div>
+
+          <div *ngFor="let review of hotel.reviews" class="bg-[rgb(33,36,37)] p-4 rounded-xl border border-gray-800">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-medium text-white">{{ review.userName | translate }}</span>
+              <div class="flex items-center gap-2">
+                <span class="text-sm text-gray-400">{{ review.date }}</span>
+                <div *ngIf="isMyReview(review)" class="flex gap-2">
+                  <button (click)="startEditReview(review)" class="text-emerald-400 hover:text-emerald-300 text-xs"> {{
+                    'Editar' | translate }} </button>
+                  <button (click)="deleteReview(review.id)" class="text-red-400 hover:text-red-300 text-xs"> {{ 'Borrar'
+                    | translate }} </button>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center gap-1 mb-3">
+              <lucide-icon *ngFor="let _ of getArray(review.rating)" [name]="StarIcon"
+                class="w-4 h-4 fill-yellow-500 text-yellow-500"></lucide-icon>
+            </div>
+            <p class="text-gray-300">{{ review.comment | translate }}</p>
+          </div>
+        </div>
+
+        <div *ngIf="auth.user()"
+          class="relative mt-8 p-[2px] rounded-2xl bg-gradient-to-r from-emerald-500 via-green-400 to-teal-500 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+          <div class="bg-[rgb(23,25,25)] p-6 md:p-8 rounded-[14px] w-full h-full">
+            <h3
+              class="text-2xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400">
+              <ng-container *ngIf="!editReviewId">{{ 'Deja tu reseña' | translate }}</ng-container>
+              <ng-container *ngIf="editReviewId">{{ 'Editar Rese€a' | translate }}</ng-container>
+            </h3>
+            <form (ngSubmit)="addReview()">
+              <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-300 mb-3">{{ '¿Cómo calificarías tu estancia?' |
+                  translate }}
+                </label>
+                <div class="flex items-center gap-2">
+                  <button type="button" *ngFor="let star of [1, 2, 3, 4, 5]" (click)="setRating(star)"
+                    class="focus:outline-none transition-transform hover:scale-110">
+                    <lucide-icon [name]="StarIcon"
+                      [ngClass]="star <= newReviewRating ? 'w-8 h-8 fill-yellow-400 text-yellow-400 drop-shadow-[0_0_6px_rgba(250,204,21,0.6)]' : 'w-8 h-8 text-gray-600 transition-colors duration-200 hover:text-yellow-400'">
+                    </lucide-icon>
+                  </button>
+                  <span class="ml-4 text-sm font-medium text-emerald-400" *ngIf="newReviewRating === 5"> {{ 'Excelente'
+                    | translate }} </span>
+                  <span class="ml-4 text-sm font-medium text-emerald-400" *ngIf="newReviewRating === 4"> {{ 'Muy bueno'
+                    | translate }} </span>
+                  <span class="ml-4 text-sm font-medium text-emerald-400" *ngIf="newReviewRating === 3"> {{ 'Bueno' |
+                    translate }} </span>
+                  <span class="ml-4 text-sm font-medium text-emerald-400" *ngIf="newReviewRating === 2"> {{ 'Regular' |
+                    translate }} </span>
+                  <span class="ml-4 text-sm font-medium text-emerald-400" *ngIf="newReviewRating === 1"> {{ 'Malo' |
+                    translate }} </span>
+                </div>
+              </div>
+              <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-300 mb-2"> {{ 'Cuéntanos más sobre tu experiencia' |
+                  translate }} </label>
+                <textarea name="comment" [(ngModel)]="newReviewComment" rows="4"
+                  [placeholder]="'¿Qué fue lo que más te gustó?' | translate"
+                  class="w-full bg-[rgb(18,20,20)] border border-gray-700/50 text-white rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all resize-none shadow-inner"></textarea>
+              </div>
+              <div class="flex justify-end gap-3">
+                <button type="button" *ngIf="editReviewId" (click)="cancelEditReview()"
+                  class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg">
+                  {{ 'Cancelar' | translate }} </button>
+                <button type="submit" [disabled]="!newReviewComment.trim()"
+                  class="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 disabled:from-gray-700 disabled:to-gray-800 disabled:text-gray-500 disabled:cursor-not-allowed text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg hover:shadow-emerald-500/25">
+                  <ng-container *ngIf="!editReviewId">{{ 'Publicar reseña' | translate }}</ng-container>
+                  <ng-container *ngIf="editReviewId">{{ 'Guardar cambios' | translate }}</ng-container>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Columna Derecha (Reserva y Recomendaciones) -->
+    <div class="lg:col-span-1">
+      <div class="sticky top-28 flex flex-col gap-8">
+        <!-- Reserva -->
+        <div class="bg-[rgb(33,36,37)] border border-gray-700 rounded-3xl p-6 shadow-xl">
+          <div class="flex items-center justify-between mb-6 pb-6 border-b border-gray-700">
+            <div>
+              <p class="text-gray-400 text-sm mb-1"> {{ 'Precio Total' | translate }} </p>
+              <p class="text-white font-semibold text-2xl flex items-center gap-2">
+                {{ totalPrice }}€
+              </p>
+            </div>
+            <lucide-icon [name]="CalendarCheckIcon" class="w-8 h-8 text-gray-500"></lucide-icon>
+          </div>
+
+          <div class="space-y-4 mb-8">
+            <div>
+              <label class="text-sm text-gray-400 block mb-1"> {{ 'Días' | translate }} </label>
+              <input type="number" [(ngModel)]="days" min="1"
+                class="w-full bg-[rgb(23,25,25)] border border-gray-700 text-white rounded-lg p-2 focus:outline-none focus:border-green-500 transition-colors" />
+            </div>
+            <div>
+              <label class="text-sm text-gray-400 block mb-1"> {{ 'Huéspedes' | translate }} </label>
+              <input type="number" [(ngModel)]="guests" min="1"
+                class="w-full bg-[rgb(23,25,25)] border border-gray-700 text-white rounded-lg p-2 focus:outline-none focus:border-green-500 transition-colors" />
+            </div>
+            <div>
+              <label class="text-sm text-gray-400 block mb-1"> {{ 'Transporte' | translate }} </label>
+              <div class="grid grid-cols-3 gap-2">
+                <button (click)="selectedTransport = 'avion'"
+                  [ngClass]="selectedTransport === 'avion' ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400' : 'border-gray-700 text-gray-400'"
+                  class="flex flex-col items-center justify-center p-3 rounded-xl border hover:bg-gray-800 transition-colors hover:text-white">
+                  <lucide-icon [name]="PlaneIcon" class="w-6 h-6 mb-2"></lucide-icon>
+                  <span class="text-xs font-medium">{{ 'Avión' | translate }}</span>
+                  <span class="text-[10px] mt-1">+150€</span>
+                </button>
+                <button (click)="selectedTransport = 'tren'"
+                  [ngClass]="selectedTransport === 'tren' ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400' : 'border-gray-700 text-gray-400'"
+                  class="flex flex-col items-center justify-center p-3 rounded-xl border hover:bg-gray-800 transition-colors hover:text-white">
+                  <lucide-icon [name]="TrainIcon" class="w-6 h-6 mb-2"></lucide-icon>
+                  <span class="text-xs font-medium">{{ 'Tren' | translate }}</span>
+                  <span class="text-[10px] mt-1">+50€</span>
+                </button>
+                <button (click)="selectedTransport = 'barco'"
+                  [ngClass]="selectedTransport === 'barco' ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400' : 'border-gray-700 text-gray-400'"
+                  class="flex flex-col items-center justify-center p-3 rounded-xl border hover:bg-gray-800 transition-colors hover:text-white">
+                  <lucide-icon [name]="ShipIcon" class="w-6 h-6 mb-2"></lucide-icon>
+                  <span class="text-xs font-medium">{{ 'Barco' | translate }}</span>
+                  <span class="text-[10px] mt-1">+100€</span>
+                </button>
+              </div>
+            </div>
+            <div class="pt-4 border-t border-gray-700">
+              <p class="text-sm text-gray-400"> {{ 'Balance actual' | translate }} </p>
+              <p class="text-white font-medium">{{ auth.credits() }}€</p>
+            </div>
+          </div>
+
+          <button (click)="reservar()"
+            class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl py-3 transition-colors">
+            {{
+            'Reservar' | translate }}
+          </button>
+          <p *ngIf="!canBook && auth.credits() < totalPrice" class="text-red-400 text-xs text-center mt-2"> {{ 'Saldo
+            insuficiente' | translate }} </p>
+          <p *ngIf="auth.cards().length === 0" class="text-red-400 text-xs text-center mt-2"> {{ 'Necesitas tener una
+            tarjeta' | translate }} </p>
+
+          <p class="text-center text-xs text-gray-500 mt-4"> {{ 'Esta es una reserva simulada. No existen cargos reales
+            asociados a esta cuenta.' | translate }} </p>
+        </div>
+
+        <!-- Recomendaciones -->
+        <div *ngIf="recommendations.length > 0" class="mt-8">
+          <h3 class="text-lg font-semibold text-white mb-4"> {{ 'Hoteles similares' | translate }} </h3>
+          <div class="space-y-4">
+            <a *ngFor="let rec of recommendations" [routerLink]="['/hotel', rec.id]"
+              class="block bg-[rgb(23,25,25)] rounded-xl overflow-hidden border border-gray-800 hover:border-gray-600 transition-all group">
+              <img loading="lazy" [src]="rec.image" [alt]="rec.name"
+                class="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300" />
+              <div class="p-3">
+                <h4 class="text-sm font-semibold text-white mb-1 group-hover:underline">
+                  {{ rec.name | translate }}
+                </h4>
+                <p class="text-xs text-gray-400 mb-2 flex items-center gap-1">
+                  <lucide-icon [name]="MapPinIcon" class="w-3 h-3"></lucide-icon> {{ getRecCity(rec.cityId)?.name |
+                  translate }}
+                </p>
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-1">
+                    <lucide-icon *ngFor="let _ of getArray(rec.rating)" [name]="StarIcon"
+                      class="w-3 h-3 fill-yellow-400 text-yellow-400"></lucide-icon>
+                  </div>
+                  <p class="text-white font-bold text-sm">
+                    {{ rec.pricePerNight }}€<span class="text-xs font-normal text-gray-400">{{ '/noche' | translate
+                      }}</span>
+                  </p>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

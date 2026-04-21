@@ -1,0 +1,192 @@
+<div class="flex-1 w-full bg-[rgb(33,36,37)] min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-4xl font-bold text-white mb-2">
+        <ng-container *ngIf="query; else noQueryTitle">
+          Resultados para "{{ query }}"
+        </ng-container>
+        <ng-template #noQueryTitle>
+          Resultados de tu Búsqueda de Presupuesto
+        </ng-template>
+      </h1>
+      <p class="text-gray-400">
+        {{ filteredResults.length }} {{ filteredResults.length === 1 ? 'hotel encontrado' : 'hoteles encontrados' }}
+      </p>
+    </div>
+
+    <!-- Filter Button -->
+    <div class="mb-6">
+      <button (click)="isFilterOpen = true"
+        class="flex items-center gap-2 bg-[rgb(23,25,25)] text-white px-6 py-3 rounded-xl border border-gray-700 hover:bg-gray-800 transition-colors">
+        <lucide-icon [img]="SlidersHorizontalIcon" class="w-5 h-5"></lucide-icon>
+        {{ 'Filtros' | translate }}
+      </button>
+    </div>
+
+    <!-- Filtros -->
+    <div *ngIf="isFilterOpen">
+      <div (click)="isFilterOpen = false" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"></div>
+      <div
+        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[rgb(26,29,30)] p-6 rounded-2xl shadow-xl border border-gray-700 w-full max-w-md z-50 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-white">{{ 'Filtrar búsqueda' | translate }}</h2>
+          <button (click)="isFilterOpen = false" class="text-gray-400 hover:text-white transition-colors">
+            <lucide-icon [img]="XIcon" class="w-5 h-5"></lucide-icon>
+          </button>
+        </div>
+
+        <div class="space-y-6">
+          <!-- Rango precios -->
+          <div>
+            <label class="text-sm font-medium text-gray-300 block mb-3">{{ 'Precio por noche' | translate }}</label>
+            <div class="flex gap-4">
+              <div class="flex-1">
+                <input type="number" [(ngModel)]="filters.minPrice"
+                  class="w-full bg-[rgb(33,36,37)] text-white border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:border-white"
+                  placeholder="Min" />
+              </div>
+              <div class="flex-1">
+                <input type="number" [(ngModel)]="filters.maxPrice"
+                  class="w-full bg-[rgb(33,36,37)] text-white border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:border-white"
+                  placeholder="Max" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Rating -->
+          <div>
+            <label class="text-sm font-medium text-gray-300 block mb-3">{{ 'Calificación mínima' | translate }}</label>
+            <select [(ngModel)]="filters.minRating"
+              class="w-full bg-[rgb(33,36,37)] text-white border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:border-white">
+              <option [ngValue]="0">{{ 'Todas las calificaciones' | translate }}</option>
+              <option [ngValue]="3">{{ '3+ estrellas' | translate }}</option>
+              <option [ngValue]="4">{{ '4+ estrellas' | translate }}</option>
+              <option [ngValue]="5">{{ '5 estrellas' | translate }}</option>
+            </select>
+          </div>
+
+          <!-- Categoria -->
+          <div>
+            <label class="text-sm font-medium text-gray-300 block mb-3">{{ 'Categoría' | translate }}</label>
+            <select [(ngModel)]="filters.category"
+              class="w-full bg-[rgb(33,36,37)] text-white border border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:border-white">
+              <option value="all">{{ 'Todas las categorías' | translate }}</option>
+              <option value="luxury">{{ 'Lujo' | translate }}</option>
+              <option value="boutique">{{ 'Boutique' | translate }}</option>
+              <option value="budget">{{ 'Económico' | translate }}</option>
+            </select>
+          </div>
+
+          <!-- Servucios -->
+          <div>
+            <label class="text-sm font-medium text-gray-300 block mb-3">{{ 'Servicios' | translate }}</label>
+            <div class="space-y-2">
+              <label class="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" [(ngModel)]="filters.hasWifi" class="w-4 h-4 rounded" />
+                <span class="text-gray-300 flex items-center gap-2"><lucide-icon [img]="WifiIcon"
+                    class="w-4 h-4"></lucide-icon> {{ 'Wifi gratuito' | translate }}</span>
+              </label>
+              <label class="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" [(ngModel)]="filters.hasPool" class="w-4 h-4 rounded" />
+                <span class="text-gray-300 flex items-center gap-2"><lucide-icon [img]="WavesIcon"
+                    class="w-4 h-4"></lucide-icon> {{ 'Piscina' | translate }}</span>
+              </label>
+              <label class="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" [(ngModel)]="filters.hasGym" class="w-4 h-4 rounded" />
+                <span class="text-gray-300 flex items-center gap-2"><lucide-icon [img]="DumbbellIcon"
+                    class="w-4 h-4"></lucide-icon> {{ 'Gimnasio' | translate }}</span>
+              </label>
+              <label class="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" [(ngModel)]="filters.hasSpa" class="w-4 h-4 rounded" />
+                <span class="text-gray-300 flex items-center gap-2"><lucide-icon [img]="CoffeeIcon"
+                    class="w-4 h-4"></lucide-icon> {{ 'Spa' | translate }}</span>
+              </label>
+              <label class="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" [(ngModel)]="filters.hasRestaurant" class="w-4 h-4 rounded" />
+                <span class="text-gray-300 flex items-center gap-2"><lucide-icon [img]="UtensilsIcon"
+                    class="w-4 h-4"></lucide-icon> {{ 'Restaurante' | translate }}</span>
+              </label>
+              <label class="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" [(ngModel)]="filters.hasParking" class="w-4 h-4 rounded" />
+                <span class="text-gray-300 flex items-center gap-2"><lucide-icon [img]="CarFrontIcon"
+                    class="w-4 h-4"></lucide-icon> {{ 'Parking' | translate }}</span>
+              </label>
+            </div>
+          </div>
+
+          <button (click)="isFilterOpen = false"
+            class="w-full bg-white text-black font-semibold rounded-xl py-3 hover:bg-gray-200 transition-colors">
+            {{ 'Aplicar filtros' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resultados -->
+    <div class="space-y-6">
+      <ng-container *ngIf="filteredResults.length > 0; else noHotels">
+        <a *ngFor="let hotel of filteredResults" [routerLink]="['/hotel', hotel.id]"
+          class="bg-[rgb(23,25,25)] rounded-2xl overflow-hidden border border-gray-800 hover:border-gray-600 transition-all shadow-lg flex flex-col md:flex-row h-auto md:h-64 group">
+          <div class="md:w-[40%] h-56 md:h-full relative shrink-0 overflow-hidden">
+            <img loading="lazy" [src]="hotel.image" [alt]="hotel.name"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+            <div class="absolute top-4 left-4 bg-black/70 backdrop-blur-sm px-3 py-1.5 rounded-full">
+              <div class="flex items-center gap-1">
+                <lucide-icon *ngFor="let _ of getArray(hotel.rating)" [img]="StarIcon"
+                  class="w-4 h-4 fill-yellow-400 text-yellow-400"></lucide-icon>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-6 flex-1 flex flex-col justify-between">
+            <div>
+              <h3 class="text-2xl font-bold text-white mb-2 group-hover:underline">{{ hotel.name | translate }}</h3>
+              <p class="text-gray-400 flex items-center gap-2 mb-4 text-sm">
+                <lucide-icon [img]="MapPinIcon" class="w-4 h-4"></lucide-icon> {{ getCity(hotel.cityId)?.name }}, {{
+                getCountryName(hotel.cityId) }}
+              </p>
+              <p class="text-gray-300 text-sm line-clamp-2 mb-4">{{ hotel.description | translate }}</p>
+
+              <div class="flex flex-wrap gap-2 mb-4">
+                <span *ngIf="hotel.hasWifi"
+                  class="text-xs bg-[rgb(33,36,37)] px-2 py-1 rounded-full text-gray-400 flex items-center gap-1"><lucide-icon
+                    [img]="WifiIcon" class="w-3 h-3"></lucide-icon> {{ 'Wifi' | translate }}</span>
+                <span *ngIf="hotel.hasPool"
+                  class="text-xs bg-[rgb(33,36,37)] px-2 py-1 rounded-full text-gray-400 flex items-center gap-1"><lucide-icon
+                    [img]="WavesIcon" class="w-3 h-3"></lucide-icon> {{ 'Piscina' | translate }}</span>
+                <span *ngIf="hotel.hasGym"
+                  class="text-xs bg-[rgb(33,36,37)] px-2 py-1 rounded-full text-gray-400 flex items-center gap-1"><lucide-icon
+                    [img]="DumbbellIcon" class="w-3 h-3"></lucide-icon> {{ 'Gym' | translate }}</span>
+                <span *ngIf="hotel.hasRestaurant"
+                  class="text-xs bg-[rgb(33,36,37)] px-2 py-1 rounded-full text-gray-400 flex items-center gap-1"><lucide-icon
+                    [img]="UtensilsIcon" class="w-3 h-3"></lucide-icon> {{ 'Restaurante' | translate }}</span>
+              </div>
+            </div>
+
+            <div class="flex items-end justify-between pt-4 border-t border-gray-800">
+              <div>
+                <p class="text-gray-400 text-xs mb-1">{{ 'Desde' | translate }}</p>
+                <p class="text-white text-2xl font-bold">{{ hotel.pricePerNight }}€<span
+                    class="text-sm font-normal text-gray-400">{{ '/noche' | translate }}</span></p>
+              </div>
+              <button
+                class="bg-white text-black font-semibold px-6 py-2.5 rounded-xl hover:bg-gray-200 transition-colors">
+                {{ 'Ver detalles' | translate }}
+              </button>
+            </div>
+          </div>
+        </a>
+      </ng-container>
+
+      <ng-template #noHotels>
+        <div class="text-center py-20">
+          <p class="text-gray-400 text-lg mb-4">{{ 'No se encontraron hoteles con estos filtros' | translate }}</p>
+          <button (click)="clearFilters()" class="text-white underline hover:text-gray-300">
+            {{ 'Limpiar filtros' | translate }}
+          </button>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

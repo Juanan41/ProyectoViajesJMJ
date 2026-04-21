@@ -1,0 +1,150 @@
+<header class="bg-[rgb(23,25,25)] w-full shadow-md">
+  <!-- Left Section -->
+  <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
+    <!-- Logo -->
+    <a routerLink="/" class="flex items-center gap-2 text-white hover:text-gray-300 cursor-pointer transition-colors">
+      <lucide-icon [name]="PlaneIcon" class="w-8 h-8"></lucide-icon>
+      <span class="text-xl font-bold tracking-widest uppercase">{{ 'JMJ Viajes' | translate }}</span>
+    </a>
+
+    <!-- Destinos -->
+    <a routerLink="/continents"
+      class="hidden lg:flex items-center gap-2 text-white hover:text-gray-300 transition-colors text-sm font-medium ml-8">
+      <lucide-icon [name]="MapPinIcon" class="w-4 h-4"></lucide-icon>
+      {{ 'Destinos' | translate }}
+    </a>
+
+    <!-- Mis Viajes -->
+    <a routerLink="/trips"
+      class="hidden lg:flex items-center gap-2 text-white hover:text-gray-300 transition-colors text-sm font-medium ml-6">
+      <lucide-icon [name]="BriefcaseIcon" class="w-4 h-4"></lucide-icon>
+      {{ 'Mis Viajes' | translate }}
+    </a>
+
+    <!-- Search Bar -->
+    <div class="hidden md:flex flex-1 max-w-md mx-8">
+      <form (submit)="handleSearch($event)" class="relative w-full group">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <lucide-icon [name]="SearchIcon"
+            class="h-5 w-5 text-gray-400 group-focus-within:text-white transition-colors"></lucide-icon>
+        </div>
+        <input type="text" [(ngModel)]="searchQuery" name="searchQuery"
+          [placeholder]="'Buscar por país o ciudad...' | translate"
+          class="w-full bg-[rgb(33,36,37)] text-white placeholder-gray-400 border border-gray-600 rounded-full py-2 pl-10 pr-4 focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all" />
+      </form>
+    </div>
+
+    <!-- Right Section -->
+    <div class="flex items-center gap-4">
+      <!-- Idioma -->
+      <button (click)="toggleLanguage()"
+        class="text-sm font-medium text-white hover:text-gray-300 transition-colors px-3 py-2">
+        {{ translationService.currentLang() === 'es' ? 'ES | EN' : 'EN | ES' }}
+      </button>
+
+      <!-- Login & Register-->
+      <ng-container *ngIf="!isLoggedIn; else loggedInMenu">
+        <a routerLink="/login" class="text-sm font-medium text-white hover:text-gray-300 transition-colors px-3 py-2">
+          {{ 'Iniciar Sesión' | translate }}
+        </a>
+        <a routerLink="/register"
+          class="text-sm font-medium bg-white text-black px-5 py-2 rounded-full hover:bg-gray-200 transition-colors">
+          {{ 'Registrarse' | translate }}
+        </a>
+      </ng-container>
+
+      <ng-template #loggedInMenu>
+        <div class="flex items-center gap-6">
+
+          <!-- Dinero  -->
+          <button (click)="isDialogOpen = true"
+            class="flex items-center gap-2 text-sm text-gray-300 bg-[rgb(33,36,37)] px-4 py-1.5 rounded-full border border-gray-700 hover:bg-gray-800 transition-colors cursor-pointer outline-none focus:ring-1 focus:ring-white">
+            <lucide-icon [name]="WalletIcon" class="w-4 h-4 text-green-400"></lucide-icon>
+            <span>{{ credits | number:'1.2-2' }}€</span>
+          </button>
+
+          <div *ngIf="isDialogOpen" class="fixed inset-0 z-[9999] flex items-center justify-center">
+            <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" (click)="isDialogOpen = false">
+            </div>
+            <div
+              class="bg-[rgb(26,29,30)] p-6 rounded-2xl shadow-xl border border-gray-700 w-[90%] max-w-sm z-[9999] relative">
+              <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-white">
+                  {{ 'Gestionar Dinero' | translate }}
+                </h2>
+                <button (click)="isDialogOpen = false" class="text-gray-400 hover:text-white transition-colors"
+                  aria-label="Cerrar">
+                  <lucide-icon [name]="XIcon" class="w-5 h-5"></lucide-icon>
+                </button>
+              </div>
+
+              <div class="mb-6 bg-[rgb(33,36,37)] p-4 rounded-xl border border-gray-700">
+                <p class="text-sm text-gray-400 mb-1">{{ 'Saldo actual' | translate }}</p>
+                <p class="text-3xl font-bold text-white flex items-center gap-2">
+                  <lucide-icon [name]="WalletIcon" class="w-6 h-6 text-green-400"></lucide-icon> {{ credits |
+                  number:'1.2-2' }}€
+                </p>
+              </div>
+
+              <div class="space-y-4">
+                <div>
+                  <label class="text-sm font-medium text-gray-300 block mb-2">
+                    {{ 'Cantidad a operar' | translate }}
+                  </label>
+                  <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">€</span>
+                    <input type="number" min="0" [(ngModel)]="amount" placeholder="0.00"
+                      class="w-full bg-[rgb(33,36,37)] text-white border border-gray-600 rounded-lg py-3 pl-8 pr-4 focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all placeholder-gray-500" />
+                  </div>
+                </div>
+                <div class="flex gap-3 pt-2">
+                  <button (click)="handleDeposit()" [disabled]="!amount || amount <= '0'"
+                    class="flex-1 bg-white text-black font-semibold rounded-lg px-4 py-3 hover:bg-gray-200 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <lucide-icon [name]="PlusIcon" class="w-4 h-4"></lucide-icon> {{ 'Ingresar' | translate }}
+                  </button>
+                  <button (click)="handleWithdraw()" [disabled]="!amount || amount <= '0' || parseAmount() > credits"
+                    class="flex-1 bg-[rgb(33,36,37)] text-white border border-gray-600 font-semibold rounded-lg px-4 py-3 hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <lucide-icon [name]="MinusIcon" class="w-4 h-4"></lucide-icon> {{ 'Sacar' | translate }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- User Menu -->
+          <div class="relative" (clickOutside)="toggleUserMenu(false)">
+            <button (click)="toggleUserMenu($event)"
+              class="flex items-center gap-2 cursor-pointer text-white hover:text-gray-300 transition-colors outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[rgb(23,25,25)] rounded-full">
+              <div class="bg-gray-700 w-8 h-8 rounded-full flex items-center justify-center overflow-hidden">
+                <img loading="lazy" *ngIf="user?.avatarUrl" [src]="user?.avatarUrl" alt="Avatar" class="w-full h-full object-cover" />
+                <lucide-icon *ngIf="!user?.avatarUrl" [name]="UserIcon" class="w-5 h-5"></lucide-icon>
+              </div>
+              <span class="text-sm font-medium hidden sm:block mr-1">{{ user?.name }}</span>
+            </button>
+
+            <div *ngIf="isUserMenuOpen"
+              class="absolute right-0 mt-2 bg-[rgb(33,36,37)] border border-gray-700 rounded-xl shadow-xl w-48 py-1.5 z-[9999] flex flex-col">
+              <a (click)="navigateTo('/profile')"
+                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-200 hover:bg-gray-700 hover:text-white cursor-pointer outline-none transition-colors">
+                <lucide-icon [name]="UserIcon" class="w-4 h-4 text-gray-400"></lucide-icon> {{ 'Mi Perfil' | translate
+                }}
+              </a>
+              <a (click)="navigateTo('/settings')"
+                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-200 hover:bg-gray-700 hover:text-white cursor-pointer outline-none transition-colors">
+                <lucide-icon [name]="SettingsIcon" class="w-4 h-4 text-gray-400"></lucide-icon> {{ 'Configuración' |
+                translate }}
+              </a>
+
+              <div class="h-px bg-gray-700 my-1.5"></div>
+
+              <button (click)="logoutEvent.emit(); toggleUserMenu(false)"
+                class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 cursor-pointer outline-none transition-colors w-full text-left">
+                <lucide-icon [name]="LogOutIcon" class="w-4 h-4"></lucide-icon> {{ 'Cerrar Sesión' | translate }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</header>

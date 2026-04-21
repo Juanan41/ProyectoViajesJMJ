@@ -1,0 +1,18 @@
+<div class="flex-1 w-full flex flex-col items-center pt-12 pb-4 px-4">
+  <div class="text-center mb-10 max-w-2xl">
+    <ng-container *ngIf="isLoggedIn; else guestHeader">
+      <h1 class="text-4xl font-bold mb-4 tracking-tight">
+        {{ '¡Hola,' | translate }} {{ user?.name | translate }}! {{ '¿A dónde viajamos hoy?' | translate }}
+      </h1>
+    </ng-container>
+    <ng-template #guestHeader>
+      <h1 class="text-4xl font-bold mb-4 tracking-tight"> {{ 'Descubre tu próximo gran destino' | translate }} </h1>
+    </ng-template>
+
+    <p class="text-gray-400 text-lg"> {{ 'Minimalismo, elegancia y experiencias inolvidables en todo el mundo.' |
+      translate }} </p>
+  </div>
+
+  <!-- Carrousel de destinos principales -->
+  <app-destino-carousel></app-destino-carousel>
+</div>

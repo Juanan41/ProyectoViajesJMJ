@@ -1,0 +1,50 @@
+<div class="w-full max-w-4xl mx-auto px-4 py-8">
+  <div *ngIf="loading" class="text-center text-gray-400 py-10">
+    Cargando destinos...
+  </div>
+
+  <div *ngIf="error" class="text-center text-red-400 py-10">
+    {{ error }}
+  </div>
+
+  <div *ngIf="!loading && !error && destinations.length === 0" class="text-center text-gray-400 py-10">
+    No hay destinos todavía en el backend.
+  </div>
+
+  <div *ngIf="!loading && !error && destinations.length > 0" class="relative rounded-2xl overflow-hidden shadow-2xl">
+    <div
+      #carousel
+      class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth scrollbar-hide no-scrollbar w-full"
+    >
+      <div
+        *ngFor="let dest of destinations"
+        class="w-full flex-shrink-0 snap-center relative outline-none"
+      >
+        <div class="aspect-video w-full relative">
+          <img
+            [src]="dest.image"
+            [alt]="dest.title"
+            class="w-full h-full object-cover"
+            loading="lazy"
+          />
+
+          <div
+            class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-end"
+          >
+            <div class="p-8">
+              <h2 class="text-3xl md:text-5xl font-bold text-white mb-2">
+                {{ dest.title }}
+              </h2>
+
+              <p class="text-gray-200 text-sm md:text-base">
+                {{ 'Explora lo mejor de' | translate }}
+                {{ dest.title }}
+                {{ 'con nosotros.' | translate }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

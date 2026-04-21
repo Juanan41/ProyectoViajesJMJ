@@ -1,0 +1,186 @@
+<div class="flex-1 w-full max-w-7xl mx-auto px-4 py-8 relative">
+  <div *ngIf="!user" class="flex-1 flex items-center justify-center">
+    <p class="text-gray-400"> {{ 'Por favor, inicia sesión para ver tu perfil.' | translate }} </p>
+  </div>
+
+  <ng-container *ngIf="user">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-4">
+      <div>
+        <h1 class="text-3xl font-bold mb-2"> {{ 'Mi Perfil' | translate }} </h1>
+        <p class="text-gray-400"> {{ 'Gestiona tus viajes, entradas y preferencias.' | translate }} </p>
+      </div>
+      <a routerLink="/settings"
+        class="bg-[rgb(33,36,37)] text-white px-5 py-2.5 rounded-lg border border-gray-700 hover:bg-gray-800 transition-colors font-medium self-start md:self-auto">
+        {{ 'Editar Opciones' | translate }} </a>
+    </div>
+
+    <!-- Detalles -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+      <div class="bg-[rgb(33,36,37)] p-6 rounded-2xl border border-gray-800">
+        <h3 class="text-gray-400 font-medium mb-1"> {{ 'Viajes Activos' | translate }} </h3>
+        <p class="text-3xl font-bold">{{ activeTrips.length }}</p>
+      </div>
+      <div class="bg-[rgb(33,36,37)] p-6 rounded-2xl border border-gray-800">
+        <h3 class="text-gray-400 font-medium mb-1"> {{ 'Destinos Visitados' | translate }} </h3>
+        <p class="text-3xl font-bold">{{ pastTrips.length }}</p>
+      </div>
+      <div class="bg-[rgb(33,36,37)] p-6 rounded-2xl border border-gray-800">
+        <h3 class="text-gray-400 font-medium mb-1"> {{ 'Km Recorridos' | translate }} </h3>
+        <p class="text-3xl font-bold">12,450</p>
+      </div>
+    </div>
+
+    <!-- Viajes activos -->
+    <div class="mb-12">
+      <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+        <lucide-icon [name]="PlaneTakeoffIcon" class="w-6 h-6"></lucide-icon> {{ 'Viajes Próximos' | translate }}
+      </h2>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div *ngFor="let trip of activeTrips"
+          class="bg-[rgb(33,36,37)] rounded-2xl overflow-hidden border border-gray-800 flex flex-col sm:flex-row group">
+          <div class="w-full sm:w-2/5 aspect-[4/3] sm:aspect-auto relative overflow-hidden cursor-pointer"
+            [routerLink]="['/hotel', trip.hotelId || trip.id || 'paris-1']">
+            <img loading="lazy" [src]="trip.image" alt="Destino"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            <div
+              class="absolute top-3 left-3 bg-white text-black text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow-lg">
+              <lucide-icon [name]="ClockIcon" class="w-3 h-3"></lucide-icon> {{ 'En 1 mes' | translate }}
+            </div>
+          </div>
+
+          <div class="p-6 flex-1 flex flex-col justify-between">
+            <div>
+              <h3 class="text-xl font-bold mb-4">{{ trip.destination }}</h3>
+
+              <div class="space-y-3">
+                <div class="flex items-center gap-3 text-gray-300">
+                  <lucide-icon [name]="CalendarIcon" class="w-4 h-4 text-gray-400"></lucide-icon>
+                  <span class="text-sm">{{ trip.date }}</span>
+                </div>
+                <div class="flex items-center gap-3 text-gray-300">
+                  <lucide-icon [name]="BedDoubleIcon" class="w-4 h-4 text-gray-400"></lucide-icon>
+                  <a [routerLink]="['/hotel', trip.hotelId || trip.id || 'paris-1']"
+                    class="text-sm font-medium hover:text-white hover:underline decoration-1 underline-offset-4 cursor-pointer transition-colors">{{
+                    trip.hotel }}</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 flex gap-3">
+              <button (click)="openTicket(trip)"
+                class="flex-1 text-center py-2.5 rounded-lg border border-gray-600 font-medium hover:bg-white hover:text-black hover:border-white transition-all cursor-pointer">
+                {{ 'Ver ticket' | translate }} </button>
+              <button (click)="openReceipt(trip)"
+                class="flex-1 text-center py-2.5 rounded-lg border border-gray-600 font-medium hover:bg-white hover:text-black hover:border-white transition-all cursor-pointer">
+                {{ 'Ver recibo' | translate }} </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reviews -->
+    <div class="bg-[rgb(33,36,37)] p-6 md:p-8 rounded-[2rem] border border-gray-700">
+      <div class="flex items-center gap-4 mb-8">
+        <div class="bg-yellow-500/10 p-3 rounded-xl">
+          <lucide-icon [name]="StarIcon" class="w-6 h-6 text-yellow-500"></lucide-icon>
+        </div>
+        <h2 class="text-2xl font-bold text-white"> {{ 'Mis Reseñas' | translate }} </h2>
+      </div>
+      <div class="space-y-6">
+        <div *ngIf="!user.reviews?.length" class="text-center py-12 text-gray-400">
+          <lucide-icon [name]="StarIcon" class="w-12 h-12 mx-auto mb-4 opacity-50"></lucide-icon>
+          <p> {{ 'A�n no has escrito ninguna reseña.' | translate }} </p>
+        </div>
+        <div *ngFor="let review of user.reviews || []" class="bg-[rgb(23,25,25)] p-6 rounded-2xl border border-gray-800">
+          <div class="flex justify-between items-start mb-4">
+            <div>
+              <h3 class="text-lg font-bold text-white mb-1">{{ review.hotelName }}</h3>
+              <p class="text-sm text-gray-500">{{ review.date }}</p>
+            </div>
+            <div class="flex gap-1">
+              <lucide-icon *ngFor="let _ of getArray(review.rating)" [name]="StarIcon"
+                class="w-4 h-4 fill-yellow-500 text-yellow-500"></lucide-icon>
+            </div>
+          </div>
+          <p class="text-gray-300"> {{ review.comment }} </p>
+        </div>
+      </div>
+    </div>
+    <!-- Ticket -->
+    <div *ngIf="selectedTicket && selectedTicket.transport" class="fixed inset-0 z-50 flex items-center justify-center">
+      <div class="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity" (click)="closeTicket()"></div>
+      <div id="ticketModal"
+        class="bg-white text-black w-full max-w-sm rounded-[2rem] overflow-hidden shadow-2xl relative z-50 transform rotate-1">
+        <button (click)="downloadPDF('ticketModal', 'ticket.pdf')" data-html2canvas-ignore="true"
+          class="absolute top-4 left-4 bg-black text-white px-3 py-1.5 text-xs font-bold rounded-full transition-colors z-10 shadow-md hover:bg-gray-800 focus:outline-none">
+          {{ 'Descargar PDF' | translate }} </button>
+        <button (click)="closeTicket()" data-html2canvas-ignore="true"
+          class="absolute top-4 right-4 bg-black/10 hover:bg-black/20 p-2 rounded-full transition-colors z-10">
+          <lucide-icon [name]="XIcon" class="w-5 h-5 text-black"></lucide-icon>
+        </button>
+        <div class="h-32 bg-gray-100 relative">
+          <img loading="lazy" [src]="selectedTicket.image" alt="Destino" class="w-full h-full object-cover opacity-80" />
+          <div class="absolute inset-0 bg-gradient-to-t from-white to-transparent"></div>
+          <div class="absolute bottom-4 left-6">
+            <p class="text-xs uppercase tracking-widest font-bold text-gray-500 mb-1"> {{ 'Boarding Pass' | translate }}
+            </p>
+            <h2 class="text-2xl font-black leading-none">{{ selectedTicket.destination.split(',')[0] }}</h2>
+          </div>
+        </div>
+        <div class="px-6 py-6 border-b-2 border-dashed border-gray-300 relative">
+          <div class="absolute -left-3 -bottom-3 w-6 h-6 bg-black rounded-full"></div>
+          <div class="absolute -right-3 -bottom-3 w-6 h-6 bg-black rounded-full"></div>
+          <div class="flex justify-between items-center mb-6">
+            <div>
+              <p class="text-xs text-gray-500 font-medium mb-1"> {{ 'Pasajero' | translate }} </p>
+              <p class="font-bold uppercase">{{ user.name | translate }}</p>
+            </div>
+            <div class="text-right">
+              <p class="text-xs text-gray-500 font-medium mb-1"> {{ 'Fecha' | translate }} </p>
+              <p class="font-bold">{{ selectedTicket.date.split(' ')[0] }}</p>
+            </div>
+          </div>
+          <div class="bg-gray-100 rounded-xl p-4 flex flex-col gap-4">
+            <div class="flex items-center gap-3">
+              <div class="bg-black text-white p-2 rounded-lg">
+                <lucide-icon [name]="getTransportIcon(selectedTicket.transport.type)" class="w-5 h-5"></lucide-icon>
+              </div>
+              <div>
+                <p class="text-xs text-gray-500 font-medium">{{ selectedTicket.transport.name }}</p>
+                <p class="font-bold">{{ selectedTicket.transport.time }}</p>
+              </div>
+            </div>
+            <div class="flex justify-between border-t border-gray-200 pt-4 mt-2">
+              <div>
+                <p class="text-xs text-gray-500 font-medium mb-1"> {{ 'Puerta' | translate }} </p>
+                <p class="font-bold text-xl">{{ selectedTicket.transport.gate }}</p>
+              </div>
+              <div>
+                <p class="text-xs text-gray-500 font-medium mb-1"> {{ 'Asiento' | translate }} </p>
+                <p class="font-bold text-xl">{{ selectedTicket.transport.seat }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 px-6 py-6 text-center">
+          <div class="w-full h-16 bg-gray-300 rounded mb-2 flex items-center justify-center relative overflow-hidden">
+            <div class="w-[80%] h-full border-x-4 border-black/20 flex divide-x-4 divide-black/20">
+              <div class="flex-1"></div>
+              <div class="flex-1"></div>
+              <div class="flex-1"></div>
+              <div class="flex-1"></div>
+              <div class="flex-1"></div>
+            </div>
+          </div>
+          <p class="text-xs text-gray-400 font-mono tracking-widest">
+            TKM-{{ selectedTicket.id.split('-')[1]?.padStart(8, '0') || '00000001' }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>
+
