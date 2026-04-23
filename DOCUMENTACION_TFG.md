@@ -916,12 +916,114 @@ Entre las mejoras relevantes realizadas durante el desarrollo destacan:
 
 ### 26.16 Valor del frontend dentro del TFG
 
-La inclusión del frontend Angular no solo aporta una capa visual moderna,
-sino que refuerza el carácter desacoplado del proyecto.
-Gracias a esta separación, el backend se convierte en una API reutilizable y el frontend
-puede evolucionar de forma independiente, manteniendo una arquitectura alineada 
-con entornos profesionales reales.
+La inclusión del frontend Angular no solo aporta una capa visual moderna, sino que refuerza el carácter desacoplado del proyecto. Gracias a esta separación, el backend se convierte en una API reutilizable y el frontend puede evolucionar de forma independiente, manteniendo una arquitectura alineada con entornos profesionales reales.
 
-En consecuencia, la documentación del TFG no debe entender Angular como un añadido menor,
-sino como la pieza que completa la transición desde una aplicación acoplada con vistas de servidor
-hacia una solución cliente-servidor moderna, mantenible y escalable.
+En consecuencia, la documentación del TFG no debe entender Angular como un añadido menor, sino como la pieza que completa la transición desde una aplicación acoplada con vistas de servidor hacia una solución cliente-servidor moderna, mantenible y escalable.
+
+## 27. Despliegue, publicación y entorno real
+
+Además del desarrollo funcional, el proyecto se ha orientado a un escenario de ejecución y publicación más cercano a un entorno real. Para ello se ha trabajado tanto la contenerización del backend como la publicación del frontend en un servidor accesible desde Internet.
+
+### 27.1 PostgreSQL como base de datos del proyecto
+
+Aunque en fases tempranas del desarrollo se realizaron pruebas con H2 y otras configuraciones de apoyo, la solución actual se ha orientado a PostgreSQL como base de datos principal del sistema.
+
+La elección de PostgreSQL aporta varias ventajas:
+
+* persistencia real de la información,
+* mejor aproximación a un entorno profesional,
+* compatibilidad adecuada con Spring Data JPA e Hibernate,
+* facilidad de despliegue en contenedores y servicios cloud.
+
+Durante el desarrollo se han realizado pruebas tanto en entorno local como en entornos preparados para despliegue, manteniendo la configuración del backend alineada con PostgreSQL como motor principal de persistencia.
+
+### 27.2 Docker y Docker Compose en backend
+
+El backend de Spring Boot y la base de datos PostgreSQL se han preparado para ejecutarse de forma desacoplada mediante contenedores Docker.
+
+Esta decisión permite:
+
+* aislar la aplicación del entorno del sistema operativo,
+* simplificar el arranque del proyecto,
+* reproducir el entorno de ejecución en diferentes máquinas,
+* acercar el proyecto a una estrategia real de despliegue.
+
+El uso de Docker Compose facilita el levantamiento conjunto de:
+
+* contenedor del backend,
+* contenedor de PostgreSQL,
+* variables de entorno necesarias para la conexión entre servicios.
+
+### 27.3 Preparación del backend para despliegue
+
+El backend ha sido adaptado para funcionar como API REST desacoplada, lo que facilita su publicación en un servicio externo. Esta preparación incluye aspectos como:
+
+* configuración del puerto de ejecución,
+* uso de variables de entorno,
+* separación entre frontend y backend,
+* compatibilidad con PostgreSQL,
+* control de seguridad basado en JWT.
+
+Esta arquitectura permite que el backend pueda ejecutarse en local durante el desarrollo o ser desplegado posteriormente en un proveedor de hosting o plataforma cloud.
+
+### 27.4 Publicación del frontend Angular
+
+El frontend Angular ha sido preparado para compilarse y generar una versión estática lista para publicación. Una vez compilado, el resultado puede subirse a un servidor web para ser servido como aplicación cliente independiente.
+
+En este proyecto, la publicación del frontend se ha abordado mediante subida de archivos al servidor utilizando FileZilla. Este proceso permite trasladar los archivos generados por Angular al espacio web del dominio correspondiente.
+
+### 27.5 Uso de FileZilla en la publicación
+
+FileZilla ha sido empleado como herramienta de transferencia para publicar el frontend en el servidor. Su uso dentro del proyecto resulta útil para:
+
+* subir la carpeta compilada del frontend,
+* sustituir versiones anteriores del sitio,
+* organizar la estructura de archivos del dominio,
+* validar visualmente la publicación del cliente Angular.
+
+Este enfoque resulta especialmente práctico en un contexto académico, ya que permite mostrar una publicación real del frontend en un servidor accesible desde navegador.
+
+### 27.6 Publicación web del proyecto
+
+El proyecto ha llegado a contar con una versión publicada del frontend en un dominio accesible públicamente. Esto aporta valor añadido al TFG, ya que no se limita a una ejecución local, sino que muestra una aproximación real a la puesta en producción de una aplicación web.
+
+La publicación del frontend demuestra:
+
+* capacidad de compilar y servir una aplicación Angular fuera del entorno de desarrollo,
+* separación efectiva entre cliente y servidor,
+* preparación del proyecto para una arquitectura web real.
+
+### 27.7 Incidencias detectadas en despliegue
+
+Durante la fase de publicación se detectaron incidencias relacionadas con las llamadas entre frontend y backend, especialmente en aspectos típicos de una arquitectura desacoplada desplegada, como pueden ser:
+
+* configuración de rutas,
+* diferencias entre entorno local y entorno publicado,
+* llamadas HTTP a la API,
+* políticas de seguridad o CORS,
+* ajuste de URLs base del frontend.
+
+Estas incidencias forman parte natural del proceso de despliegue y resultan relevantes dentro de la memoria del TFG, ya que muestran que no solo se ha trabajado el desarrollo, sino también la transición hacia un entorno real de publicación.
+
+### 27.8 Valor académico del despliegue
+
+La incorporación de PostgreSQL, Docker y la publicación del frontend mediante FileZilla refuerza el carácter profesional del proyecto. No se trata únicamente de una aplicación funcional en local, sino de una solución preparada para ejecutarse en un entorno más realista.
+
+Desde el punto de vista académico, este bloque permite justificar competencias relacionadas con:
+
+* despliegue de aplicaciones web,
+* configuración de entornos,
+* separación de responsabilidades entre cliente y servidor,
+* uso de bases de datos reales,
+* publicación de aplicaciones frontend en servidor.
+
+### 27.9 Trabajo pendiente y mejora futura del despliegue
+
+Como línea de mejora, el proyecto queda preparado para cerrar completamente el circuito de despliegue, documentando de forma detallada:
+
+* la publicación definitiva del backend en un entorno remoto,
+* la conexión completa entre frontend publicado y backend desplegado,
+* la resolución de incidencias de llamadas entre dominios,
+* la documentación técnica completa del proceso de despliegue.
+
+Este apartado constituye una base sólida para incorporar posteriormente capturas, configuraciones finales, comandos y pruebas reales de publicación como anexo técnico del TFG.
