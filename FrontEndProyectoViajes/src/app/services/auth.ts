@@ -192,6 +192,16 @@ export class Auth {
     return localStorage.getItem('role');
   }
 
+  isCurrentUserAdmin(): boolean {
+  const role = this.getRole();
+
+  if (!role) return false;
+
+  const normalizedRole = role.trim().toUpperCase();
+
+  return normalizedRole === 'ADMIN' || normalizedRole === 'ROLE_ADMIN';
+}
+
   private getAuthHeaders(): HttpHeaders {
     const token = this.getToken();
     return new HttpHeaders({

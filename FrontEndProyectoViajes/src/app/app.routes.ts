@@ -15,6 +15,7 @@ import { Cities } from './pages/cities/cities';
 import { Hotels } from './pages/hotels/hotels';
 import { Receipt } from './pages/receipt/receipt';
 import { Trips } from './pages/trips/trips';
+import { AdminDashboard } from './pages/admin-dashboard/admin-dashboard';
 
 export const routes: Routes = [
   {
@@ -35,6 +36,10 @@ export const routes: Routes = [
       { path: 'city/:cityId', component: Hotels, title: 'Hoteles | JMJ Viajes' },
       { path: 'receipt/:hotelId', component: Receipt, title: 'Recibo | JMJ Viajes' },
       { path: 'trips', component: Trips, title: 'Mis Viajes | JMJ Viajes' },
+
+      // CMS / Panel de administración
+      { path: 'admin', component: AdminDashboard, title: 'Panel Admin | JMJ Viajes' },
+      { path: 'admin/users', component: AdminDashboard, title: 'Gestión de Usuarios | JMJ Viajes' },
     ],
   },
   { path: '**', redirectTo: '' },

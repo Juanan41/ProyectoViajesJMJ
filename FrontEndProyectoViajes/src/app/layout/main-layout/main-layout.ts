@@ -27,6 +27,10 @@ export class MainLayout {
     return this.authService.credits();
   }
 
+  get isAdmin() {
+    return this.authService.isCurrentUserAdmin();
+  }
+
   handleLogout() {
     this.authService.logout();
   }

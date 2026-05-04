@@ -1,3 +1,4 @@
+import { fetchRemoteStore, putRemoteStore } from './persistence-api';
 export interface Review {
   id: string;
   userName: string;
@@ -5,6 +6,44 @@ export interface Review {
   comment: string;
   date: string;
   hotelName?: string;
+  hotelId?: string;
+}
+
+export type TransportType = 'avion' | 'tren' | 'barco';
+export type BookingStatus = 'active' | 'canceled';
+
+export interface BookingTransport {
+  type: TransportType;
+  name: string;
+  time: string;
+  seat: string;
+  gate: string;
+  platform?: string | null;
+  terminal?: string | null;
+}
+
+export interface BookingRecord {
+  id: string;
+  userEmail?: string;
+  hotelId: string;
+  hotelName: string;
+  cityId: string;
+  countryId: string;
+  destination: string;
+  image: string;
+  bookingDate: string;
+  checkIn: string;
+  checkOut: string;
+  nights: number;
+  guests: number;
+  roomType: string;
+  totalAmount: number;
+  paymentMethod: string;
+  paymentDate: string;
+  confirmationCode: string;
+  transport: BookingTransport;
+  status?: BookingStatus;
+  canceledAt?: string;
 }
 
 export interface Hotel {
@@ -773,7 +812,6 @@ export function searchHotels(query: string): Hotel[] {
       countryIds.includes(city.countryId),
   );
   const cityIds = matchingCities.map((c) => c.id);
-
   const matchingHotels = hotels.filter(
     (hotel) =>
       normalizeText(hotel.name).includes(normQuery) ||
@@ -782,4 +820,162 @@ export function searchHotels(query: string): Hotel[] {
   );
 
   return matchingHotels;
+}
+
+const HOTEL_BOOKING_STORAGE_KEY = 'jmj-bookings';
+const HOTEL_BOOKING_API_PATH = '/bookings';
+
+function normalizeAccountEmail(email: string | undefined | null): string {
+  return (email ?? '').trim().toLowerCase();
+}
+
+function canUseLocalStorage(): boolean {
+  return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
+}
+
+function readBookingStore(): BookingRecord[] {
+  if (!canUseLocalStorage()) return [];
+
+  try {
+    const storedValue = window.localStorage.getItem(HOTEL_BOOKING_STORAGE_KEY);
+    return storedValue ? (JSON.parse(storedValue) as BookingRecord[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function normalizeBooking(booking: BookingRecord): BookingRecord {
+  return {
+    ...booking,
+    userEmail: normalizeAccountEmail(booking.userEmail),
+    status: booking.status ?? 'active',
+  };
+}
+
+function writeBookingStore(bookings: BookingRecord[]) {
+  if (!canUseLocalStorage()) return;
+
+  window.localStorage.setItem(HOTEL_BOOKING_STORAGE_KEY, JSON.stringify(bookings));
+
+  void putRemoteStore(HOTEL_BOOKING_API_PATH, bookings);
+}
+
+export async function syncBookingStoreFromRemote(): Promise<void> {
+  const remoteBookings = await fetchRemoteStore<BookingRecord[]>(HOTEL_BOOKING_API_PATH);
+
+  if (!remoteBookings || remoteBookings.length === 0 || !canUseLocalStorage()) return;
+
+  const normalizedRemoteBookings = remoteBookings.map((booking) => normalizeBooking(booking));
+
+  window.localStorage.setItem(HOTEL_BOOKING_STORAGE_KEY, JSON.stringify(normalizedRemoteBookings));
+}
+
+export function getStoredBookings(): BookingRecord[] {
+  const storedBookings = readBookingStore();
+  const normalizedBookings = storedBookings.map((booking) => normalizeBooking(booking));
+
+  normalizedBookings.sort((left, right) => {
+    return right.bookingDate.localeCompare(left.bookingDate);
+  });
+
+  return normalizedBookings;
+}
+
+export function getStoredBookingsForUser(email: string | undefined | null): BookingRecord[] {
+  const normalizedEmail = normalizeAccountEmail(email);
+  const bookings = getStoredBookings();
+
+  return bookings.filter((booking) => {
+    if (!booking.userEmail) return true;
+    return booking.userEmail === normalizedEmail;
+  });
+}
+
+export function getStoredBookingById(id: string): BookingRecord | undefined {
+  const booking = readBookingStore().find((item) => item.id === id);
+  return booking ? normalizeBooking(booking) : undefined;
+}
+
+export function saveStoredBooking(booking: BookingRecord) {
+  const bookings = readBookingStore();
+  const filteredBookings = bookings.filter((item) => item.id !== booking.id);
+  const nextBookings = [normalizeBooking(booking), ...filteredBookings];
+
+  writeBookingStore(nextBookings);
+}
+
+export function cancelStoredBooking(bookingId: string): BookingRecord | undefined {
+  const bookings = readBookingStore();
+  const booking = bookings.find((item) => item.id === bookingId);
+
+  if (!booking) return undefined;
+
+  const canceledBooking: BookingRecord = {
+    ...normalizeBooking(booking),
+    status: 'canceled',
+    canceledAt: new Date().toISOString(),
+  };
+
+  const nextBookings = bookings.map((item) => {
+    if (item.id === bookingId) {
+      return canceledBooking;
+    }
+
+    return item;
+  });
+
+  writeBookingStore(nextBookings);
+
+  return canceledBooking;
+}
+
+export function isBookingCanceled(booking: BookingRecord): boolean {
+  return (booking.status ?? 'active') === 'canceled';
+}
+
+export function isBookingPast(booking: BookingRecord): boolean {
+  if ((booking.status ?? 'active') === 'canceled') return false;
+
+  const checkOutDate = new Date(`${booking.checkOut}T00:00:00`);
+  if (Number.isNaN(checkOutDate.getTime())) return false;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return checkOutDate.getTime() < today.getTime();
+}
+
+export function formatBookingDate(value: string, locale: string = 'es-ES'): string {
+  if (!value) return '';
+
+  const date = new Date(value.includes('T') ? value : `${value}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return new Intl.DateTimeFormat(locale, {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  }).format(date);
+}
+
+export function formatBookingDateTime(value: string, locale: string = 'es-ES'): string {
+  if (!value) return '';
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return new Intl.DateTimeFormat(locale, {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date);
+}
+
+export function formatStayRange(checkIn: string, checkOut: string, locale: string = 'es-ES'): string {
+  const formattedCheckIn = formatBookingDate(checkIn, locale);
+  const formattedCheckOut = formatBookingDate(checkOut, locale);
+
+  return `${formattedCheckIn} - ${formattedCheckOut}`;
 }

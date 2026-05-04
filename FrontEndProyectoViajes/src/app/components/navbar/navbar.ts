@@ -37,6 +37,7 @@ export class Navbar {
   @Input() isLoggedIn = false;
   @Input() user: UserData | null = null;
   @Input() credits = 0;
+  @Input() isAdmin = false;
 
   @Output() loginEvent = new EventEmitter<void>();
   @Output() logoutEvent = new EventEmitter<void>();
