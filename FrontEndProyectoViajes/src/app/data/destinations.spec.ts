@@ -1,16 +1,18 @@
-import { TestBed } from '@angular/core/testing';
-
 import { getCitiesByCountry, getCountriesByContinent, continents } from './destinations';
 
 describe('Destinations', () => {
-  let service: Destinations;
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(Destinations);
+  it('should expose continents data', () => {
+    expect(continents.length).toBeGreaterThan(0);
   });
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
+  it('should return countries for an existing continent', () => {
+    const countries = getCountriesByContinent('europe');
+    expect(countries.length).toBeGreaterThan(0);
+  });
+
+  it('should return cities for an existing country', () => {
+    const cities = getCitiesByCountry('france');
+    expect(cities.length).toBeGreaterThan(0);
   });
 });
+

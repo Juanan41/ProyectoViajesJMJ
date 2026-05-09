@@ -20,3 +20,4 @@ describe('Hotel', () => {
     expect(component).toBeTruthy();
   });
 });
+
