@@ -1,0 +1,86 @@
+<div class="flex-1 w-full bg-[rgb(23,25,25)] min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 py-12">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+      <div class="flex items-center gap-4">
+        <div
+          class="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+          <lucide-icon [name]="DashboardIcon" class="w-8 h-8 text-emerald-500"></lucide-icon>
+        </div>
+        <div>
+          <h1 class="text-3xl font-black text-white tracking-tight uppercase">{{ 'Panel de Control' | translate }}</h1>
+          <p class="text-gray-500 text-sm tracking-widest uppercase font-bold">{{ 'Administración de la plataforma' |
+            translate }}</p>
+        </div>
+      </div>
+
+      <div class="flex bg-[rgb(33,36,37)] p-1.5 rounded-2xl border border-gray-800">
+        <button (click)="activeTab.set('destinos')"
+          [class]="activeTab() === 'destinos' ? 'bg-emerald-500 text-[rgb(23,25,25)] shadow-lg shadow-emerald-500/20' : 'text-gray-400 hover:text-white'"
+          class="flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all">
+          <lucide-icon [name]="MapIcon" class="w-4 h-4"></lucide-icon>
+          {{ 'Destinos' | translate }}
+        </button>
+        <button (click)="activeTab.set('alojamientos')"
+          [class]="activeTab() === 'alojamientos' ? 'bg-emerald-500 text-[rgb(23,25,25)] shadow-lg shadow-emerald-500/20' : 'text-gray-400 hover:text-white'"
+          class="flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all">
+          <lucide-icon [name]="HotelIcon" class="w-4 h-4"></lucide-icon>
+          {{ 'Hoteles' | translate }}
+        </button>
+      </div>
+    </div>
+
+    @if (activeTab() === 'destinos') {
+    <div class="bg-[rgb(33,36,37)] rounded-[40px] border border-gray-800 overflow-hidden shadow-2xl">
+      <div class="p-8 border-b border-gray-800 flex justify-between items-center bg-gray-800/20">
+        <h2 class="text-white font-bold uppercase tracking-[3px] text-sm">{{ 'Listado de Destinos' | translate }}</h2>
+        <button
+          class="bg-emerald-500 hover:bg-emerald-400 text-[rgb(23,25,25)] px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 transition-all">
+          <lucide-icon [name]="PlusIcon" class="w-4 h-4"></lucide-icon>
+          {{ 'Añadir Destino' | translate }}
+        </button>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-black/20 text-gray-500 text-[10px] font-black uppercase tracking-[3px]">
+              <th class="px-8 py-6">{{ 'Imagen' | translate }}</th>
+              <th class="px-8 py-6">{{ 'Nombre' | translate }}</th>
+              <th class="px-8 py-6">{{ 'País' | translate }}</th>
+              <th class="px-8 py-6">{{ 'Precio' | translate }}</th>
+              <th class="px-8 py-6 text-right">{{ 'Acciones' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-800">
+            @for (dest of destinos(); track dest.id) {
+            <tr class="group hover:bg-white/5 transition-colors">
+              <td class="px-8 py-6">
+                <div class="w-16 h-16 rounded-2xl overflow-hidden border border-gray-800">
+                  <img [src]="dest.imagen" class="w-full h-full object-cover" />
+                </div>
+              </td>
+              <td class="px-8 py-6 text-white font-bold">{{ dest.nombre }}</td>
+              <td class="px-8 py-6 text-gray-400">{{ dest.pais }}</td>
+              <td class="px-8 py-6">
+                <span class="text-emerald-500 font-bold">{{ dest.precio }}€</span>
+              </td>
+              <td class="px-8 py-6 text-right">
+                <div class="flex justify-end gap-3">
+                  <button (click)="editDestino(dest)"
+                    class="p-2.5 bg-gray-800 text-gray-400 hover:text-emerald-500 hover:bg-emerald-500/10 rounded-xl transition-all">
+                    <lucide-icon [name]="EditIcon" class="w-5 h-5"></lucide-icon>
+                  </button>
+                  <button (click)="deleteDestino(dest.id)"
+                    class="p-2.5 bg-gray-800 text-gray-400 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all">
+                    <lucide-icon [name]="TrashIcon" class="w-5 h-5"></lucide-icon>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+    }
+  </div>
+</div>

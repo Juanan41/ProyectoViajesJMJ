@@ -15,7 +15,7 @@ import { Cities } from './pages/cities/cities';
 import { Hotels } from './pages/hotels/hotels';
 import { Receipt } from './pages/receipt/receipt';
 import { Trips } from './pages/trips/trips';
-import { AdminDashboard } from './pages/admin-dashboard/admin-dashboard';
+import { AdminDashboard } from './pages/admin/admin-dashboard';
 
 export const routes: Routes = [
   {
