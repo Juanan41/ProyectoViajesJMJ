@@ -1,15 +1,8 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import {
-  getCityById,
-  getCountryById,
-  getHotelsByCity,
-  City,
-  Country,
-  Hotel,
-} from '../../data/destinations';
+import { DestinoService } from '../../services/destino.service';
 import {
   LucideAngularModule,
   ArrowLeft,
@@ -34,7 +27,8 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
   styleUrl: './hotels.css',
 })
 export class Hotels implements OnInit {
-  route = inject(ActivatedRoute);
+  private route = inject(ActivatedRoute);
+  private destinoService = inject(DestinoService);
 
   readonly ArrowLeftIcon = ArrowLeft;
   readonly StarIcon = Star;
@@ -48,9 +42,9 @@ export class Hotels implements OnInit {
   readonly SlidersHorizontalIcon = SlidersHorizontal;
   readonly XIcon = X;
 
-  city: City | undefined;
-  country: Country | undefined;
-  allHotels: Hotel[] = [];
+  city = signal<any>(null);
+  country = signal<any>(null);
+  allHotels = signal<any[]>([]);
 
   isFilterOpen = false;
 
@@ -72,42 +66,68 @@ export class Hotels implements OnInit {
 
   ngOnInit() {
     this.route.paramMap.subscribe((params) => {
-      const cityId = params.get('cityId');
-      if (cityId) {
-        this.city = getCityById(cityId);
-        if (this.city) {
-          this.country = getCountryById(this.city.countryId);
-          this.allHotels = getHotelsByCity(cityId);
-        }
+      const id = params.get('destinoId');
+      if (id) {
+        this.loadData(Number(id));
       }
+    });
+  }
+
+  private loadData(id: number) {
+    this.destinoService.getDestinoById(id).subscribe({
+      next: (dest) => {
+        this.city.set(dest);
+        this.country.set({ id: dest.continenteId });
+      },
+    });
+
+    this.destinoService.getAlojamientosByDestino(id).subscribe({
+      next: (data) => {
+        this.allHotels.set(data);
+      },
     });
   }
 
   get filteredHotels() {
-    return this.allHotels.filter((hotel) => {
-      if (
-        hotel.pricePerNight < this.filters.minPrice ||
-        hotel.pricePerNight > this.filters.maxPrice
-      )
-        return false;
-      if (this.filters.budget !== null && this.filters.budget > 0) {
-        const totalBasePrice = hotel.pricePerNight * this.filters.days * this.filters.guests;
-        if (totalBasePrice > this.filters.budget) return false;
-      }
-      if (hotel.rating < this.filters.minRating) return false;
-      if (this.filters.category !== 'all' && hotel.category !== this.filters.category) return false;
-      if (this.filters.hasPool && !hotel.hasPool) return false;
-      if (this.filters.hasGym && !hotel.hasGym) return false;
-      if (this.filters.hasSpa && !hotel.hasSpa) return false;
-      if (this.filters.hasRestaurant && !hotel.hasRestaurant) return false;
-      if (this.filters.hasWifi && !hotel.hasWifi) return false;
-      if (this.filters.hasParking && !hotel.hasParking) return false;
+    return this.allHotels().filter((hotel) => {
+      if (!this.matchesPrice(hotel)) return false;
+      if (!this.matchesBudget(hotel)) return false;
+      if (!this.matchesRatingAndCategory(hotel)) return false;
+      if (!this.matchesAmenities(hotel)) return false;
       return true;
     });
   }
 
+  private matchesPrice(hotel: any): boolean {
+    const precio = hotel.precioPorNoche || hotel.pricePerNight || 0;
+    return precio >= this.filters.minPrice && precio <= this.filters.maxPrice;
+  }
+
+  private matchesBudget(hotel: any): boolean {
+    if (this.filters.budget === null || this.filters.budget <= 0) return true;
+    const precio = hotel.precioPorNoche || hotel.pricePerNight || 0;
+    const totalBasePrice = precio * this.filters.days * this.filters.guests;
+    return totalBasePrice <= this.filters.budget;
+  }
+
+  private matchesRatingAndCategory(hotel: any): boolean {
+    if ((hotel.rating || 0) < this.filters.minRating) return false;
+    if (this.filters.category !== 'all' && hotel.tipo !== this.filters.category) return false;
+    return true;
+  }
+
+  private matchesAmenities(hotel: any): boolean {
+    if (this.filters.hasPool && !hotel.hasPool) return false;
+    if (this.filters.hasGym && !hotel.hasGym) return false;
+    if (this.filters.hasSpa && !hotel.hasSpa) return false;
+    if (this.filters.hasRestaurant && !hotel.hasRestaurant) return false;
+    if (this.filters.hasWifi && !hotel.hasWifi) return false;
+    if (this.filters.hasParking && !hotel.hasParking) return false;
+    return true;
+  }
+
   getArray(length: number) {
-    return new Array(length);
+    return new Array(length || 0);
   }
 
   clearFilters() {
@@ -122,7 +142,7 @@ export class Hotels implements OnInit {
       hasRestaurant: false,
       hasWifi: false,
       hasParking: false,
-      budget: null,
+      budget: null as number | null,
       guests: 1,
       days: 1,
     };

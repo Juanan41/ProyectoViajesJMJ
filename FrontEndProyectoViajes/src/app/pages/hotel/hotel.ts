@@ -1,17 +1,7 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import {
-  getHotelById,
-  getCityById,
-  getCountryById,
-  hotels,
-  Hotel,
-  City,
-  Country,
-  Review,
-} from '../../data/destinations';
 import {
   LucideAngularModule,
   ArrowLeft,
@@ -27,6 +17,7 @@ import {
   CalendarCheck,
 } from 'lucide-angular';
 import { Auth } from '../../services/auth';
+import { DestinoService } from '../../services/destino.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { TranslationService } from '../../services/translation';
 
@@ -38,9 +29,11 @@ import { TranslationService } from '../../services/translation';
   styleUrl: './hotel.css',
 })
 export class HotelComponent implements OnInit {
-  translationService = inject(TranslationService);
-  route = inject(ActivatedRoute);
-  auth = inject(Auth);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private destinoService = inject(DestinoService);
+  public auth = inject(Auth);
+  public translationService = inject(TranslationService);
 
   readonly ArrowLeftIcon = ArrowLeft;
   readonly StarIcon = Star;
@@ -54,41 +47,95 @@ export class HotelComponent implements OnInit {
   readonly BedDoubleIcon = BedDouble;
   readonly CalendarCheckIcon = CalendarCheck;
 
-  hotel: Hotel | undefined;
-  city: City | undefined;
-  country: Country | undefined;
+  hotel = signal<any>(null);
+  habitaciones = signal<any[]>([]);
+  recommendations = signal<any[]>([]);
+  city = signal<any>(null);
+  country = signal<any>(null);
 
-  recommendations: Hotel[] = [];
-
-  days = 1;
+  checkInDate = '';
+  checkOutDate = '';
   guests = 1;
+  selectedTransport: 'AVION' | 'TREN' | 'BARCO' = 'AVION';
 
-  newReviewRating: number = 5;
-  newReviewComment: string = '';
-
-  selectedTransport: 'avion' | 'tren' | 'barco' = 'avion';
-  availableTransports: string[] = ['avion', 'barco'];
-
+  newReviewRating = 5;
+  newReviewComment = '';
   editReviewId: string | null = null;
 
-  setRating(star: number) {
-    this.newReviewRating = star;
+  ngOnInit() {
+    this.route.paramMap.subscribe((params) => {
+      const id = params.get('id');
+      if (id) {
+        this.loadHotelFullData(Number(id));
+      }
+    });
   }
 
-  isMyReview(review: Review): boolean {
-    return this.auth.user()?.name === review.userName;
+  private loadHotelFullData(id: number) {
+    this.destinoService.getHotelDetails(id).subscribe({
+      next: (data) => {
+        this.hotel.set(data);
+        this.loadRooms(id);
+        this.loadRecommendations();
+        this.initializeStayDates();
+      },
+    });
   }
 
-  deleteReview(reviewId: string) {
-    if (!this.hotel) return;
-    this.hotel.reviews = this.hotel.reviews?.filter((r) => r.id !== reviewId);
-    if (this.auth.user()) {
-      const filtered = this.auth.user()!.reviews?.filter((r) => r.id !== reviewId) || [];
-      this.auth.updateUser({ reviews: filtered });
-    }
+  private loadRooms(hotelId: number) {
+    this.destinoService
+      .getHabitacionesByHotel(hotelId)
+      .subscribe((data) => this.habitaciones.set(data));
   }
 
-  startEditReview(review: Review) {
+  private loadRecommendations() {
+    this.destinoService.getDestinos().subscribe((data) => {
+      this.recommendations.set(data.slice(0, 3));
+    });
+  }
+
+  initializeStayDates() {
+    const today = new Date();
+    today.setDate(today.getDate() + 1);
+    this.checkInDate = today.toISOString().split('T')[0];
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    this.checkOutDate = tomorrow.toISOString().split('T')[0];
+  }
+
+  get nights(): number {
+    if (!this.checkInDate || !this.checkOutDate) return 0;
+    const diff = new Date(this.checkOutDate).getTime() - new Date(this.checkInDate).getTime();
+    return diff <= 0 ? 0 : Math.ceil(diff / (1000 * 60 * 60 * 24));
+  }
+
+  get totalPrice(): number {
+    const costs: any = { AVION: 150, TREN: 50, BARCO: 100 };
+    const hotelPrice = this.hotel()?.precioPorNoche ?? 0;
+    return hotelPrice * this.nights * this.guests + (costs[this.selectedTransport] || 0);
+  }
+
+  get canBook(): boolean {
+    return (
+      this.nights > 0 && this.auth.credits() >= this.totalPrice && this.auth.cards().length > 0
+    );
+  }
+
+  getArray(length: number): any[] {
+    return Array.from({ length: length || 0 });
+  }
+
+  getRatingLabel(rating: number): string {
+    const labels: any = { 5: 'Excelente', 4: 'Muy bueno', 3: 'Bueno', 2: 'Regular', 1: 'Malo' };
+    return labels[rating] || '';
+  }
+
+  isMyReview(review: any): boolean {
+    const user = this.auth.user();
+    return user ? user.name === review.userName : false;
+  }
+
+  startEditReview(review: any) {
     this.editReviewId = review.id;
     this.newReviewRating = review.rating;
     this.newReviewComment = review.comment;
@@ -100,125 +147,36 @@ export class HotelComponent implements OnInit {
     this.newReviewComment = '';
   }
 
-  addReview() {
-    if (!this.newReviewComment.trim()) return;
-
-    const currentUser = this.auth.user();
-    if (!currentUser || !this.hotel) return;
-
-    if (this.editReviewId) {
-      // Editable
-      const updatedReview = {
-        rating: Number(this.newReviewRating),
-        comment: this.newReviewComment,
-        date: new Date().toISOString().split('T')[0],
-      };
-
-      this.hotel.reviews = this.hotel.reviews?.map((r) =>
-        r.id === this.editReviewId ? { ...r, ...updatedReview } : r,
-      );
-      const userReviews =
-        currentUser.reviews?.map((r) =>
-          r.id === this.editReviewId ? { ...r, ...updatedReview } : r,
-        ) || [];
-      this.auth.updateUser({ reviews: userReviews });
-
-      this.editReviewId = null;
-    } else {
-      const newReview: Review = {
-        id: Math.random().toString(36).substr(2, 9),
-        userName: currentUser.name,
-        rating: Number(this.newReviewRating),
-        comment: this.newReviewComment,
-        date: new Date().toISOString().split('T')[0],
-        hotelName: this.hotel.name,
-      };
-
-      if (!this.hotel.reviews) {
-        this.hotel.reviews = [];
-      }
-      this.hotel.reviews = [...this.hotel.reviews, newReview];
-
-      const userReviews = currentUser.reviews || [];
-      this.auth.updateUser({ reviews: [...userReviews, newReview] });
-    }
-
-    this.newReviewComment = '';
-    this.newReviewRating = 5;
+  deleteReview(id: any) {
+    console.log('Borrar review', id);
   }
 
-  get canBook(): boolean {
-    const balance = this.auth.credits();
-    const hasCard = this.auth.cards().length > 0;
-    return balance >= this.totalPrice && hasCard;
+  addReview() {
+    console.log('Añadir review', this.newReviewComment);
+  }
+
+  setRating(star: number) {
+    this.newReviewRating = star;
+  }
+
+  getRecCity(cityId: any) {
+    return { name: 'Ciudad' };
   }
 
   reservar() {
-    if (this.auth.cards().length === 0) {
-      alert(
-        this.translationService.translate(
-          'Necesitas tener una tarjeta asociada a tu cuenta para reservar.',
-        ),
-      );
-      return;
-    }
-
-    const balance = this.auth.credits();
-    if (balance < this.totalPrice) {
-      alert(this.translationService.translate('No tienes saldo suficiente.'));
-      return;
-    }
-
-    this.auth.updateCredits(-this.totalPrice);
-    alert(this.translationService.translate('Reserva exitosa!'));
-  }
-
-  ngOnInit() {
-    this.route.paramMap.subscribe((params) => {
-      const id = params.get('id');
-      if (id) {
-        this.hotel = getHotelById(id);
-        if (this.hotel) {
-          this.city = getCityById(this.hotel.cityId);
-          if (this.city) {
-            this.country = getCountryById(this.city.countryId);
-          }
-          this.loadRecommendations();
-        }
-      }
+    const bookingRequest = {
+      usuarioId: this.auth.user()?.id,
+      habitacionId: this.habitaciones()[0]?.id,
+      fechaInicio: this.checkInDate,
+      fechaFin: this.checkOutDate,
+      transporte: this.selectedTransport,
+      precioTotal: this.totalPrice,
+    };
+    this.destinoService.crearReserva(bookingRequest).subscribe({
+      next: (res) => {
+        this.auth.updateCredits(-this.totalPrice);
+        this.router.navigate(['/receipt', res.id]);
+      },
     });
-  }
-
-  loadRecommendations() {
-    if (!this.hotel) return;
-
-    const h = this.hotel;
-    const similarHotels = hotels.filter((item) => {
-      if (item.id === h.id) return false;
-
-      const isSameCity = item.cityId === h.cityId;
-      const priceDiff = Math.abs(item.pricePerNight - h.pricePerNight);
-      const isSimilarPrice = priceDiff <= 200;
-
-      return isSameCity || isSimilarPrice;
-    });
-
-    this.recommendations = similarHotels.slice(0, 3);
-  }
-
-  getArray(length: number) {
-    return Array.from({ length }).map((_, i) => i + 1);
-  }
-
-  getRecCity(cityId: string) {
-    return getCityById(cityId);
-  }
-
-  get totalPrice(): number {
-    let basePrice = (this.hotel?.pricePerNight || 0) * this.days * this.guests;
-    if (this.selectedTransport === 'avion') basePrice += 150;
-    if (this.selectedTransport === 'tren') basePrice += 50;
-    if (this.selectedTransport === 'barco') basePrice += 100;
-    return basePrice;
   }
 }
