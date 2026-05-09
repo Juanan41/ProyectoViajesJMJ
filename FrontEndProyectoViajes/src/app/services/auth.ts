@@ -183,6 +183,9 @@ export class Auth {
 
     this.cards.update((prev) => [...prev, newCard]);
   }
+  removeCard(id: string) {
+    this.cards.update((prev) => prev.filter((card) => card.id !== id));
+  }
 
   getToken(): string | null {
     return localStorage.getItem('token');

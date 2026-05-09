@@ -1,116 +1,101 @@
-<div *ngIf="!hotel || !city || !country" class="flex-1 flex flex-col items-center justify-center">
-  <p class="text-gray-400 mb-4">{{ 'Recibo no encontrado' | translate }}</p>
-  <a routerLink="/profile" class="text-white hover:underline flex items-center gap-2">
-    <lucide-icon [img]="ArrowLeftIcon" class="w-4 h-4"></lucide-icon> {{ 'Volver al perfil' | translate }}
-  </a>
-</div>
+<div class="flex-1 w-full bg-[rgb(23,25,25)] py-20 px-4">
+  @if (!booking()) {
+  <div class="max-w-md mx-auto text-center">
+    <div class="loading loading-spinner loading-lg text-emerald-500 mb-4"></div>
+    <p class="text-gray-400">{{ 'Generando recibo...' | translate }}</p>
+  </div>
+  } @else {
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-10 flex items-center justify-between">
+      <a routerLink="/trips"
+        class="text-gray-500 hover:text-white transition-colors flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
+        <lucide-icon [name]="ArrowLeftIcon" class="w-4 h-4"></lucide-icon>
+        {{ 'Volver a mis viajes' | translate }}
+      </a>
+      <div class="flex gap-3">
+        <button (click)="print()"
+          class="p-3 bg-[rgb(33,36,37)] border border-gray-800 text-white rounded-2xl hover:bg-gray-800 transition-all">
+          <lucide-icon [name]="PrinterIcon" class="w-5 h-5"></lucide-icon>
+        </button>
+        <button (click)="download()"
+          class="p-3 bg-[rgb(33,36,37)] border border-gray-800 text-white rounded-2xl hover:bg-gray-800 transition-all">
+          <lucide-icon [name]="DownloadIcon" class="w-5 h-5"></lucide-icon>
+        </button>
+      </div>
+    </div>
 
-<div *ngIf="hotel && city && country" class="flex-1 w-full bg-[rgb(33,36,37)] min-h-screen">
-  <div class="max-w-4xl mx-auto px-4 py-12">
-    <a [routerLink]="['/hotel', hotel.id]"
-      class="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-8 transition-colors">
-      <lucide-icon [img]="ArrowLeftIcon" class="w-4 h-4"></lucide-icon> {{ 'Volver al hotel' | translate }}
-    </a>
-
-    <!-- Tarjeta reserva -->
-    <div id="receiptContent" class="bg-white text-black rounded-3xl overflow-hidden shadow-2xl">
-      <!-- Header -->
-      <div class="bg-gradient-to-r from-[rgb(33,36,37)] to-[rgb(23,25,25)] text-white p-8">
-        <div class="flex items-center justify-between mb-6">
-          <div>
-            <h1 class="text-3xl font-bold mb-2">{{ 'Recibo de Pago' | translate }}</h1>
-            <p class="text-gray-300">{{ 'JMJ Viajes - Confirmación de Reserva' | translate }}</p>
+    <div class="bg-white rounded-[40px] overflow-hidden shadow-2xl">
+      <div class="bg-emerald-500 p-10 text-[rgb(23,25,25)] flex items-center justify-between">
+        <div>
+          <div class="flex items-center gap-3 mb-2">
+            <lucide-icon [name]="CheckCircleIcon" class="w-8 h-8"></lucide-icon>
+            <h1 class="text-3xl font-black uppercase tracking-tighter">{{ 'Pago Confirmado' | translate }}</h1>
           </div>
-          <div class="bg-green-500 p-3 rounded-full">
-            <lucide-icon [img]="CheckCircle2Icon" class="w-8 h-8"></lucide-icon>
-          </div>
+          <p class="font-bold opacity-80 text-sm tracking-widest">{{ 'ID RESERVA:' | translate }} #{{ booking()?.id }}
+          </p>
         </div>
-        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4">
-          <p class="text-sm text-gray-300 mb-1">{{ 'Código de confirmación' | translate }}</p>
-          <p class="text-2xl font-bold font-mono tracking-wider">{{ bookingDetails.confirmationCode }}</p>
+        <div class="text-right hidden sm:block">
+          <p class="text-4xl font-black">{{ booking()?.precioTotal }}€</p>
+          <p class="text-[10px] font-black uppercase tracking-widest opacity-60">{{ 'Total Pagado' | translate }}</p>
         </div>
       </div>
 
-      <!-- Hotel Info -->
-      <div class="p-8 border-b border-gray-200">
-        <h2 class="text-2xl font-bold mb-4">{{ hotel.name | translate }}</h2>
-        <p class="text-gray-600 mb-2">{{ city.name | translate }}, {{ country.name | translate }}</p>
-        <div class="flex items-center gap-2 text-gray-700">
-          <lucide-icon [img]="BedDoubleIcon" class="w-5 h-5"></lucide-icon>
-          <span>{{ bookingDetails.roomType | translate }}</span>
-        </div>
-      </div>
-
-      <!-- Detalles reserva -->
-      <div class="p-8 border-b border-gray-200">
-        <h3 class="text-xl font-semibold mb-6">{{ 'Detalles de la Reserva' | translate }}</h3>
-        <div class="grid grid-cols-2 gap-6">
+      <div class="p-10">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12 pb-12 border-b border-gray-100">
           <div>
-            <p class="text-sm text-gray-500 mb-1 flex items-center gap-2">
-              <lucide-icon [img]="CalendarIcon" class="w-4 h-4"></lucide-icon> {{ 'Fecha de reserva' | translate }}
-            </p>
-            <p class="font-semibold">{{ bookingDetails.bookingDate }}</p>
+            <span class="text-gray-400 text-[10px] font-black uppercase tracking-widest block mb-4">{{ 'Detalles del
+              Destino' | translate }}</span>
+            <div class="flex gap-4">
+              <div class="w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0">
+                <img [src]="booking()?.imagenUrl" class="w-full h-full object-cover" />
+              </div>
+              <div>
+                <h2 class="text-xl font-bold text-gray-900 mb-1">{{ booking()?.destinoNombre | translate }}</h2>
+                <p class="text-gray-500 text-sm flex items-center gap-1">
+                  <lucide-icon [name]="MapPinIcon" class="w-3 h-3"></lucide-icon>
+                  {{ booking()?.pais | translate }}
+                </p>
+              </div>
+            </div>
           </div>
-          <div>
-            <p class="text-sm text-gray-500 mb-1 flex items-center gap-2">
-              <lucide-icon [img]="UserIcon" class="w-4 h-4"></lucide-icon> {{ 'Huéspedes' | translate }}
-            </p>
-            <p class="font-semibold">{{ bookingDetails.guests }} {{ 'Adultos' | translate }}</p>
-          </div>
-          <div>
-            <p class="text-sm text-gray-500 mb-1">{{ 'Check-in' | translate }}</p>
-            <p class="font-semibold">{{ bookingDetails.checkIn }}</p>
-          </div>
-          <div>
-            <p class="text-sm text-gray-500 mb-1">{{ 'Check-out' | translate }}</p>
-            <p class="font-semibold">{{ bookingDetails.checkOut }}</p>
+          <div class="grid grid-cols-2 gap-6">
+            <div>
+              <span class="text-gray-400 text-[10px] font-black uppercase tracking-widest block mb-2">{{ 'Fecha' |
+                translate }}</span>
+              <p class="text-gray-900 font-bold text-sm">{{ booking()?.fechaInicio }}</p>
+            </div>
+            <div>
+              <span class="text-gray-400 text-[10px] font-black uppercase tracking-widest block mb-2">{{ 'Transporte' |
+                translate }}</span>
+              <p class="text-gray-900 font-bold text-sm uppercase">{{ booking()?.transporte | translate }}</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Resumen pago -->
-      <div class="p-8 border-b border-gray-200 bg-gray-50">
-        <h3 class="text-xl font-semibold mb-6">{{ 'Resumen de Pago' | translate }}</h3>
-        <div class="space-y-3">
-          <div class="flex justify-between">
-            <span class="text-gray-600">{{ hotel.pricePerNight }}€ × {{ bookingDetails.nights }} {{ 'noches' | translate }}</span>
-            <span class="font-semibold">{{ hotel.pricePerNight * bookingDetails.nights }}€</span>
+        <div class="bg-gray-50 rounded-3xl p-8 mb-10">
+          <div class="flex justify-between mb-4">
+            <span class="text-gray-500 text-sm font-medium">{{ 'Método de Pago' | translate }}</span>
+            <div class="flex items-center gap-2 text-gray-900 font-bold text-sm">
+              <lucide-icon [name]="CreditCardIcon" class="w-4 h-4"></lucide-icon>
+              {{ 'Créditos JMJ' | translate }}
+            </div>
           </div>
-          <div class="flex justify-between text-sm">
-            <span class="text-gray-600">{{ 'Tasas de servicio' | translate }}</span>
-            <span>0€</span>
-          </div>
-          <div class="flex justify-between text-sm">
-            <span class="text-gray-600">{{ 'Impuestos' | translate }}</span>
-            <span>{{ 'Incluidos' | translate }}</span>
-          </div>
-          <div class="border-t border-gray-300 pt-3 mt-3 flex justify-between text-xl">
-            <span class="font-bold">{{ 'Total' | translate }}</span>
-            <span class="font-bold text-green-600">{{ bookingDetails.totalAmount }}€</span>
+          <div class="flex justify-between pt-4 border-t border-gray-200">
+            <span class="text-gray-900 font-bold">{{ 'Total Cobrado' | translate }}</span>
+            <span class="text-emerald-600 text-xl font-black">{{ booking()?.precioTotal }}€</span>
           </div>
         </div>
-      </div>
 
-      <!-- Pago -->
-      <div class="p-8">
-        <h3 class="text-xl font-semibold mb-6">{{ 'Método de Pago' | translate }}</h3>
-        <div class="bg-gray-100 rounded-xl p-4 flex items-center gap-4">
-          <div class="bg-gradient-to-br from-gray-800 to-gray-600 p-3 rounded-lg">
-            <lucide-icon [img]="CreditCardIcon" class="w-6 h-6 text-white"></lucide-icon>
-          </div>
-          <div>
-            <p class="font-semibold">{{ bookingDetails.paymentMethod | translate }}</p>
-            <p class="text-sm text-gray-500">{{ 'Pagado el' | translate }} {{ bookingDetails.paymentDate }}</p>
+        <div class="text-center">
+          <p class="text-gray-400 text-[10px] font-bold uppercase tracking-[4px] mb-2">{{ 'Gracias por confiar en JMJ' |
+            translate }}</p>
+          <div class="w-full h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+            <span class="text-[10px] text-gray-300 font-mono tracking-widest">JMJ-{{ booking()?.id
+              }}-SECURE-PAYMENT</span>
           </div>
         </div>
-      </div>
-
-      <!-- Footer -->
-      <div class="bg-gray-100 p-6 text-center border-t border-gray-200" data-html2canvas-ignore="true">
-        <p class="text-sm text-gray-600 mb-4">
-          {{ 'Esta es una reserva simulada. No existen cargos reales asociados a esta cuenta.' | translate }}
-        </p>
       </div>
     </div>
   </div>
+  }
 </div>

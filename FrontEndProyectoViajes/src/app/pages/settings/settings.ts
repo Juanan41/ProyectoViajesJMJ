@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -14,7 +14,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
   styleUrl: './settings.css',
 })
 export class Settings implements OnInit {
-  authService = inject(Auth);
+  constructor(private authService: Auth) { }
 
   @ViewChild('fileInputRef') fileInputRef!: ElementRef<HTMLInputElement>;
 
@@ -69,7 +69,7 @@ export class Settings implements OnInit {
   }
 
   removeCard(id: string) {
-    // In a real app we'd call a service to remove the card
-    this.authService.cards.update((cards) => cards.filter((c) => c.id !== id));
+    this.authService.removeCard(id);
   }
 }
+
