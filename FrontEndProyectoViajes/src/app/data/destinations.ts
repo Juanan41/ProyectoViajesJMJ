@@ -94,32 +94,32 @@ export const continents: Continent[] = [
   {
     id: 'europe',
     name: 'Europa',
-    image: 'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=800',
+    image: 'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=800&q=80',
     description: 'Historia, cultura y arquitectura milenaria',
   },
   {
     id: 'asia',
     name: 'Asia',
-    image: 'https://images.unsplash.com/photo-1480796927426-f609979314bd?w=800',
+    image: 'https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=800&q=80',
     description: 'Tradición ancestral y modernidad vibrante',
   },
   {
     id: 'america',
-    name: 'Amï¿½rica',
-    image: 'https://images.unsplash.com/photo-1501466044931-62695aada8e9?w=800',
+    name: 'América',
+    image: 'https://images.unsplash.com/photo-1501466044931-62695aada8e9?auto=format&fit=crop&w=800&q=80',
     description: 'Naturaleza salvaje y ciudades cosmopolitas',
   },
   {
     id: 'africa',
-    name: 'ï¿½frica',
-    image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=800',
+    name: 'África',
+    image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=800&q=80',
     description: 'Safari, desiertos y culturas ancestrales',
   },
   {
     id: 'oceania',
-    name: 'Oceanï¿½a',
-    image: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=800',
-    description: 'Playas paradisiacas y naturaleza ï¿½nica',
+    name: 'Oceanía',
+    image: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=800&q=80',
+    description: 'Playas paradisiacas y naturaleza única',
   },
 ];
 
