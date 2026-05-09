@@ -1,44 +1,47 @@
-<app-destino-carousel></app-destino-carousel>
-
-<div class="max-w-7xl mx-auto px-4 py-24">
-  <div class="flex items-end justify-between mb-12">
-    <div>
-      <h2 class="text-sm font-black text-emerald-500 uppercase tracking-[4px] mb-2">
-        {{ 'Categorías' | translate }}
-      </h2>
-      <h3 class="text-4xl font-bold text-white tracking-tight">
-        {{ 'Explora por Continente' | translate }}
-      </h3>
+@if (!auth.isLoggedIn()) {
+  <app-destino-carousel [destinos]="destinos()"></app-destino-carousel>
+} @else {
+  <div class="max-w-7xl mx-auto px-4 py-24">
+    <div class="flex items-end justify-between mb-12">
+      <div>
+        <h2 class="text-sm font-black text-emerald-500 uppercase tracking-[4px] mb-2">
+          {{ 'Categorías' | translate }}
+        </h2>
+        <h3 class="text-4xl font-bold text-white tracking-tight">
+          {{ 'Explora por Continente' | translate }}
+        </h3>
+      </div>
     </div>
-  </div>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    @for (cont of continentes; track cont.id) {
-      <div
-        [routerLink]="['/continent', cont.id]"
-        class="group relative h-80 rounded-[32px] overflow-hidden border border-white/5 cursor-pointer"
-      >
-        <img
-          [src]="cont.imagen"
-          class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-        />
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (cont of continentes; track cont.id) {
+        <div
+          [routerLink]="['/continent', cont.id]"
+          class="group relative h-80 rounded-[32px] overflow-hidden border border-white/5 cursor-pointer"
+        >
+          <img
+            [src]="cont.imagen"
+            (error)="cambiarImagen($event, cont.nombre)"
+            class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          />
 
-        <div class="absolute inset-0 bg-gradient-to-t from-[rgb(23,25,25)] via-[rgb(23,25,25)]/20 to-transparent"></div>
+          <div class="absolute inset-0 bg-gradient-to-t from-[rgb(23,25,25)] via-[rgb(23,25,25)]/20 to-transparent"></div>
 
-        <div class="absolute inset-0 flex items-end p-8">
-          <div>
-            <h4 class="text-2xl font-bold text-white mb-1">
-              {{ cont.nombre | translate }}
-            </h4>
+          <div class="absolute inset-0 flex items-end p-8">
+            <div>
+              <h4 class="text-2xl font-bold text-white mb-1">
+                {{ cont.nombre | translate }}
+              </h4>
 
-            <p
-              class="text-emerald-400 text-xs font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0"
-            >
-              {{ 'Ver destinos' | translate }} →
-            </p>
+              <p
+                class="text-emerald-400 text-xs font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0"
+              >
+                {{ 'Ver destinos' | translate }} →
+              </p>
+            </div>
           </div>
         </div>
-      </div>
-    }
+      }
+    </div>
   </div>
-</div>
+}
