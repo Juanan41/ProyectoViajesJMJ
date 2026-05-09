@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -14,8 +14,10 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
   styleUrl: './add-card.css',
 })
 export class AddCard {
-  authService = inject(Auth);
-  router = inject(Router);
+  constructor(
+    private authService: Auth,
+    private router: Router,
+  ) { }
 
   readonly ArrowLeftIcon = ArrowLeft;
   readonly CardIconType = CardIcon;
@@ -25,12 +27,13 @@ export class AddCard {
   expiry = '';
   cvv = '';
 
+  private onlyDigits(value: string): string {
+    return value.replace(/[^0-9]/g, '');
+  }
+
   formatCardNumber(value: string): string {
-    const v = value
-      .replace(/\s+/g, '')
-      .replace(/[^0-9]/gi, '')
-      .substring(0, 16);
-    const matches = v.match(/\d{1,4}/g);
+    const digits = this.onlyDigits(value).substring(0, 16);
+    const matches = digits.match(/\d{1,4}/g);
     if (matches && matches.length) {
       return matches.join(' ');
     }
@@ -38,11 +41,11 @@ export class AddCard {
   }
 
   formatExpiry(value: string): string {
-    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-    if (v.length >= 2) {
-      return `${v.substring(0, 2)}/${v.substring(2, 4)}`;
+    const digits = this.onlyDigits(value);
+    if (digits.length >= 2) {
+      return `${digits.substring(0, 2)}/${digits.substring(2, 4)}`;
     }
-    return v;
+    return digits;
   }
 
   handleCardNumberChange(event: Event) {
@@ -68,11 +71,11 @@ export class AddCard {
   }
 
   handleCvvChange(value: string) {
-    const v = value.replace(/[^0-9]/gi, '');
-    if (v.length <= 4) {
-      this.cvv = v;
+    const digits = this.onlyDigits(value);
+    if (digits.length <= 4) {
+      this.cvv = digits;
     } else {
-      this.cvv = v.substring(0, 4);
+      this.cvv = digits.substring(0, 4);
     }
   }
 
@@ -103,3 +106,4 @@ export class AddCard {
     }
   }
 }
+
