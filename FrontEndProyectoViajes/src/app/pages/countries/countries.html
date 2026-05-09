@@ -1,67 +1,56 @@
-<div *ngIf="!continent" class="flex-1 flex flex-col items-center justify-center">
-  <p class="text-gray-400 mb-4"> {{ 'Continente no encontrado' | translate }} </p>
-  <a routerLink="/continents" class="text-white hover:underline flex items-center gap-2">
-    <lucide-icon [img]="ArrowLeftIcon" class="w-4 h-4"></lucide-icon>
-    {{ 'Volver a continentes' | translate }}
-  </a>
+@if (!continent()) {
+<div class="flex-1 flex flex-col items-center justify-center">
+  <div class="loading loading-spinner loading-lg text-emerald-500 mb-4"></div>
+  <p class="text-gray-400"> {{ 'Cargando continente...' | translate }} </p>
 </div>
-
-<div *ngIf="continent" class="flex-1 w-full bg-[rgb(33,36,37)] min-h-screen">
+} @if (continent()) {
+<div class="flex-1 w-full">
+  <div class="relative h-[40vh] min-h-[300px] w-full flex items-center justify-center overflow-hidden">
+    <div class="absolute inset-0 bg-[rgb(23,25,25)]"></div>
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent to-[rgb(23,25,25)]"></div>
+    <div class="relative z-10 text-center px-4 max-w-4xl">
+      <h1 class="text-5xl md:text-7xl font-bold text-white mb-4">{{ continent()?.name | translate }}</h1>
+      <p class="text-gray-400 text-lg">{{ continent()?.description | translate }}</p>
+    </div>
+  </div>
   <div class="max-w-7xl mx-auto px-4 py-12">
-    <a routerLink="/continents"
-      class="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-8 transition-colors">
-      <lucide-icon [img]="ArrowLeftIcon" class="w-4 h-4"></lucide-icon>
-      {{ 'Volver a continentes' | translate }}
-    </a>
-
-    <div class="text-center mb-12">
-      <h1 class="text-5xl font-bold text-white mb-4">{{ continent.name | translate }}</h1>
-      <p class="text-gray-400 text-lg">{{ continent.description | translate }}</p>
-    </div>
-
-    <div *ngIf="loading" class="text-center text-gray-400 py-12">
-      Cargando destinos...
-    </div>
-
-    <div *ngIf="error" class="text-center text-red-400 py-12">
-      {{ error }}
-    </div>
-
-    <div *ngIf="!loading && !error && countries.length === 0" class="text-center text-gray-400 py-12">
-      No hay destinos disponibles para este continente.
-    </div>
-
-    <div *ngIf="!loading && !error" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <a *ngFor="let country of countries"
-        [routerLink]="['/search']"
-        [queryParams]="{ q: country.nombre }"
-        class="group relative h-72 rounded-2xl overflow-hidden border border-gray-800 hover:border-gray-600 transition-all shadow-xl">
-
-        <img loading="lazy" [src]="country.image" [alt]="country.nombre"
-          class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-
-        <div
-          class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent flex flex-col justify-end p-6">
-
-          <h2
-            class="text-2xl font-bold text-white mb-2 flex items-center gap-2 group-hover:translate-x-2 transition-transform">
-
-            <img loading="lazy" [src]="getFlagUrl(country.pais)" alt="Flag" class="w-8 aspect-auto rounded-sm shadow-sm"
-              *ngIf="getFlagUrl(country.pais)" />
-
-            {{ country.nombre }}
-          </h2>
-
-          <p class="text-gray-300 text-sm mb-2">
-            {{ country.pais }} · desde {{ country.precio }}€
-          </p>
-
-          <div class="text-white text-sm font-medium flex items-center gap-2 mt-2">
-            Ver destino
-            <lucide-icon [img]="ChevronRightIcon" class="w-4 h-4"></lucide-icon>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      @for (country of countries(); track country.id) {
+      <div [routerLink]="['/hotels', country.id]"
+        class="group bg-[rgb(33,36,37)] rounded-3xl overflow-hidden border border-gray-800 hover:border-emerald-500/50 transition-all duration-500 cursor-pointer shadow-xl hover:shadow-emerald-500/10">
+        <div class="relative h-64 overflow-hidden">
+          <img [src]="country.imagen" [alt]="country.nombre"
+            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+          <div class="absolute inset-0 bg-gradient-to-t from-[rgb(33,36,37)] via-transparent to-transparent"></div>
+          <div
+            class="absolute top-4 right-4 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 flex items-center gap-2">
+            <img [src]="getFlagUrl(country.codigoIso)" class="w-5 h-3.5 object-cover rounded-sm" />
+            <span class="text-xs font-medium text-white tracking-wider uppercase">{{ country.codigoIso }}</span>
           </div>
         </div>
-      </a>
+        <div class="p-8">
+          <div class="flex items-center gap-2 text-emerald-500 mb-3">
+            <lucide-icon [name]="MapPinIcon" class="w-4 h-4"></lucide-icon>
+            <span class="text-xs font-bold tracking-widest uppercase">{{ country.pais | translate }}</span>
+          </div>
+          <h3 class="text-2xl font-bold text-white mb-3 group-hover:text-emerald-400 transition-colors">{{
+            country.nombre | translate }}</h3>
+          <p class="text-gray-400 text-sm leading-relaxed mb-6 line-clamp-2">{{ country.descripcion | translate }}</p>
+          <div class="flex items-center justify-between pt-6 border-t border-gray-800">
+            <div>
+              <span class="text-gray-500 text-xs block mb-1 uppercase tracking-tighter">{{ 'Desde' | translate }}</span>
+              <span class="text-white font-bold text-xl">{{ country.precio }}€</span>
+            </div>
+            <div
+              class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500 transition-all duration-300">
+              <lucide-icon [name]="ChevronRightIcon"
+                class="w-6 h-6 text-emerald-500 group-hover:text-white"></lucide-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+      }
     </div>
   </div>
 </div>
+}

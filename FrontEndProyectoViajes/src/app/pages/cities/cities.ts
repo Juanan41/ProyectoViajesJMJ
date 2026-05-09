@@ -1,8 +1,8 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
-import { getCountryById, getCitiesByCountry, Country, City } from '../../data/destinations';
-import { LucideAngularModule, ArrowLeft, MapPin } from 'lucide-angular';
+import { DestinoService, DestinoDTO } from '../../services/destino.service';
+import { LucideAngularModule, ArrowLeft, ChevronRight, MapPin } from 'lucide-angular';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
@@ -13,51 +13,34 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
   styleUrl: './cities.css',
 })
 export class Cities implements OnInit {
-  route = inject(ActivatedRoute);
+  private route = inject(ActivatedRoute);
+  private destinoService = inject(DestinoService);
 
   readonly ArrowLeftIcon = ArrowLeft;
+  readonly ChevronRightIcon = ChevronRight;
   readonly MapPinIcon = MapPin;
 
-  country: Country | undefined;
-  cities: City[] = [];
-
-  private flagMap: Record<string, string> = {
-    france: 'fr',
-    spain: 'es',
-    italy: 'it',
-    uk: 'gb',
-    germany: 'de',
-    switzerland: 'ch',
-    japan: 'jp',
-    thailand: 'th',
-    uae: 'ae',
-    singapore: 'sg',
-    india: 'in',
-    usa: 'us',
-    brazil: 'br',
-    argentina: 'ar',
-    mexico: 'mx',
-    canada: 'ca',
-    morocco: 'ma',
-    egypt: 'eg',
-    southafrica: 'za',
-    australia: 'au',
-    newzealand: 'nz',
-  };
-
-  getFlagUrl(countryId: string | undefined): string {
-    if (!countryId) return '';
-    const code = this.flagMap[countryId];
-    return code ? `https://flagcdn.com/112x84/${code}.png` : '';
-  }
+  countryName = signal<string | null>(null);
+  cities = signal<DestinoDTO[]>([]);
 
   ngOnInit() {
     this.route.paramMap.subscribe((params) => {
-      const countryId = params.get('countryId');
-      if (countryId) {
-        this.country = getCountryById(countryId);
-        this.cities = getCitiesByCountry(countryId);
+      const country = params.get('countryId');
+      if (country) {
+        this.countryName.set(country);
+        this.loadCities(country);
       }
+    });
+  }
+
+  private loadCities(country: string) {
+    this.destinoService.getDestinosByPais(country).subscribe({
+      next: (data: DestinoDTO[]) => {
+        this.cities.set(data);
+      },
+      error: (err: any) => {
+        console.error('Error cargando ciudades:', err);
+      },
     });
   }
 }
