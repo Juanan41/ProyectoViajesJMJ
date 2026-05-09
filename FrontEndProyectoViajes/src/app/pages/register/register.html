@@ -6,10 +6,12 @@
     </div>
 
     <!-- Error message -->
-    <div *ngIf="error"
+    @if (error) {
+    <div
       class="mb-6 p-4 bg-red-500/10 border border-red-500/50 rounded-lg text-red-500 text-sm font-medium text-center">
       {{ error }}
     </div>
+    }
 
     <form (submit)="handleSubmit($event)" class="space-y-6">
       <div class="space-y-2">
@@ -31,7 +33,7 @@
         <label class="text-sm font-medium text-gray-300 block" for="password"> {{ 'Contraseña' | translate }} </label>
         <input type="password" id="password" name="password" [(ngModel)]="password" required
           class="w-full bg-[rgb(33,36,37)] border border-gray-700 text-white rounded-lg px-4 py-3 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white transition-all shadow-inner"
-          [placeholder]="'••••••••' | translate" />
+          [placeholder]="'Tu contraseña' | translate" />
       </div>
 
       <div class="space-y-2">
@@ -39,7 +41,7 @@
           translate }} </label>
         <input type="password" id="confirmPassword" name="confirmPassword" [(ngModel)]="confirmPassword" required
           class="w-full bg-[rgb(33,36,37)] border border-gray-700 text-white rounded-lg px-4 py-3 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white transition-all shadow-inner"
-          [placeholder]="'••••••••' | translate" />
+          [placeholder]="'Repite tu contraseña' | translate" />
       </div>
 
       <button type="submit"
@@ -48,8 +50,8 @@
     </form>
 
     <div class="mt-8 text-center text-sm text-gray-400">
-      {{ '¿Ya tienes una cuenta?' | translate }} <a routerLink="/login" class="text-white hover:underline transition-all"> {{ 'Iniciar
-        sesión' | translate }} </a>
+      {{ '¿Ya tienes una cuenta?' | translate }} <a routerLink="/login"
+        class="text-white hover:underline transition-all"> {{ 'Iniciar sesión' | translate }} </a>
     </div>
   </div>
 </div>

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -15,36 +15,28 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 export class Login {
   email = '';
   password = '';
-  error = '';
-  loading = false;
 
-  authService = inject(Auth);
-  router = inject(Router);
+  constructor(
+    private authService: Auth,
+    private router: Router,
+  ) {}
 
-  handleSubmit(event: Event) {
+  async handleSubmit(event: Event) {
     event.preventDefault();
+    if (!this.email || !this.password) return;
 
-    if (!this.email || !this.password) {
-      this.error = 'Introduce correo y contraseña';
-      return;
-    }
-
-    this.error = '';
-    this.loading = true;
-
-    this.authService.login({
-      email: this.email,
-      password: this.password,
-    }).subscribe({
-      next: () => {
-        this.loading = false;
-        this.router.navigate(['/']);
-      },
-      error: (err) => {
-        this.loading = false;
-        this.error = 'Correo o contraseña incorrectos';
-        console.error('Error de login:', err);
-      }
+    this.authService.login({ email: this.email, password: this.password }).subscribe({
+      next: () => this.router.navigate(['/']),
+      error: (err) => alert('Error al iniciar sesión'),
     });
+  }
+
+  private getUserNameFromEmail(email: string): string {
+    const emailStart = email.split('@')[0];
+    const cleanName = emailStart.replace(/[^a-zA-Z]/g, ' ').trim();
+
+    if (!cleanName) return 'Usuario';
+
+    return cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
   }
 }

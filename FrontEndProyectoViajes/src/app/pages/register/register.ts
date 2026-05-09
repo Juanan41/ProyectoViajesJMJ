@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -19,41 +19,29 @@ export class Register {
   confirmPassword = '';
   error = '';
 
-  authService = inject(Auth);
-  router = inject(Router);
+  constructor(
+    private authService: Auth,
+    private router: Router,
+  ) {}
 
-  handleSubmit(event: Event) {
+  async handleSubmit(event: Event) {
     event.preventDefault();
+    if (this.password !== this.confirmPassword) return;
 
-    if (this.password !== this.confirmPassword) {
-      this.error = 'Las contraseñas no coinciden. Inténtalo de nuevo.';
-      return;
-    }
-
-    if (!this.name || !this.email || !this.password) {
-      this.error = 'Debes rellenar todos los campos';
-      return;
-    }
-
-    this.error = '';
-
-    this.authService.register({
+    const payload = {
       username: this.name,
       email: this.email,
-      password: this.password
-    }).subscribe({
+      password: this.password,
+      role: 'USER'
+    };
+
+    this.authService.register(payload).subscribe({
       next: () => {
-        this.authService.login({
-          email: this.email,
-          password: this.password
-        }).subscribe({
-          next: () => this.router.navigate(['/']),
-          error: () => this.router.navigate(['/login'])
+        this.authService.login({ email: this.email, password: this.password }).subscribe(() => {
+          this.router.navigate(['/']);
         });
       },
-      error: () => {
-        this.error = 'No se pudo registrar el usuario';
-      }
+      error: (err) => alert('Error en el registro'),
     });
   }
 }
