@@ -1,0 +1,112 @@
+<div class="min-h-screen bg-[rgb(23,25,25)] flex">
+  <aside class="w-64 border-r border-white/5 flex flex-col p-6 gap-2">
+    <div class="mb-8">
+      <p class="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-1">Panel de Control</p>
+      <h2 class="text-xl font-bold text-white uppercase tracking-tighter">Administración</h2>
+    </div>
+
+    <button (click)="setTab('stats')" [class.bg-white/5]="activeTab() === 'stats'"
+      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all hover:bg-white/5"
+      [class.text-emerald-500]="activeTab() === 'stats'" [class.text-gray-400]="activeTab() !== 'stats'">
+      <lucide-icon [name]="DashboardIcon" class="w-4 h-4"></lucide-icon> Dashboard
+    </button>
+    <button (click)="setTab('users')" [class.bg-white/5]="activeTab() === 'users'"
+      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all hover:bg-white/5"
+      [class.text-emerald-500]="activeTab() === 'users'" [class.text-gray-400]="activeTab() !== 'users'">
+      <lucide-icon [name]="UsersIcon" class="w-4 h-4"></lucide-icon> Usuarios
+    </button>
+    <button (click)="setTab('destinos')" [class.bg-white/5]="activeTab() === 'destinos'"
+      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all hover:bg-white/5"
+      [class.text-emerald-500]="activeTab() === 'destinos'" [class.text-gray-400]="activeTab() !== 'destinos'">
+      <lucide-icon [name]="MapIcon" class="w-4 h-4"></lucide-icon> Destinos
+    </button>
+  </aside>
+
+  <main class="flex-1 p-10">
+
+    @if (activeTab() === 'stats') {
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+      <div class="bg-white/5 p-8 rounded-[2rem] border border-white/5">
+        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Total Usuarios</p>
+        <h3 class="text-4xl font-black text-white">{{ usuarios().length }}</h3>
+      </div>
+      <div class="bg-white/5 p-8 rounded-[2rem] border border-white/5">
+        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Destinos Activos</p>
+        <h3 class="text-4xl font-black text-white">{{ destinos().length }}</h3>
+      </div>
+      <div class="bg-emerald-500/10 p-8 rounded-[2rem] border border-emerald-500/10">
+        <p class="text-xs font-bold text-emerald-500 uppercase tracking-widest mb-2">Estado Sistema</p>
+        <h3 class="text-4xl font-black text-emerald-500">ONLINE</h3>
+      </div>
+    </div>
+    }
+
+    @if (activeTab() === 'users') {
+    <div class="bg-white/5 rounded-[2rem] border border-white/5 overflow-hidden">
+      <table class="w-full text-left">
+        <thead class="bg-white/5 text-[10px] font-black text-gray-500 uppercase tracking-widest">
+          <tr>
+            <th class="px-8 py-6">ID</th>
+            <th class="px-8 py-6">Nombre</th>
+            <th class="px-8 py-6">Email</th>
+            <th class="px-8 py-6">Rol</th>
+            <th class="px-8 py-6 text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-white/5">
+          @for (user of usuarios(); track user.id) {
+          <tr class="hover:bg-white/[0.02] transition-colors">
+            <td class="px-8 py-6 text-sm font-mono text-gray-500">#{{ user.id }}</td>
+            <td class="px-8 py-6 text-sm font-bold text-white">{{ user.username }}</td>
+            <td class="px-8 py-6 text-sm text-gray-400">{{ user.email }}</td>
+            <td class="px-8 py-6">
+              <span
+                class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/10"
+                [class.text-emerald-500]="user.role === 'ADMIN'" [class.text-gray-400]="user.role !== 'ADMIN'">
+                {{ user.role || 'USER' }}
+              </span>
+            </td>
+            <td class="px-8 py-6 text-right">
+              <button (click)="deleteUsuario(user.id)" class="text-red-500 hover:text-red-400 p-2">
+                <lucide-icon [name]="TrashIcon" class="w-4 h-4"></lucide-icon>
+              </button>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    }
+
+    @if (activeTab() === 'destinos') {
+    <div class="flex justify-between items-center mb-8">
+      <h2 class="text-2xl font-black text-white uppercase tracking-tighter">Lista de Destinos</h2>
+      <button
+        class="bg-emerald-500 text-[rgb(23,25,25)] font-black px-6 py-3 rounded-xl text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-emerald-400 transition-all">
+        <lucide-icon [name]="PlusIcon" class="w-4 h-4"></lucide-icon> Añadir Destino
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      @for (dest of destinos(); track dest.id) {
+      <div class="bg-white/5 p-6 rounded-[2rem] border border-white/5 flex gap-6 items-center">
+        <img [src]="dest.imagen || '/placeholder.jpg'" class="w-20 h-20 rounded-2xl object-cover" />
+        <div class="flex-1">
+          <h4 class="text-lg font-bold text-white">{{ dest.nombre }}</h4>
+          <p class="text-sm text-gray-500">{{ dest.pais }}</p>
+        </div>
+        <div class="flex gap-2">
+          <button class="text-gray-400 hover:text-white p-2">
+            <lucide-icon [name]="EditIcon" class="w-4 h-4"></lucide-icon>
+          </button>
+          <button (click)="deleteDestino(dest.id)" class="text-red-500 hover:text-red-400 p-2">
+            <lucide-icon [name]="TrashIcon" class="w-4 h-4"></lucide-icon>
+          </button>
+        </div>
+      </div>
+      }
+    </div>
+    }
+
+  </main>
+</div>

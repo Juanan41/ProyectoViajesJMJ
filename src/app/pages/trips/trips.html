@@ -1,0 +1,88 @@
+<div class="flex-1 w-full max-w-7xl mx-auto px-4 py-8 relative">
+  <div class="flex items-center gap-4 mb-8">
+    <div class="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center">
+      <lucide-icon [name]="PlaneIcon" class="w-6 h-6 text-emerald-500"></lucide-icon>
+    </div>
+    <div>
+      <h1 class="text-3xl font-black text-white tracking-tighter uppercase">{{ 'Mis Viajes' | translate }}</h1>
+      <p class="text-gray-400 text-sm font-medium">{{ 'Gestiona tu historial de reservas y billetes' | translate }}</p>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+  <div class="flex-1 flex items-center justify-center py-20">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
+  </div>
+  } @else if (trips().length === 0) {
+  <div class="bg-[rgb(23,25,25)] p-12 rounded-3xl border border-white/5 text-center shadow-xl">
+    <lucide-icon [name]="HistoryIcon" class="w-16 h-16 mx-auto mb-4 text-gray-600"></lucide-icon>
+    <h2 class="text-2xl font-bold text-white mb-2">{{ 'Aún no tienes viajes' | translate }}</h2>
+    <p class="text-gray-400 mb-6">{{ 'Parece que tu pasaporte está pidiendo algo de acción.' | translate }}</p>
+    <a routerLink="/continents"
+      class="inline-flex items-center gap-2 bg-emerald-500 text-[rgb(23,25,25)] font-bold px-6 py-3 rounded-xl hover:bg-emerald-400 transition-colors uppercase tracking-widest text-sm">
+      {{ 'Explorar destinos' | translate }}
+      <lucide-icon [name]="ArrowRightIcon" class="w-4 h-4"></lucide-icon>
+    </a>
+  </div>
+  } @else {
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    @for (trip of trips(); track trip.id) {
+    <div
+      class="bg-[rgb(23,25,25)] rounded-2xl overflow-hidden border border-white/5 group hover:border-emerald-500/30 transition-colors relative flex flex-col">
+
+      <div class="aspect-video relative overflow-hidden">
+        <img [src]="trip.imagenUrl || 'assets/placeholder.jpg'" [alt]="trip.destinoNombre"
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+        <div class="absolute inset-0 bg-gradient-to-t from-[rgb(23,25,25)] to-transparent"></div>
+        <div
+          class="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest border backdrop-blur-md"
+          [ngClass]="getStatusClass(trip.estado)">
+          {{ trip.estado | translate }}
+        </div>
+      </div>
+
+      <div class="p-6 flex-1 flex flex-col">
+        <div class="mb-4">
+          <h3 class="text-xl font-bold text-white mb-1">{{ trip.destinoNombre }}</h3>
+          <div class="flex items-center gap-2 text-gray-400 text-sm">
+            <lucide-icon [name]="MapPinIcon" class="w-4 h-4"></lucide-icon>
+            <span>{{ trip.alojamientoNombre }}</span>
+          </div>
+        </div>
+
+        <div class="bg-white/5 p-4 rounded-xl mb-6 space-y-3">
+          <div class="flex items-center justify-between text-sm">
+            <div class="flex items-center gap-2 text-gray-300">
+              <lucide-icon [name]="CalendarIcon" class="w-4 h-4 text-emerald-500"></lucide-icon>
+              <span>Check In</span>
+            </div>
+            <span class="font-bold text-white">{{ trip.checkIn | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <div class="flex items-center gap-2 text-gray-300">
+              <lucide-icon [name]="CalendarIcon" class="w-4 h-4 text-emerald-500"></lucide-icon>
+              <span>Check Out</span>
+            </div>
+            <span class="font-bold text-white">{{ trip.checkOut | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+
+        <div class="mt-auto flex items-center gap-3">
+          <a [routerLink]="['/receipt', trip.id]"
+            class="flex-1 bg-white/5 text-white font-bold text-sm py-3 rounded-xl border border-white/10 hover:border-emerald-500/50 hover:text-emerald-500 transition-colors text-center uppercase tracking-widest">
+            {{ 'Ver Recibo' | translate }}
+          </a>
+          @if (trip.estado !== 'CANCELADA') {
+          <button (click)="cancelTrip(trip.id)"
+            class="w-12 h-12 flex items-center justify-center bg-red-500/10 text-red-500 rounded-xl border border-red-500/20 hover:bg-red-500 hover:text-white transition-colors cursor-pointer"
+            title="Cancelar viaje">
+            <lucide-icon [name]="TrashIcon" class="w-5 h-5"></lucide-icon>
+          </button>
+          }
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+  }
+</div>

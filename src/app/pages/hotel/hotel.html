@@ -1,0 +1,295 @@
+@if (!hotel()) {
+<div class="flex-1 flex flex-col items-center justify-center min-h-screen">
+  <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mb-4"></div>
+  <p class="text-gray-400"> {{ 'Cargando información del alojamiento...' | translate }} </p>
+</div>
+} @else {
+<div class="flex-1 w-full bg-[rgb(23,25,25)] min-h-screen">
+  <div class="relative w-full h-[50vh] md:h-[60vh]">
+    <img loading="lazy" [src]="hotel()?.imagenUrl || hotel()?.image || 'assets/placeholder.jpg'"
+      [alt]="hotel()?.nombre || hotel()?.name" class="w-full h-full object-cover" />
+    <div
+      class="absolute inset-0 bg-gradient-to-t from-[rgb(23,25,25)] via-[rgb(23,25,25)]/40 to-transparent flex items-end">
+      <div class="max-w-7xl mx-auto px-4 w-full pb-10">
+        <a routerLink="/continents"
+          class="inline-flex items-center gap-2 text-white bg-black/40 hover:bg-black/60 px-4 py-2 rounded-full backdrop-blur-md transition-colors mb-6 text-sm">
+          <lucide-icon [name]="ArrowLeftIcon" class="w-4 h-4"></lucide-icon> {{ 'Volver a explorar' | translate }}
+        </a>
+        <div class="flex items-center gap-2 mb-2">
+          @for (_ of getArray(hotel()?.estrellas || hotel()?.rating || 5); track _) {
+          <lucide-icon [name]="StarIcon" class="w-5 h-5 fill-yellow-500 text-yellow-500"></lucide-icon>
+          }
+        </div>
+        <h1 class="text-4xl md:text-6xl font-bold text-white mb-3 tracking-tight">{{ hotel()?.nombre || hotel()?.name |
+          translate }}</h1>
+        <p class="text-gray-300 flex items-center gap-2 text-lg">
+          <lucide-icon [name]="MapPinIcon" class="w-5 h-5 text-emerald-500"></lucide-icon>
+          {{ hotel()?.ciudad | translate }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="lg:col-span-2 space-y-12">
+      <section>
+        <h2 class="text-2xl font-bold text-white mb-6 uppercase tracking-widest text-emerald-500"> {{ 'Acerca del hotel'
+          | translate }} </h2>
+        <p class="text-gray-400 leading-relaxed text-lg">
+          {{ hotel()?.descripcion || hotel()?.description | translate }}
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-white mb-6 uppercase tracking-widest text-emerald-500"> {{ 'Comodidades
+          principales' | translate }} </h2>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex items-center gap-3 text-gray-300 bg-[rgb(33,36,37)] p-4 rounded-xl border border-gray-800">
+            <lucide-icon [name]="WifiIcon" class="w-5 h-5 text-emerald-500"></lucide-icon>
+            <span class="font-medium"> {{ 'Wifi gratuito' | translate }} </span>
+          </div>
+          <div class="flex items-center gap-3 text-gray-300 bg-[rgb(33,36,37)] p-4 rounded-xl border border-gray-800">
+            <lucide-icon [name]="WindIcon" class="w-5 h-5 text-emerald-500"></lucide-icon>
+            <span class="font-medium"> {{ 'Aire acondicionado' | translate }} </span>
+          </div>
+          <div class="flex items-center gap-3 text-gray-300 bg-[rgb(33,36,37)] p-4 rounded-xl border border-gray-800">
+            <lucide-icon [name]="CoffeeIcon" class="w-5 h-5 text-emerald-500"></lucide-icon>
+            <span class="font-medium"> {{ 'Desayuno incluido' | translate }} </span>
+          </div>
+          <div class="flex items-center gap-3 text-gray-300 bg-[rgb(33,36,37)] p-4 rounded-xl border border-gray-800">
+            <lucide-icon [name]="BedDoubleIcon" class="w-5 h-5 text-emerald-500"></lucide-icon>
+            <span class="font-medium"> {{ 'Camas King size' | translate }} </span>
+          </div>
+        </div>
+      </section>
+
+      @if (hotel()?.additionalPhotos && hotel()?.additionalPhotos.length > 0) {
+      <section>
+        <h2 class="text-2xl font-bold text-white mb-6 uppercase tracking-widest text-emerald-500"> {{ 'Galería' |
+          translate }} </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          @for (photo of hotel()?.additionalPhotos; track photo) {
+          <img loading="lazy" [src]="photo" class="w-full h-64 object-cover rounded-xl border border-gray-800"
+            alt="Galeria hotel" />
+          }
+        </div>
+      </section>
+      }
+
+      <section>
+        <h2 class="text-2xl font-bold text-white mb-6 uppercase tracking-widest text-emerald-500"> {{ 'Reseñas' |
+          translate }} </h2>
+
+        <div class="space-y-4 mb-8">
+          @if (reviews().length === 0) {
+          <div class="text-gray-400 bg-[rgb(33,36,37)] p-6 rounded-xl border border-gray-800 text-center">
+            {{ 'No hay reseñas todavía. ¡Sé el primero en opinar!' | translate }}
+          </div>
+          }
+
+          @for (review of reviews(); track review.id) {
+          <div class="bg-[rgb(33,36,37)] p-6 rounded-xl border border-gray-800">
+            <div class="flex items-center justify-between mb-3">
+              <span class="font-bold text-white">{{ review.userName | translate }}</span>
+              <div class="flex items-center gap-3">
+                <span class="text-sm text-gray-400 font-mono">{{ review.date }}</span>
+                @if (isMyReview(review)) {
+                <div class="flex gap-2">
+                  <button (click)="startEditReview(review)"
+                    class="text-emerald-500 hover:text-emerald-400 text-xs font-bold uppercase tracking-widest transition-colors">
+                    {{ 'Editar' | translate }} </button>
+                  <button (click)="deleteReview(review.id)"
+                    class="text-red-500 hover:text-red-400 text-xs font-bold uppercase tracking-widest transition-colors">
+                    {{ 'Borrar' | translate }} </button>
+                </div>
+                }
+              </div>
+            </div>
+            <div class="flex items-center gap-1 mb-4">
+              @for (_ of getArray(review.rating); track _) {
+              <lucide-icon [name]="StarIcon" class="w-4 h-4 fill-yellow-500 text-yellow-500"></lucide-icon>
+              }
+            </div>
+            <p class="text-gray-300">{{ review.comment | translate }}</p>
+          </div>
+          }
+        </div>
+
+        @if (auth.user()) {
+        <div class="relative mt-8 p-[1px] rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500">
+          <div class="bg-[rgb(23,25,25)] p-6 md:p-8 rounded-[15px] w-full h-full">
+            <h3 class="text-2xl font-bold mb-6 text-white">
+              @if (!editReviewId) {
+              {{ 'Deja tu reseña' | translate }}
+              } @else {
+              {{ 'Editar Reseña' | translate }}
+              }
+            </h3>
+            <form (ngSubmit)="addReview()">
+              <div class="mb-6">
+                <label class="block text-sm font-bold text-gray-400 uppercase tracking-widest mb-3">
+                  {{ '¿Cómo calificarías tu estancia?' | translate }}
+                </label>
+                <div class="flex items-center gap-2">
+                  @for (star of [1, 2, 3, 4, 5]; track star) {
+                  <button type="button" (click)="setRating(star)"
+                    class="focus:outline-none transition-transform hover:scale-110">
+                    <lucide-icon [name]="StarIcon"
+                      [class]="star <= newReviewRating ? 'w-8 h-8 fill-yellow-500 text-yellow-500 drop-shadow-[0_0_8px_rgba(234,179,8,0.4)]' : 'w-8 h-8 text-gray-600 hover:text-yellow-500 transition-colors'"></lucide-icon>
+                  </button>
+                  }
+                  @if (getRatingLabel(newReviewRating)) {
+                  <span class="ml-4 text-sm font-bold text-emerald-500 uppercase tracking-widest"> {{
+                    getRatingLabel(newReviewRating) | translate }} </span>
+                  }
+                </div>
+              </div>
+              <div class="mb-6">
+                <label class="block text-sm font-bold text-gray-400 uppercase tracking-widest mb-3"> {{ 'Tu experiencia'
+                  | translate }} </label>
+                <textarea name="comment" [(ngModel)]="newReviewComment" rows="4"
+                  [placeholder]="'¿Qué fue lo que más te gustó?' | translate"
+                  class="w-full bg-[rgb(33,36,37)] border border-gray-700 text-white rounded-xl p-4 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all resize-none"></textarea>
+              </div>
+              <div class="flex justify-end gap-3">
+                @if (editReviewId) {
+                <button type="button" (click)="cancelEditReview()"
+                  class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-xl transition-all border border-gray-700 uppercase tracking-widest text-xs">
+                  {{ 'Cancelar' | translate }}
+                </button>
+                }
+                <button type="submit" [disabled]="!newReviewComment.trim()"
+                  class="bg-emerald-500 hover:bg-emerald-400 disabled:bg-gray-800 disabled:text-gray-500 text-[rgb(23,25,25)] font-bold py-3 px-6 rounded-xl transition-all uppercase tracking-widest text-xs shadow-lg shadow-emerald-500/20 disabled:shadow-none">
+                  @if (!editReviewId) {
+                  {{ 'Publicar reseña' | translate }}
+                  } @else {
+                  {{ 'Guardar cambios' | translate }}
+                  }
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+        }
+      </section>
+    </div>
+
+    <div class="lg:col-span-1">
+      <div class="sticky top-28 flex flex-col gap-8">
+
+        <div class="bg-[rgb(33,36,37)] rounded-[32px] p-8 border border-gray-800 shadow-2xl">
+          <div class="mb-8 pb-8 border-b border-gray-800">
+            <span class="text-gray-500 text-xs block mb-1 uppercase tracking-widest font-bold">{{ 'Precio por noche' |
+              translate }}</span>
+            <div class="flex items-baseline gap-2">
+              <span class="text-white text-5xl font-black">{{ hotel()?.precioPorNoche }}€</span>
+            </div>
+          </div>
+
+          <div class="space-y-6 mb-8">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-2">{{ 'Entrada' |
+                  translate }}</label>
+                <input type="date" [(ngModel)]="checkInDate"
+                  (ngModelChange)="checkOutDate && checkOutDate <= checkInDate ? checkOutDate = '' : null"
+                  class="w-full bg-[rgb(23,25,25)] border border-gray-800 text-white rounded-xl p-3 text-sm outline-none focus:border-emerald-500 transition-colors" />
+              </div>
+              <div>
+                <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-2">{{ 'Salida' |
+                  translate }}</label>
+                <input type="date" [(ngModel)]="checkOutDate" [min]="checkInDate"
+                  class="w-full bg-[rgb(23,25,25)] border border-gray-800 text-white rounded-xl p-3 text-sm outline-none focus:border-emerald-500 transition-colors" />
+              </div>
+            </div>
+
+            <div>
+              <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-2">{{ 'Huéspedes' |
+                translate }}</label>
+              <input type="number" [(ngModel)]="guests" min="1"
+                class="w-full bg-[rgb(23,25,25)] border border-gray-800 text-white rounded-xl p-3 text-sm outline-none focus:border-emerald-500 transition-colors" />
+            </div>
+
+            <div>
+              <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-3">{{ 'Transporte' |
+                translate }}</label>
+              <div class="grid grid-cols-3 gap-3">
+                <button (click)="selectedTransport = 'AVION'"
+                  [class]="selectedTransport === 'AVION' ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500' : 'border-gray-800 text-gray-500 hover:text-white'"
+                  class="flex flex-col items-center py-3 rounded-xl border transition-all">
+                  <lucide-icon [name]="PlaneIcon" class="w-5 h-5 mb-1"></lucide-icon>
+                  <span class="text-[9px] font-bold uppercase tracking-tighter">{{ 'Avión' | translate }}</span>
+                  <span class="text-[8px] mt-1 opacity-70">+150€</span>
+                </button>
+                <button (click)="selectedTransport = 'TREN'"
+                  [class]="selectedTransport === 'TREN' ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500' : 'border-gray-800 text-gray-500 hover:text-white'"
+                  class="flex flex-col items-center py-3 rounded-xl border transition-all">
+                  <lucide-icon [name]="TrainIcon" class="w-5 h-5 mb-1"></lucide-icon>
+                  <span class="text-[9px] font-bold uppercase tracking-tighter">{{ 'Tren' | translate }}</span>
+                  <span class="text-[8px] mt-1 opacity-70">+50€</span>
+                </button>
+                <button (click)="selectedTransport = 'BARCO'"
+                  [class]="selectedTransport === 'BARCO' ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500' : 'border-gray-800 text-gray-500 hover:text-white'"
+                  class="flex flex-col items-center py-3 rounded-xl border transition-all">
+                  <lucide-icon [name]="ShipIcon" class="w-5 h-5 mb-1"></lucide-icon>
+                  <span class="text-[9px] font-bold uppercase tracking-tighter">{{ 'Barco' | translate }}</span>
+                  <span class="text-[8px] mt-1 opacity-70">+100€</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-[rgb(23,25,25)] rounded-2xl p-5 mb-6 border border-gray-800">
+            <div class="flex justify-between items-center text-sm mb-3 text-gray-400">
+              <span>{{ nights }} {{ 'noches' | translate }}</span>
+              <span>{{ (hotel()?.precioPorNoche || 0) * nights }}€</span>
+            </div>
+            <div class="flex justify-between items-center text-white font-black text-xl pt-4 border-t border-gray-800">
+              <span class="uppercase tracking-widest text-xs text-gray-500">{{ 'Total a pagar' | translate }}</span>
+              <span class="text-emerald-500">{{ totalPrice }}€</span>
+            </div>
+          </div>
+
+          <button (click)="reservar()" [disabled]="!canBook"
+            class="w-full bg-emerald-500 hover:bg-emerald-400 disabled:bg-gray-800 disabled:text-gray-600 text-[rgb(23,25,25)] font-black py-4 rounded-xl uppercase tracking-widest text-xs transition-all shadow-xl shadow-emerald-500/20 disabled:shadow-none">
+            {{ 'Confirmar Reserva' | translate }}
+          </button>
+
+          @if (nights <= 0) { <p class="text-red-400 text-xs text-center mt-3 font-medium"> {{ 'Selecciona fechas
+            válidas.' | translate }} </p>
+            } @else if (!canBook && auth.credits() < totalPrice) { <p
+              class="text-red-400 text-xs text-center mt-3 font-medium"> {{ 'Saldo insuficiente en tu cartera.' |
+              translate }} </p>
+              }
+        </div>
+
+        @if (recommendations().length > 0) {
+        <div class="mt-4">
+          <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4"> {{ 'Hoteles similares' | translate
+            }} </h3>
+          <div class="space-y-4">
+            @for (rec of recommendations(); track rec.id) {
+            <a [routerLink]="['/hotel', rec.id]"
+              class="flex items-center gap-4 bg-[rgb(33,36,37)] p-3 rounded-2xl border border-gray-800 hover:border-emerald-500/50 transition-colors group">
+              <img loading="lazy" [src]="rec.imagenUrl || 'assets/placeholder.jpg'" [alt]="rec.nombre"
+                class="w-20 h-20 object-cover rounded-xl group-hover:scale-105 transition-transform" />
+              <div class="flex-1">
+                <h4 class="text-sm font-bold text-white mb-1 group-hover:text-emerald-500 transition-colors">{{
+                  rec.nombre | translate }}</h4>
+                <p class="text-xs text-gray-400 flex items-center gap-1 mb-2">
+                  <lucide-icon [name]="MapPinIcon" class="w-3 h-3"></lucide-icon> {{ rec.pais | translate }}
+                </p>
+                <p class="text-emerald-500 font-black text-sm">{{ rec.precio }}€ <span
+                    class="text-gray-500 font-normal text-[10px] uppercase">/{{ 'noche' | translate }}</span></p>
+              </div>
+            </a>
+            }
+          </div>
+        </div>
+        }
+
+      </div>
+    </div>
+  </div>
+</div>
+}

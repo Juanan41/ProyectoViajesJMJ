@@ -1,0 +1,292 @@
+.pantalla-carga {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background:
+    radial-gradient(circle at center, rgba(0, 212, 150, 0.12), transparent 35%),
+    radial-gradient(circle at top, #202629 0%, #111616 45%, #0b0f0f 100%);
+
+  color: white;
+  overflow: hidden;
+
+  animation: entradaCarga 0.5s ease forwards;
+}
+
+.pantalla-carga::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.04), transparent);
+  animation: brilloFondo 4s ease-in-out infinite;
+}
+
+.contenido-carga {
+  position: relative;
+  text-align: center;
+  width: min(90%, 760px);
+  padding: 40px 24px;
+  z-index: 2;
+}
+
+.zona-ilustracion {
+  position: relative;
+  width: 360px;
+  height: 230px;
+  margin: 0 auto 20px;
+}
+
+.globo {
+  position: absolute;
+  width: 170px;
+  height: 170px;
+  left: 50%;
+  top: 28px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.18), transparent 18%),
+    radial-gradient(circle at 60% 55%, rgba(0, 212, 150, 0.18), transparent 28%),
+    linear-gradient(145deg, #2c3436, #101515);
+
+  box-shadow:
+    0 0 40px rgba(0, 212, 150, 0.18),
+    inset 0 0 40px rgba(255, 255, 255, 0.04);
+
+  opacity: 0.95;
+}
+
+.globo::before,
+.globo::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.globo::before {
+  inset: 28px;
+}
+
+.globo::after {
+  inset: 55px;
+}
+
+.pin {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  transform: translate(-50%, -50%);
+  font-size: 38px;
+  filter: drop-shadow(0 0 12px rgba(0, 212, 150, 0.8));
+}
+
+.ruta {
+  position: absolute;
+  border: 2px dashed rgba(0, 212, 150, 0.75);
+  border-color: rgba(0, 212, 150, 0.75) transparent transparent transparent;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.ruta-uno {
+  width: 320px;
+  height: 130px;
+  left: 20px;
+  top: 92px;
+  transform: rotate(8deg);
+}
+
+.ruta-dos {
+  width: 160px;
+  height: 90px;
+  right: -10px;
+  top: 110px;
+  transform: rotate(-20deg);
+  opacity: 0.7;
+}
+
+.avion {
+  position: absolute;
+  left: 245px;
+  top: 55px;
+  font-size: 42px;
+  color: #13c990;
+  text-shadow: 0 0 18px rgba(0, 212, 150, 0.8);
+  animation: volar 3s ease-in-out infinite;
+}
+
+.maleta {
+  position: absolute;
+  left: 35px;
+  top: 122px;
+  font-size: 58px;
+  color: #13c990;
+  text-shadow: 0 0 16px rgba(0, 212, 150, 0.65);
+  opacity: 0.9;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(38px, 5vw, 62px);
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+h1 span {
+  color: #13c990;
+  text-shadow: 0 0 18px rgba(0, 212, 150, 0.35);
+}
+
+.subtitulo {
+  margin: 14px 0 8px;
+  font-size: clamp(17px, 2vw, 23px);
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.texto-secundario {
+  margin: 0;
+  font-size: 16px;
+  color: rgba(190, 205, 215, 0.8);
+}
+
+.puntos-carga {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.puntos-carga span {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #13c990;
+  box-shadow: 0 0 14px rgba(0, 212, 150, 0.75);
+  animation: pulso 1.4s infinite ease-in-out;
+}
+
+.puntos-carga span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.puntos-carga span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.barra-carga {
+  width: 260px;
+  height: 5px;
+  margin: 24px auto 0;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.progreso {
+  width: 45%;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #13c990, #42ffd0);
+  box-shadow: 0 0 18px rgba(0, 212, 150, 0.8);
+  animation: cargarBarra 2.2s ease-in-out infinite;
+}
+
+@keyframes volar {
+  0% {
+    transform: translate(0, 0) rotate(-8deg);
+  }
+
+  50% {
+    transform: translate(18px, -16px) rotate(8deg);
+  }
+
+  100% {
+    transform: translate(0, 0) rotate(-8deg);
+  }
+}
+
+@keyframes pulso {
+  0%, 80%, 100% {
+    opacity: 0.35;
+    transform: scale(0.8);
+  }
+
+  40% {
+    opacity: 1;
+    transform: scale(1.25);
+  }
+}
+
+@keyframes cargarBarra {
+  0% {
+    transform: translateX(-120%);
+  }
+
+  50% {
+    transform: translateX(60%);
+  }
+
+  100% {
+    transform: translateX(230%);
+  }
+}
+
+@keyframes brilloFondo {
+  0%, 100% {
+    opacity: 0.25;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@media (max-width: 600px) {
+  .zona-ilustracion {
+    width: 280px;
+    height: 200px;
+  }
+
+  .globo {
+    width: 140px;
+    height: 140px;
+  }
+
+  .avion {
+    left: 200px;
+    top: 50px;
+    font-size: 34px;
+  }
+
+  .maleta {
+    left: 20px;
+    top: 120px;
+    font-size: 44px;
+  }
+
+  .ruta-uno {
+    width: 250px;
+    height: 110px;
+  }
+
+  .barra-carga {
+    width: 220px;
+  }
+
+  @keyframes entradaCarga {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+}
