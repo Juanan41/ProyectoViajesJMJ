@@ -32,7 +32,6 @@ export class Register {
       username: this.name,
       email: this.email,
       password: this.password,
-      role: 'USER'
     };
 
     this.authService.register(payload).subscribe({
