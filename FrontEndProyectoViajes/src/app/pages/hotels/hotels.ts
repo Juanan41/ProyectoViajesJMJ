@@ -66,26 +66,86 @@ export class Hotels implements OnInit {
 
   ngOnInit() {
     this.route.paramMap.subscribe((params) => {
-      const id = params.get('destinoId');
+      const id = Number(params.get('cityId'));
+
       if (id) {
-        this.loadData(Number(id));
+        this.loadData(id);
       }
     });
   }
 
   private loadData(id: number) {
+    this.city.set({
+      id,
+      name: 'Destino',
+      nombre: 'Destino',
+      description: 'Alojamientos disponibles',
+      descripcion: 'Alojamientos disponibles',
+      image: 'https://picsum.photos/seed/destino-' + id + '/1200/600',
+      imagen: 'https://picsum.photos/seed/destino-' + id + '/1200/600',
+    });
+
+    this.country.set({ id: 1 });
+
     this.destinoService.getDestinoById(id).subscribe({
-      next: (dest) => {
-        this.city.set(dest);
-        this.country.set({ id: dest.continenteId });
+      next: (dest: any) => {
+        const continenteId = this.obtenerContinenteId(dest.continente || dest.continenteNombre);
+
+        this.city.set({
+          ...dest,
+          name: dest.nombre,
+          image: dest.imagen,
+          description: dest.descripcion,
+        });
+
+        this.country.set({ id: continenteId });
       },
+      error: (err) => console.error('Error cargando destino:', err),
     });
 
     this.destinoService.getAlojamientosByDestino(id).subscribe({
-      next: (data) => {
-        this.allHotels.set(data);
+      next: (data: any[]) => {
+        const hoteles = data.map((hotel) => ({
+          ...hotel,
+          name: hotel.nombre,
+          image: hotel.imagen,
+          description:
+            hotel.descripcion ||
+            `${hotel.tipo} en ${hotel.ciudad}, ${hotel.pais}`,
+          rating: hotel.rating || 4,
+          precioPorNoche: hotel.precioPorNoche || hotel.precio || 0,
+          hasWifi: true,
+          hasRestaurant: true,
+          hasParking: true,
+        }));
+
+        this.allHotels.set(hoteles);
       },
+      error: (err) => console.error('Error cargando alojamientos:', err),
     });
+  }
+
+  private obtenerContinenteId(nombreContinente: string): number {
+    const nombre = this.normalizar(nombreContinente || '');
+
+    const mapa: Record<string, number> = {
+      europa: 1,
+      asia: 2,
+      africa: 3,
+      oceania: 4,
+      'america del norte': 5,
+      'america del sur': 6,
+    };
+
+    return mapa[nombre] || 1;
+  }
+
+  private normalizar(texto: string): string {
+    return texto
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
   }
 
   get filteredHotels() {
@@ -99,13 +159,13 @@ export class Hotels implements OnInit {
   }
 
   private matchesPrice(hotel: any): boolean {
-    const precio = hotel.precioPorNoche || hotel.pricePerNight || 0;
+    const precio = hotel.precioPorNoche || hotel.pricePerNight || hotel.precio || 0;
     return precio >= this.filters.minPrice && precio <= this.filters.maxPrice;
   }
 
   private matchesBudget(hotel: any): boolean {
     if (this.filters.budget === null || this.filters.budget <= 0) return true;
-    const precio = hotel.precioPorNoche || hotel.pricePerNight || 0;
+    const precio = hotel.precioPorNoche || hotel.pricePerNight || hotel.precio || 0;
     const totalBasePrice = precio * this.filters.days * this.filters.guests;
     return totalBasePrice <= this.filters.budget;
   }
