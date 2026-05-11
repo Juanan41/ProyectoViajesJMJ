@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viaje a América del Norte - Cultura y Modernidad</title>
+    <link rel="stylesheet" href="americaNorte.css">
+</head>
+<body>
+    <header>
+        <h1>Explora Ámerica del Norte</h1>
+    </header>
+
+    <main class="contenido-pagina">
+        <section class="informacion">
+            
+            <p>
+                América del Norte combina grandes metrópolis, maravillas naturales y culturas únicas. 
+                Desde las luces de Nueva York hasta las playas de México y los lagos de Canadá, 
+                este continente ofrece infinitas experiencias. 
+            </p>
+        </section>
+
+        <!--Galería de destinos-->
+
+        <section class="galeria-destinos">
+
+            <article class="destino">
+
+                <img src="americaNorte/imagen_Nueva_York.jpg" alt="Nueva_York">
+                <h3>Nueva York, EEUU</h3>
+                <p>
+                   La ciudad que nunca duerme. Con la Estatua de la Libertad, Times Square y Central Park, Nueva York es el corazón cultural del mundo. 
+                </p>
+
+            </article>
+
+            <article class="destino">
+
+                <img src="americaNorte/imagen_Ciudad_Mexico.jpg" alt="Ciudad_Mexico">
+                <h3>Ciudad de México, México</h3>
+                <p>
+                    Una capital llena de historia, gastronomía y color. Desde el Zócalo hasta los canales de Xochimilco, cada rincón cuenta una historia.
+                </p>
+
+            </article>
+
+            <article class="destino">
+
+                <img src="americaNorte/imagen_Toronto.jpg" alt="Toronto">
+                <h3>Toronto, Canadá</h3>
+                <p>
+                    Una ciudad multicultural y moderna, famosa por su torre CN y su proximidad a las Cataratas del Niágara. Una joya del norte.
+                </p>
+
+            </article>
+
+            <article class="destino">
+
+                <img src="americaNorte/imagen_San_Francisco.jpg" alt="San_Francisco">
+                <h3>San Francisco, EEUU</h3>
+                <p>
+                    Con el Golden Gate y sus tranvías clásicos, esta ciudad californiana combina historia, tecnología y vistas inolvidables.
+                </p>
+
+            </article>
+
+            <article class="destino">
+
+                <img src="americaNorte/imagen_Cancun.jpg" alt="Cancun">
+                <h3>Cancun, México</h3>
+                <p>
+                    Playas de arena blanca y aguas cristalinas. Cancún es uno de los destinos turísticos más famosos del Caribe mexicano.
+                </p>
+
+            </article>
+
+            <article class="destino">
+
+                <img src="americaNorte/imagen_Chicago.jpg" alt="Chicago">
+                <h3>Chicago, EEUU</h3>
+                <p>
+                    Ciudad de arquitectura impresionante a orillas del Lago Michigan. Conocida por su música, museos y el famoso Cloud Gate.
+                </p>
+
+            </article>
+            
+        </section>
+
+        <section class="formulario-recomendacion">
+            <form id="formulario-americaNorte">
+
+                <label for="Nombre">Nombre</label>
+                <input type="text" id = "Nombre" placeholder="Nombre">
+                <br>  
+                <label for="Apellidos">Apellidos</label>
+                <input type="text" id = "Apellidos" placeholder="Apellidos">
+                <br>  
+                <label for="Direccion">Dirección</label>
+                <input type="text" id = "Direccion" placeholder="Dirección">
+                <br><br>
+
+                <label for="clima">¿Qué clima prefieres?</label>
+                <select name="clima" id="clima">
+                    <option value="calido">Cálido</option>
+                    <option value="templado">Templado</option>
+                    <option value="frio">Frio</option>
+                </select>
+
+                <label id="actividad">¿Qué tipo de viaje te gustaría?</label>
+                <select name="actividad" id="actividad">
+                    <option value="cultural">Cultural</option>
+                    <option value="urbano">Urbano</option>
+                    <option value="playa">Playa</option>
+                    <option value="montaña">Montaña</option>
+                </select>
+
+                <label id="presupuesto">Presupuesto aproximado</label>
+                <select name="presupuesto" id="presupuesto">
+                    <option value="alto">Alto</option>
+                    <option value="medio">Medio</option>
+                    <option value="bajo">Bajo</option>
+                </select>
+                <br>
+
+                <label for="Fecha">Elija una fecha</label>
+                <input type="date" id = "Fecha">
+                <br>
+
+                <textarea name="" id="" cols="60" rows="5">Escriba alguna sugerencia para destino</textarea>
+                <br>
+
+                <button type="button" onclick="recomendarDestino()">Ver recomendaciones</button>
+            </form>
+
+            <p id="resultado"></p>
+
+        </section>
+
+        <a href="../index1.html" class="boton-volver">⬅️Volver a inicio</a>
+
+    </main>
+
+    <footer>
+        <p>
+            2025 Viajes JAD | Página de America del Norte
+        </p>
+    </footer>
+    
+</body>
+</html>

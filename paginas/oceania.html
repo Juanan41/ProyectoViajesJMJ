@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viaje a Oceanía - Naturaleza y Aventura</title>
+    <link rel="stylesheet" href="oceania.css">
+</head>
+<body>
+    <header>
+        <h1>Explora Oceanía</h1>
+    </header>
+
+    <main class="contenido-pagina"> 
+
+        <section class="informacion">
+            
+            <p>
+                Oceanía es un paraíso natural de islas, playas, montañas y arrecifes. 
+                Desde las modernas ciudades australianas hasta los paisajes tropicales del Pacífico, 
+                este continente ofrece experiencias únicas y una conexión directa con la naturaleza.
+            </p>
+        </section>
+
+        <section class="galeria-destinos">
+            <!--Galería de destinos-->
+
+            <article class="destino">
+
+                <img src="Oceania/imagen_SIdney.jpg" alt="Sidney">
+                <h3>Sidney, Australia</h3>
+                <p>
+                    La ciudad más icónica de Australia, con su famosa Ópera, el puerto y las playas de Bondi. Un equilibrio perfecto entre cultura y mar.
+                </p>
+
+            </article>
+
+            <article class="destino">
+
+                <img src="Oceania/imagen_Melbourne.jpg" alt="">
+                <h3>Melbourne, Australia</h3>
+                <p>
+                    Capital cultural del país. Arte callejero, cafeterías y eventos deportivos hacen de Melbourne un lugar vibrante y cosmopolita.
+                </p>
+
+            </article>
+
+            <article class="destino">
+
+                <img src="Oceania/imagen_Auckland.jpg" alt="Auckland">
+                <h3>Auckland, Nueva Zelanda</h3>
+                <p>
+                    Una ciudad rodeada de volcanes y bahías. Perfecta para los amantes de la aventura y los paisajes naturales.
+                </p>
+
+            </article>
+
+            <article class="destino">
+
+                <img src="Oceania/imagen_Fiyi.jpg" alt="Fiyi">
+                <h3>Fiyi, </h3>
+                <p>
+                    Islas paradisíacas de aguas turquesas y naturaleza exótica. Ideal para desconectar y disfrutar de playas de ensueño.</p>
+                </p>
+
+            </article>
+
+            <article class="destino">
+
+                <img src="Oceania/imagen_Bora_Bora.jpg" alt="Bora Bora">
+                <h3>Bora Bora, Polinesia Francesa</h3>
+                <p>
+                    Uno de los destinos más románticos del mundo. Sus cabañas sobre el agua y su laguna azul son pura magia tropical.
+                </p>
+
+            </article>
+
+            <article class="destino">
+
+                <img src="Oceania/imagen_Perth.jpg" alt="Perth">
+                <h3>Perth, Australia</h3>
+                <p>
+                    Ciudad moderna rodeada de playas vírgenes y parques naturales. Un lugar tranquilo con espíritu aventurero.
+                </p>
+
+            </article>
+
+            
+
+        </section>
+
+        <section class="formulario-recomendacion">
+            <form id="formulario-oceania">
+
+                <label for="Nombre">Nombre</label>
+                <input type="text" id = "Nombre" placeholder="Nombre">
+                <br>  
+                <label for="Apellidos">Apellidos</label>
+                <input type="text" id = "Apellidos" placeholder="Apellidos">
+                <br>  
+                <label for="Direccion">Dirección</label>
+                <input type="text" id = "Direccion" placeholder="Dirección">
+                <br><br>
+
+                <label for="clima">¿Qué clima prefieres?</label>
+                <select name="clima" id="clima">
+                    <option value="calido">Cálido</option>
+                    <option value="templado">Templado</option>
+                    <option value="frio">Frio</option>
+                </select>
+
+                <label id="actividad">¿Qué tipo de viaje te gustaría?</label>
+                <select name="actividad" id="actividad">
+                    <option value="cultural">Cultural</option>
+                    <option value="urbano">Urbano</option>
+                    <option value="playa">Playa</option>
+                    <option value="montaña">Montaña</option>
+                </select>
+
+                <label id="presupuesto">Presupuesto aproximado</label>
+                <select name="presupuesto" id="presupuesto">
+                    <option value="alto">Alto</option>
+                    <option value="medio">Medio</option>
+                    <option value="bajo">Bajo</option>
+                </select>
+                <br>
+
+                <label for="Fecha">Elija una fecha</label>
+                <input type="date" id = "Fecha">
+                <br>
+
+                <textarea name="" id="" cols="60" rows="5">Escriba alguna sugerencia para destino</textarea>
+                <br>
+
+                <button type="button" onclick="recomendarDestino()">Ver recomendaciones</button>
+            </form>
+
+            <p id="resultado"></p>
+
+        </section>
+
+        <a href="../index1.html" class="boton-volver">⬅️Volver a inicio</a>
+
+    </main>
+
+    <footer>
+        <p>
+            2025 Viajes JAD | Página de Oceania
+        </p>
+    </footer>
+    
+</body>
+</html>

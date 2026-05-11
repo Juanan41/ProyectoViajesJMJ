@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>>Viaje a América del Sur - Naturaleza y Cultura</title>
+    <link rel="stylesheet" href="americaSur.css">
+</head>
+<body>
+    <header>
+        <h1>Explora Ámerica del Sur</h1>
+    </header>
+
+    <main class="contenido-pagina">
+        <section class="informacion">
+            
+            <p>
+                América del Sur es un continente lleno de contrastes: desde la selva amazónica hasta los Andes, 
+                pasando por playas paradisíacas y ciudades llenas de historia. 
+                Descubre la alegría, la gastronomía y los paisajes más impresionantes del mundo.
+            </p>
+        </section>
+
+        <!--Galería de destinos-->
+
+        <section class="galeria-destinos">
+
+            <article class="destino">
+
+                <img src="americaSur/imagen_Rio_Janeiro.jpg" alt="Rio_Janeiro">
+                <h3>Rio de Janeiro, Brasil</h3>
+                <p>
+                   Famosa por el Cristo Redentor, el Pan de Azúcar y sus playas de Copacabana e Ipanema. 
+                    Una ciudad vibrante llena de ritmo y alegría. 
+                </p>
+
+            </article>
+
+            <article class="destino">
+
+                <img src="americaSur/imagen_Buenos_Aires.jpg" alt="Buenos_Aires">
+                <h3>Buenos Aires, Argentina</h3>
+                <p>
+                    La capital del tango. Con su arquitectura europea y sus cafés históricos, Buenos Aires combina cultura y pasión.
+                </p>
+
+            </article>
+
+            <article class="destino">
+
+                <img src="americaSur/imagen_Machupichu.jpg" alt="Machupichu">
+                <h3>Machupichu, Perú</h3>
+                <p>
+                    Una de las maravillas del mundo moderno. El legado de los incas entre montañas y nubes en pleno corazón del Perú.
+                </p>
+
+            </article>
+
+            <article class="destino">
+
+                <img src="americaSur/imagen_Cartagena.jpg" alt="Cartagena">
+                <h3>Cartagena, Colombia</h3>
+                <p>
+                    Ciudad colonial a orillas del Caribe. Sus murallas, colores y ambiente tropical la hacen un destino inolvidable.
+                </p>
+
+            </article>
+
+            <article class="destino">
+
+                <img src="americaSur/imagen_Santiago_Chile.jpg" alt="Santiago_Chile">
+                <h3>Santiago de Chile, Chile</h3>
+                <p>
+                    Una metrópoli moderna rodeada por la Cordillera de los Andes. Ideal para combinar ciudad, nieve y naturaleza.
+                </p>
+
+            </article>
+
+            <article class="destino">
+
+                <img src="americaSur/imagen_Monte_Video.jpg" alt="Montevideo">
+                <h3>Montevideo, Uruguay</h3>
+                <p>
+                    Tranquila y encantadora, Montevideo mezcla playas, historia y una gran calidad de vida junto al Río de la Plata.
+                </p>
+
+            </article>
+
+        </section>
+
+        <section class="formulario-recomendacion">
+            <form id="formulario-americaSur">
+
+                <label for="Nombre">Nombre</label>
+                <input type="text" id = "Nombre" placeholder="Nombre">
+                <br>  
+                <label for="Apellidos">Apellidos</label>
+                <input type="text" id = "Apellidos" placeholder="Apellidos">
+                <br>  
+                <label for="Direccion">Dirección</label>
+                <input type="text" id = "Direccion" placeholder="Dirección">
+                <br><br>
+
+                <label for="clima">¿Qué clima prefieres?</label>
+                <select name="clima" id="clima">
+                    <option value="calido">Cálido</option>
+                    <option value="templado">Templado</option>
+                    <option value="frio">Frio</option>
+                </select>
+
+                <label id="actividad">¿Qué tipo de viaje te gustaría?</label>
+                <select name="actividad" id="actividad">
+                    <option value="cultural">Cultural</option>
+                    <option value="urbano">Urbano</option>
+                    <option value="playa">Playa</option>
+                    <option value="montaña">Montaña</option>
+                </select>
+
+                <label id="presupuesto">Presupuesto aproximado</label>
+                <select name="presupuesto" id="presupuesto">
+                    <option value="alto">Alto</option>
+                    <option value="medio">Medio</option>
+                    <option value="bajo">Bajo</option>
+                </select>
+                <br>
+
+                <label for="Fecha">Elija una fecha</label>
+                <input type="date" id = "Fecha">
+                <br>
+
+                <textarea name="" id="" cols="60" rows="5">Escriba alguna sugerencia para destino</textarea>
+                <br>
+
+                <button type="button" onclick="recomendarDestino()">Ver recomendaciones</button>
+            </form>
+
+            <p id="resultado"></p>
+
+        </section>
+
+        <a href="../index1.html" class="boton-volver">⬅️Volver a inicio</a>
+
+    </main>
+
+    <footer>
+        <p>
+            2025 Viajes JAD | Página de America del Sur
+        </p>
+    </footer>
+    
+</body>
+</html>

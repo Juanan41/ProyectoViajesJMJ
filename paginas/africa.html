@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viaje a África -- Naturaleza y Cultura</title>
+    <link rel="stylesheet" href="africa.css">
+</head>
+<body>
+    <header>
+        <h1>Explora África</h1>
+    </header>
+    
+    <main class="contenido-pagina">
+        <section class="informacion">
+            
+            <p>
+                África es un continente de belleza salvaje, culturas milenarias y paisajes inolvidables. 
+                Desde los desiertos del norte hasta las selvas del centro y las playas del sur, cada rincón ofrece una experiencia única.
+            </p>
+            
+        </section>
+
+        <!--Galería de destinos-->
+
+        <section class="galeria-destinos">
+
+            <article class="destino">
+                <a href="#elcairo">
+                    <img src="Africa/imagen_El_Cairo.jpg" alt="El_Cairo">
+                </a>
+                <h3>El Cairo, Egipto</h3>
+                <p>
+                    La ciudad de los faraones y las pirámides de Giza. Un viaje al pasado donde historia y misterio se unen a orillas del Nilo.
+                </p>
+
+                <!-- Hoteles -->
+                <div id="elcairo" class="hoteles-destino">
+                    <!-- Hotel 1 -->
+                    <div class="hotel">
+                        <h4>Hotel Faraón</h4>
+                        <img src="Africa/imagen_HotelFaraon.jpg" alt="HotelFaraon">
+                        <form onsubmit="return false;">
+                            <label>Tipo de habitación:</label>
+                            <img src="Africa/habitacionFaraon.jpg" alt="HabitacioFaraon">
+                            <select>
+                                <option>Individual</option>
+                                <option>Doble</option>
+                                <option>Suite</option>
+                            </select>
+
+                            <label>Régimen de comida:</label>
+                            <select>
+                                <option>Solo alojamiento</option>
+                                <option>Desayuno incluido</option>
+                                <option>Media pensión</option>
+                            </select>
+
+                            <label>Personas:</label>
+                            <input type="number" min="1" max="10" value="1">
+
+                            <button type="button" onclick="alert('Reserva simulada en Hotel Faraón')">
+                                Reservar
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Hotel 2 -->
+                    <div class="hotel">
+                        <h4>Hotel Nilo</h4>
+                        <img src="Africa/imagen_HotelNilo.jpg" alt="HotelNilo">
+                        <form onsubmit="return false;">
+                            <label>Tipo de habitación:</label>
+                            <img src="Africa/HabitacionNilo.jpg" alt="HabitacionNilo">
+                            <select>
+                                <option>Individual</option>
+                                <option>Doble</option>
+                                <option>Suite</option>
+                            </select>
+
+                            <label>Régimen de comida:</label>
+                            <select>
+                                <option>Solo alojamiento</option>
+                                <option>Desayuno incluido</option>
+                                <option>Todo incluido</option>
+                            </select>
+
+                            <label>Personas:</label>
+                            <input type="number" min="1" max="10" value="2">
+
+                            <button type="button" onclick="alert('Reserva simulada en Hotel Nilo')">
+                                Reservar
+                            </button>
+                        </form>
+                    </div>
+                    <a href="#" class="cerrar-formulario">✖ Cerrar</a>
+                </div>
+
+            </article>
+
+            <article class="destino">
+
+                <img src="Africa/imagen_Marrakech.jpg" alt="Marrakech">
+                <h3>Marrakech, Marruecos</h3>
+                <p>
+                   Colores, aromas y tradiciones en los zocos y palacios de esta mágica ciudad del desierto, llena de vida y cultura. 
+                </p>
+
+            </article>
+
+            <article class="destino">
+
+                <img src="Africa/imagen_Nairobi.jpg" alt="Nairobi">
+                <h3>Nairobi, Kenia</h3>
+                <p>
+                   Puerta de entrada a los safaris africanos. Conoce la sabana, los leones y las jirafas en su hábitat natural. 
+                </p>
+            </article>
+
+            <article class="destino">
+
+                <img src="Africa/Imagen_Ciudad_del_Cabo.jpg" alt="Ciudad_del_Cabo">
+                <h3>Ciudad del Cabo, Sudáfrica </h3>
+                <p>
+                    Una de las ciudades más bellas del mundo, con la Montaña de la Mesa, playas espectaculares y mezcla de culturas.
+                </p>
+
+            </article>
+
+            <article class="destino">
+
+                <img src="Africa/imagen_Zanzibar.jpg" alt="Zanzibar">
+                <h3>Zanzibar, Tanzania</h3>
+                <p>
+                    Islas paradisíacas de arena blanca y mar turquesa. El destino perfecto para relajarte tras un safari africano.
+                </p>
+
+            </article>
+
+            <article class="destino">
+
+                 <img src="Africa/imagen_Desierto_Sahara.jpg" alt="Sahara">
+                 <h3>Desierto del Sahara</h3>
+                 <p>
+                    El desierto más grande del mundo, un mar de dunas doradas donde el silencio y la inmensidad te envuelven por completo.
+                 </p>
+
+            </article>
+
+        </section>
+
+        <section class="formulario-recomendacion">
+            <form id="formulario-europa">
+
+                <label for="Nombre">Nombre</label>
+                <input type="text" id = "Nombre" placeholder="Nombre">
+                <br>  
+                <label for="Apellidos">Apellidos</label>
+                <input type="text" id = "Apellidos" placeholder="Apellidos">
+                <br>  
+                <label for="Direccion">Dirección</label>
+                <input type="text" id = "Direccion" placeholder="Dirección">
+                <br><br>
+
+                <label for="clima">¿Qué clima prefieres?</label>
+                <select name="clima" id="clima">
+                    <option value="calido">Cálido</option>
+                    <option value="templado">Templado</option>
+                    <option value="frio">Frio</option>
+                </select>
+
+                <label id="actividad">¿Qué tipo de viaje te gustaría?</label>
+                <select name="actividad" id="actividad">
+                    <option value="cultural">Cultural</option>
+                    <option value="urbano">Urbano</option>
+                    <option value="playa">Playa</option>
+                    <option value="montaña">Montaña</option>
+                </select>
+
+                <label id="presupuesto">Presupuesto aproximado</label>
+                <select name="presupuesto" id="presupuesto">
+                    <option value="alto">Alto</option>
+                    <option value="medio">Medio</option>
+                    <option value="bajo">Bajo</option>
+                </select>
+                <br>
+
+                <label for="Fecha">Elija una fecha</label>
+                <input type="date" id = "Fecha">
+                <br>
+
+                <textarea name="" id="" cols="60" rows="5">Escriba alguna sugerencia para destino</textarea>
+                <br>
+
+                <button type="button" onclick="recomendarDestino()">Ver recomendaciones</button>
+            </form>
+
+            <p id="resultado"></p>
+
+        </section>
+
+        <a href="../index1.html" class="boton-volver">⬅️ Volver al inicio</a>
+    
+
+    </main>
+
+    <footer>
+        <p>
+            2025 Viajes JAD | Página de África
+        </p>
+    </footer>
+
+    
+</body>
+</html>

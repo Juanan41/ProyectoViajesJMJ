@@ -1,0 +1,118 @@
+header {
+    font-family: 'Courier New', Courier, monospace;
+    text-align: center;
+    color: black;
+    
+}
+
+body {
+    
+    margin: 0;
+    padding: 0;
+    background-image: url('../paginas/Oceania/imagen_fondo.jpg');
+    background-size: cover;         /* La imagen cubre toda la pantalla */
+    background-repeat: no-repeat;   /* Evita repeticiones */
+    background-attachment: fixed;   /* La imagen se queda fija al hacer scroll */
+    background-position: center;    /* Centrada */
+}
+
+.contenido-pagina {
+    padding: 20px;
+    text-align: center;
+}
+
+.galeria-destinos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+.destino {
+    background-color: aliceblue;
+    border: 2px solid blue;
+    border-radius: 10px;
+    width: 300px;
+    box-shadow: 5px 5px 10px rgb(0,0,0,0.2 );
+    text-align: center;
+    overflow: hidden;
+    transition: 0.5s;
+}
+
+.destino:hover {
+    transform: scale(1.05);
+}
+
+.destino img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.destino h3 {
+    background-color: #4CAF50;
+    color: aliceblue;
+    margin: 0;
+    padding: 10px;
+}
+
+.destino p {
+    padding: 10px;
+}
+
+.boton-volver {
+    display: inline-block;
+    background-color: rgb(0, 221, 255);
+    color: aliceblue;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 10px;
+    margin-top: 20px;
+    transition: background-color 0.3s;
+}
+
+.boton-volver:hover{
+    background-color:#4551a0;
+}
+
+.formulario-recomendacion {
+    margin: 30px auto;
+    padding: 20px;
+    background-color: sandybrown;
+    border-radius: 10px;
+    width: 80%;
+    box-shadow: 0 4px 8px white;
+}
+
+.formulario-recomendacion h2 {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.formulario-recomendacion form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+}
+
+.formulario-recomendacion select,
+.formulario-recomendacion button {
+    padding: 8px;
+    font-size: 1em;
+    border-radius: 6px;
+    border: 1px solid black;
+}
+
+.formulario-recomendacion button {
+    background-color: rgb(0, 221, 255);
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.formulario-recomendacion button:hover {
+    background-color: #4551a0;
+}
+
