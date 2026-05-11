@@ -1,75 +1,51 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, CreditCard, Camera, Trash2 } from 'lucide-angular';
 import { Auth } from '../../services/auth';
+import { LucideAngularModule, CreditCard, Trash2, Plus, ArrowLeft } from 'lucide-angular';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, LucideAngularModule, TranslatePipe],
+  imports: [CommonModule, RouterModule, LucideAngularModule, TranslatePipe],
   templateUrl: './settings.html',
-  styleUrl: './settings.css',
 })
 export class Settings implements OnInit {
-  constructor(private authService: Auth) { }
-
-  @ViewChild('fileInputRef') fileInputRef!: ElementRef<HTMLInputElement>;
+  public authService = inject(Auth);
 
   readonly CreditCardIcon = CreditCard;
-  readonly CameraIcon = Camera;
-  readonly Trash2Icon = Trash2;
+  readonly TrashIcon = Trash2;
+  readonly PlusIcon = Plus;
+  readonly ArrowLeftIcon = ArrowLeft;
 
-  name = '';
-  email = '';
-  password = '';
-  saved = false;
+  tarjetas = signal<any[]>([]);
+  isLoading = signal(true);
 
-  get user() {
-    return this.authService.user();
+  ngOnInit() {
+    this.loadCards();
   }
 
-  get cards() {
-    return this.authService.cards();
+  loadCards() {
+    this.isLoading.set(true);
+    this.authService.obtenerTarjetas().subscribe({
+      next: (data) => {
+        this.tarjetas.set(data);
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error cargando tarjetas', err);
+        this.isLoading.set(false);
+      },
+    });
   }
 
-  ngOnInit(): void {
-    const u = this.user;
-    if (u) {
-      this.name = u.name || '';
-      this.email = u.email || '';
+  removeCard(id: number) {
+    if (confirm('¿Seguro que quieres borrar esta tarjeta de tu cuenta?')) {
+      this.authService.borrarTarjeta(id).subscribe({
+        next: () => this.loadCards(),
+        error: (err) => console.error('Error borrando tarjeta', err),
+      });
     }
-  }
-
-  handleSave(event: Event) {
-    event.preventDefault();
-    this.authService.updateUser({ name: this.name, email: this.email });
-    this.saved = true;
-    setTimeout(() => (this.saved = false), 3000);
-  }
-
-  triggerFileInput() {
-    if (this.fileInputRef) {
-      this.fileInputRef.nativeElement.click();
-    }
-  }
-
-  handleImageUpload(event: Event) {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        this.authService.updateUser({ avatarUrl: reader.result as string });
-      };
-      reader.readAsDataURL(file);
-    }
-  }
-
-  removeCard(id: string) {
-    this.authService.removeCard(id);
   }
 }
-

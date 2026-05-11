@@ -13,72 +13,24 @@ import { SearchResults } from './pages/search-results/search-results';
 import { Login } from './pages/login/login';
 import { Register } from './pages/register/register';
 import { AdminDashboard } from './pages/admin/admin-dashboard';
+import { AddCard } from './pages/add-card/add-card';
 import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-  {
-    path: '',
-    component: Home,
-  },
-  {
-    path: 'continents',
-    component: Continents,
-  },
-  {
-    path: 'continent/:id',
-    component: Countries,
-  },
-  {
-    path: 'countries/:country',
-    component: Cities,
-  },
-  {
-    path: 'hotels/:id',
-    component: Hotels,
-  },
-  {
-    path: 'hotel/:id',
-    component: HotelComponent,
-  },
-  {
-    path: 'trips',
-    component: Trips,
-    canActivate: [AuthGuard],
-  },
-  {
-    path: 'profile',
-    component: Profile,
-    canActivate: [AuthGuard],
-  },
-  {
-    path: 'settings',
-    component: Settings,
-    canActivate: [AuthGuard],
-  },
-  {
-    path: 'receipt/:id',
-    component: Receipt,
-    canActivate: [AuthGuard],
-  },
-  {
-    path: 'search-results',
-    component: SearchResults,
-  },
-  {
-    path: 'login',
-    component: Login,
-  },
-  {
-    path: 'register',
-    component: Register,
-  },
-  {
-    path: 'admin',
-    component: AdminDashboard,
-    canActivate: [AuthGuard],
-  },
-  {
-    path: '**',
-    redirectTo: '',
-  },
+  { path: '', component: Home },
+  { path: 'continents', component: Continents },
+  { path: 'continent/:id', component: Countries },
+  { path: 'countries/:country', component: Cities },
+  { path: 'hotels/:id', component: Hotels },
+  { path: 'hotel/:id', component: HotelComponent },
+  { path: 'trips', component: Trips, canActivate: [AuthGuard] },
+  { path: 'profile', component: Profile, canActivate: [AuthGuard] },
+  { path: 'settings', component: Settings, canActivate: [AuthGuard] },
+  { path: 'add-card', component: AddCard, canActivate: [AuthGuard] },
+  { path: 'receipt/:id', component: Receipt, canActivate: [AuthGuard] },
+  { path: 'search-results', component: SearchResults },
+  { path: 'login', component: Login },
+  { path: 'register', component: Register },
+  { path: 'admin', component: AdminDashboard, canActivate: [AuthGuard] },
+  { path: '**', redirectTo: '' },
 ];

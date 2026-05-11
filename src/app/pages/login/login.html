@@ -1,36 +1,62 @@
-<div class="flex-1 w-full flex items-center justify-center p-4">
-  <div class="w-full max-w-md bg-[rgb(23,25,25)] p-8 rounded-2xl shadow-xl border border-gray-800">
-    <div class="text-center mb-8">
-      <h1 class="text-3xl font-bold tracking-tight mb-2"> {{ 'Bienvenido de nuevo' | translate }} </h1>
-      <p class="text-gray-400 text-sm"> {{ 'Inicia sesión para continuar con tu aventura.' | translate }} </p>
+<div class="min-h-screen flex items-center justify-center relative overflow-hidden bg-[rgb(23,25,25)]">
+  <div class="absolute inset-0 z-0">
+    <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent"></div>
+    <div
+      class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=2074')] bg-cover bg-center opacity-10 mix-blend-overlay">
     </div>
+  </div>
 
-    <form (submit)="handleSubmit($event)" class="space-y-6">
-      <div class="space-y-2">
-        <label class="text-sm font-medium text-gray-300 block" for="email"> {{ 'Correo electrónico' | translate }}
-        </label>
-        <input type="email" id="email" name="email" [(ngModel)]="email" required
-          class="w-full bg-[rgb(33,36,37)] border border-gray-700 text-white rounded-lg px-4 py-3 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white transition-all shadow-inner"
-          [placeholder]="'tu@email.com' | translate" />
+  <div class="w-full max-w-md p-8 relative z-10">
+    <div class="bg-[rgb(33,36,37)] p-8 rounded-[2rem] border border-gray-800 shadow-2xl backdrop-blur-xl">
+      <div class="text-center mb-8">
+        <a routerLink="/"
+          class="inline-flex items-center justify-center w-16 h-16 bg-emerald-500 rounded-2xl mb-6 shadow-lg shadow-emerald-500/20">
+          <span class="text-2xl">✈️</span>
+        </a>
+        <h1 class="text-3xl font-black text-white uppercase tracking-tighter mb-2">{{ 'Bienvenido de nuevo' | translate
+          }}</h1>
+        <p class="text-gray-400 font-medium">{{ 'Tu próxima aventura te espera' | translate }}</p>
       </div>
 
-      <div class="space-y-2">
-        <div class="flex justify-between">
-          <label class="text-sm font-medium text-gray-300 block" for="password"> {{ 'Contraseña' | translate }} </label>
+      @if (errorMessage()) {
+      <div
+        class="bg-red-500/10 border border-red-500/20 text-red-500 text-sm font-bold px-4 py-3 rounded-xl mb-6 text-center uppercase tracking-widest">
+        {{ errorMessage() | translate }}
+      </div>
+      }
+
+      <form (submit)="handleSubmit($event)" class="space-y-5">
+        <div>
+          <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">{{ 'Correo
+            electrónico' | translate }}</label>
+          <input type="email" [(ngModel)]="email" name="email" required
+            class="w-full bg-[rgb(23,25,25)] border border-gray-800 text-white rounded-xl px-4 py-3.5 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all placeholder-gray-600"
+            [placeholder]="'tu@email.com' | translate" />
         </div>
-        <input type="password" id="password" name="password" [(ngModel)]="password" required
-          class="w-full bg-[rgb(33,36,37)] border border-gray-700 text-white rounded-lg px-4 py-3 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white transition-all shadow-inner"
-          [placeholder]="'Tu contraseña' | translate" />
-      </div>
 
-      <button type="submit"
-        class="w-full bg-white text-black font-bold text-lg rounded-lg py-3 hover:bg-gray-200 transition-colors shadow-lg mt-4 cursor-pointer outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[rgb(23,25,25)]">
-        {{ 'Iniciar Sesión' | translate }} </button>
-    </form>
+        <div>
+          <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">{{ 'Contraseña' |
+            translate }}</label>
+          <input type="password" [(ngModel)]="password" name="password" required
+            class="w-full bg-[rgb(23,25,25)] border border-gray-800 text-white rounded-xl px-4 py-3.5 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all placeholder-gray-600"
+            placeholder="••••••••" />
+        </div>
 
-    <div class="mt-8 text-center text-sm text-gray-400">
-      {{ '¿No tienes una cuenta?' | translate }} <a routerLink="/register"
-        class="text-white hover:underline transition-all"> {{ 'Regístrate ahora' | translate }} </a>
+        <button type="submit" [disabled]="isLoading()"
+          class="w-full bg-emerald-500 text-[rgb(23,25,25)] font-black py-4 rounded-xl hover:bg-emerald-400 transition-all uppercase tracking-widest text-xs mt-4 shadow-xl shadow-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed">
+          @if (isLoading()) {
+          {{ 'Conectando...' | translate }}
+          } @else {
+          {{ 'Iniciar Sesión' | translate }}
+          }
+        </button>
+      </form>
+
+      <p class="text-center text-gray-400 mt-8 text-sm font-medium">
+        {{ '¿No tienes cuenta?' | translate }}
+        <a routerLink="/register" class="text-emerald-500 hover:text-emerald-400 font-bold ml-1 transition-colors">{{
+          'Regístrate aquí' | translate }}</a>
+      </p>
     </div>
   </div>
 </div>

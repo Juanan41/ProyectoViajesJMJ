@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -10,11 +10,12 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule, TranslatePipe],
   templateUrl: './login.html',
-  styleUrl: './login.css',
 })
 export class Login {
   email = '';
   password = '';
+  errorMessage = signal<string>('');
+  isLoading = signal<boolean>(false);
 
   constructor(
     private authService: Auth,
@@ -23,20 +24,31 @@ export class Login {
 
   async handleSubmit(event: Event) {
     event.preventDefault();
-    if (!this.email || !this.password) return;
+    if (!this.email || !this.password) {
+      this.errorMessage.set('Por favor, completa todos los campos.');
+      return;
+    }
+
+    this.isLoading.set(true);
+    this.errorMessage.set('');
 
     this.authService.login({ email: this.email, password: this.password }).subscribe({
-      next: () => this.router.navigate(['/']),
-      error: (err) => alert('Error al iniciar sesión'),
+      next: () => {
+        this.isLoading.set(false);
+        this.router.navigate(['/']);
+      },
+      error: (err) => {
+        this.isLoading.set(false);
+        if (err.error && typeof err.error === 'string') {
+          this.errorMessage.set(err.error);
+        } else if (err.error && err.error.message) {
+          this.errorMessage.set(err.error.message);
+        } else if (err.status === 401 || err.status === 403) {
+          this.errorMessage.set('Credenciales incorrectas. Vuelve a intentarlo.');
+        } else {
+          this.errorMessage.set('Error de conexión con el servidor.');
+        }
+      },
     });
-  }
-
-  private getUserNameFromEmail(email: string): string {
-    const emailStart = email.split('@')[0];
-    const cleanName = emailStart.replace(/[^a-zA-Z]/g, ' ').trim();
-
-    if (!cleanName) return 'Usuario';
-
-    return cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
   }
 }

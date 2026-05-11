@@ -227,6 +227,24 @@ export class Auth {
     return localStorage.getItem('role');
   }
 
+  obtenerTarjetas(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/cuentas/mis-cuentas`, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  agregarTarjeta(tarjeta: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/cuentas`, tarjeta, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  borrarTarjeta(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/cuentas/${id}`, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
   isCurrentUserAdmin(): boolean {
     const role = this.getRole();
     if (!role) return false;

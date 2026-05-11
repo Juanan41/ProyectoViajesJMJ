@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import {
@@ -67,16 +67,16 @@ export class Profile implements OnInit {
   readonly ShipIcon = Ship;
   readonly StarIcon = Star;
 
-  selectedTicket: Trip | null = null;
-  activeTrips: Trip[] = [];
-  pastTrips: Trip[] = [];
-  isLoading = true;
+  selectedTicket = signal<Trip | null>(null);
+  activeTrips = signal<Trip[]>([]);
+  pastTrips = signal<Trip[]>([]);
+  isLoading = signal(true);
 
   ngOnInit() {
     if (this.user) {
       this.cargarReservas();
     } else {
-      this.isLoading = false;
+      this.isLoading.set(false);
     }
   }
 
@@ -90,19 +90,19 @@ export class Profile implements OnInit {
         const trips = reservas.map((res) => this.toTrip(res));
         const now = new Date().toISOString().split('T')[0];
 
-        this.activeTrips = trips.filter((t) => t.estado !== 'CANCELADA' && t.checkOut >= now);
-        this.pastTrips = trips.filter((t) => t.estado !== 'CANCELADA' && t.checkOut < now);
-        this.isLoading = false;
+        this.activeTrips.set(trips.filter((t) => t.estado !== 'CANCELADA' && t.checkOut >= now));
+        this.pastTrips.set(trips.filter((t) => t.estado !== 'CANCELADA' && t.checkOut < now));
+        this.isLoading.set(false);
       },
       error: (err) => {
         console.error('Error cargando reservas', err);
-        this.isLoading = false;
+        this.isLoading.set(false);
       },
     });
   }
 
   openTicket(trip: Trip) {
-    this.selectedTicket = trip;
+    this.selectedTicket.set(trip);
   }
 
   openReceipt(trip: Trip) {
@@ -110,7 +110,7 @@ export class Profile implements OnInit {
   }
 
   closeTicket() {
-    this.selectedTicket = null;
+    this.selectedTicket.set(null);
   }
 
   getTransportIcon(type: string | undefined | null) {
