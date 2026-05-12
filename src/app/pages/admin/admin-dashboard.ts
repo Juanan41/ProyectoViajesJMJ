@@ -20,7 +20,7 @@ import {
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule], // <- TranslatePipe eliminado de aquí
+  imports: [CommonModule, FormsModule, LucideAngularModule],
   templateUrl: './admin-dashboard.html',
 })
 export class AdminDashboard implements OnInit {

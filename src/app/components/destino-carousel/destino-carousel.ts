@@ -1,56 +1,69 @@
-import { Component, Input, ViewChild, ElementRef, inject, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { TranslatePipe } from '../../pipes/translate.pipe';
+import {
+  Component,
+  Input,
+  ViewChild,
+  ElementRef,
+  AfterViewInit,
+  OnDestroy,
+  PLATFORM_ID,
+  Inject,
+} from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { RouterModule, Router } from '@angular/router';
+import { LucideAngularModule, MapPin } from 'lucide-angular';
 import { DestinoDTO } from '../../services/destino.service';
-import { LucideAngularModule } from 'lucide-angular';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-destino-carousel',
   standalone: true,
-  imports: [CommonModule, TranslatePipe, LucideAngularModule],
+  imports: [CommonModule, RouterModule, LucideAngularModule, TranslatePipe],
   templateUrl: './destino-carousel.html',
-  styleUrl: './destino-carousel.css',
 })
-export class DestinoCarousel implements OnInit, OnDestroy {
+export class DestinoCarousel implements AfterViewInit, OnDestroy {
   @Input() destinos: DestinoDTO[] = [];
-  @ViewChild('carousel') carouselRef!: ElementRef<HTMLDivElement>;
-  private router = inject(Router);
-  private intervalId: any;
+  @ViewChild('carousel') carousel!: ElementRef;
+  readonly MapPinIcon = MapPin;
+  private autoPlayInterval: any;
 
-  ngOnInit() {
-    this.startAutoPlay();
+  constructor(
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object,
+  ) {}
+
+  ngAfterViewInit() {
+    if (isPlatformBrowser(this.platformId)) {
+      this.autoPlayInterval = setInterval(() => {
+        this.next();
+      }, 4000);
+    }
   }
 
   ngOnDestroy() {
-    if (this.intervalId) clearInterval(this.intervalId);
-  }
-
-  startAutoPlay() {
-    this.intervalId = setInterval(() => this.next(), 5000);
+    if (this.autoPlayInterval) {
+      clearInterval(this.autoPlayInterval);
+    }
   }
 
   next() {
-    if (!this.carouselRef) return;
-    const el = this.carouselRef.nativeElement;
-    if (el.scrollLeft >= el.scrollWidth - el.clientWidth - 10) {
+    if (!this.carousel) return;
+    const el = this.carousel.nativeElement;
+    if (el.scrollLeft + el.clientWidth >= el.scrollWidth - 10) {
       el.scrollTo({ left: 0, behavior: 'smooth' });
     } else {
-      el.scrollBy({ left: el.clientWidth, behavior: 'smooth' });
+      el.scrollBy({ left: el.offsetWidth, behavior: 'smooth' });
     }
   }
 
   prev() {
-    if (!this.carouselRef) return;
-    const el = this.carouselRef.nativeElement;
-    if (el.scrollLeft <= 10) {
-      el.scrollTo({ left: el.scrollWidth, behavior: 'smooth' });
-    } else {
-      el.scrollBy({ left: -el.clientWidth, behavior: 'smooth' });
-    }
+    if (!this.carousel) return;
+    const el = this.carousel.nativeElement;
+    el.scrollBy({ left: -el.offsetWidth, behavior: 'smooth' });
   }
 
   goToDestination(dest: DestinoDTO) {
-    this.router.navigate(['/hotels', dest.id]);
+    if (dest.id) {
+      this.router.navigate(['/hotels', dest.id]);
+    }
   }
 }

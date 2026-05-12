@@ -1,21 +1,14 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
-import {
-  LucideAngularModule,
-  ArrowLeft,
-  MapPin,
-  ArrowRight,
-  Star,
-  ChevronRight,
-} from 'lucide-angular';
 import { DestinoService, DestinoDTO } from '../../services/destino.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { LucideAngularModule, ArrowLeft, ChevronRight } from 'lucide-angular';
 
 @Component({
   selector: 'app-cities',
   standalone: true,
-  imports: [CommonModule, RouterModule, LucideAngularModule, TranslatePipe],
+  imports: [CommonModule, RouterModule, TranslatePipe, LucideAngularModule],
   templateUrl: './cities.html',
 })
 export class Cities implements OnInit {
@@ -23,39 +16,40 @@ export class Cities implements OnInit {
   private destinoService = inject(DestinoService);
 
   readonly ArrowLeftIcon = ArrowLeft;
-  readonly MapPinIcon = MapPin;
-  readonly ArrowRightIcon = ArrowRight;
-  readonly StarIcon = Star;
   readonly ChevronRightIcon = ChevronRight;
 
   countryName = signal<string>('');
-  cities = signal<DestinoDTO[]>([]);
+  cities = signal<any[]>([]);
   isLoading = signal(true);
 
   ngOnInit() {
     this.route.paramMap.subscribe((params) => {
-      const country = params.get('country');
-      if (country) {
-        this.countryName.set(country);
-        this.loadCities(country);
+      const id = Number(params.get('id'));
+      if (id) {
+        this.loadData(id);
       }
     });
   }
 
-  loadCities(country: string) {
-    this.destinoService.getDestinosByPais(country).subscribe({
-      next: (destinos) => {
-        this.cities.set(destinos);
+  loadData(id: number) {
+    this.isLoading.set(true);
+
+    this.destinoService.getDestinoById(id).subscribe({
+      next: (dest) => {
+        this.countryName.set((dest.ciudad || dest.nombre || dest.pais || 'Destino') as string);
+      },
+      error: () => {},
+    });
+
+    this.destinoService.getAlojamientosByDestino(id).subscribe({
+      next: (data) => {
+        this.cities.set(data || []);
         this.isLoading.set(false);
       },
-      error: (err) => {
-        console.error('Error cargando ciudades:', err);
+      error: () => {
+        this.cities.set([]);
         this.isLoading.set(false);
       },
     });
-  }
-
-  getArray(length: number): any[] {
-    return new Array(length || 0);
   }
 }

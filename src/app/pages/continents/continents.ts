@@ -13,6 +13,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 export class Continents {
   readonly ChevronRightIcon = ChevronRight;
 
+  // Estas son las fotos reales emparejadas con sus cabeceras
   continents = [
     {
       id: 1,

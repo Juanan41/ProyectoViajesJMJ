@@ -29,7 +29,6 @@ export class Countries implements OnInit {
       const id = params.get('id');
       if (id) {
         let numericId = Number(id);
-        // Fallback por si el navegador ha guardado "europe" en caché
         if (isNaN(numericId)) {
           const mapStr: Record<string, number> = {
             europe: 1,
@@ -52,37 +51,37 @@ export class Countries implements OnInit {
         id: 1,
         name: 'Europa',
         description: 'Descubre la historia, el arte y una cultura inigualable.',
-        image: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800',
+        image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?q=80&w=2020',
       },
       '2': {
         id: 2,
         name: 'Asia',
         description: 'Explora maravillas ancestrales y ciudades vanguardistas.',
-        image: 'https://images.unsplash.com/photo-1464817739973-0128fe77aaa1',
+        image: 'https://images.unsplash.com/photo-1464817739973-0128fe77aaa1?q=80&w=2070',
       },
       '3': {
         id: 3,
         name: 'África',
         description: 'Naturaleza salvaje y paisajes únicos en el mundo.',
-        image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5',
+        image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?q=80&w=1972',
       },
       '4': {
         id: 4,
         name: 'América del Norte',
         description: 'Ciudades icónicas y una gran diversidad natural.',
-        image: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9',
+        image: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?q=80&w=2070',
       },
       '5': {
         id: 5,
         name: 'América del Sur',
         description: 'Cultura vibrante, selvas y maravillas naturales.',
-        image: 'https://images.unsplash.com/photo-1518182170546-076616fdfaaf',
+        image: 'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?q=80&w=2076',
       },
       '6': {
         id: 6,
         name: 'Oceanía',
         description: 'Islas paradisíacas y aventuras increíbles.',
-        image: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9',
+        image: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?q=80&w=2070',
       },
     };
 
@@ -91,12 +90,11 @@ export class Countries implements OnInit {
     this.destinoService.getDestinos().subscribe({
       next: (destinos) => {
         const filtered = destinos.filter((d) => d.continenteId === contId);
-        // Le pasamos los destinos directamente, sin agrupar, para que no pierda datos vitales
         this.countries.set(filtered);
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error('Error cargando países:', err);
+        console.error('Error cargando destinos:', err);
         this.isLoading.set(false);
       },
     });

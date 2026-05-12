@@ -51,8 +51,7 @@ export class AddCard {
   }
 
   handleExpiryChange(value: string) {
-    const formatted = this.formatExpiry(value);
-    this.expiry = formatted.substring(0, 5);
+    this.expiry = this.formatExpiry(value).substring(0, 5);
   }
 
   handleCvvChange(value: string) {
@@ -75,34 +74,37 @@ export class AddCard {
 
     if (this.isValid) {
       this.isLoading = true;
-      const payload = {
-        titular: this.cardHolder,
-        numeroTarjeta: this.cardNumber.replace(/\s+/g, ''),
-        fechaExpiracion: this.expiry,
-        cvv: this.cvv,
-      };
 
-      this.authService.agregarTarjeta(payload).subscribe({
-        next: () => {
-          this.isLoading = false;
-          this.router.navigate(['/settings']);
-        },
-        error: (err) => {
-          this.isLoading = false; // Desbloqueamos el botón aunque falle
+      try {
+        const payload = {
+          titular: this.cardHolder,
+          iban: this.cardNumber.replace(/\s+/g, ''),
+          entidad: 'TARJETA ' + this.expiry,
+          swift_bic: this.cvv,
+          swiftBic: this.cvv,
+          activa: true,
+        };
 
-          // Interpretación de errores de Spring Boot
-          if (err.status === 403 || err.status === 401) {
-            this.errorMessage = 'Sesión caducada. Por favor, vuelve a iniciar sesión.';
-          } else if (err.error && err.error.message) {
-            this.errorMessage = err.error.message;
-          } else if (err.error && typeof err.error === 'string') {
-            this.errorMessage = err.error;
-          } else {
-            this.errorMessage = 'Error al guardar la tarjeta en el servidor. Inténtalo de nuevo.';
-          }
-          console.error(err);
-        },
-      });
+        this.authService.agregarTarjeta(payload).subscribe({
+          next: () => {
+            this.isLoading = false;
+            this.router.navigate(['/settings']);
+          },
+          error: (err) => {
+            this.isLoading = false;
+            if (err.status === 403 || err.status === 401) {
+              this.errorMessage = 'Sesión caducada. Por favor, vuelve a iniciar sesión.';
+            } else if (err.error && typeof err.error === 'string') {
+              this.errorMessage = err.error;
+            } else {
+              this.errorMessage = 'Error en el servidor al intentar guardar la tarjeta.';
+            }
+          },
+        });
+      } catch (error) {
+        this.isLoading = false;
+        this.errorMessage = 'Error interno en la aplicación.';
+      }
     } else {
       this.errorMessage = 'Por favor, revise los datos de la tarjeta.';
     }
