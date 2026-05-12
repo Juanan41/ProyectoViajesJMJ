@@ -205,6 +205,7 @@ export class HotelComponent implements OnInit {
       transporte: this.selectedTransport,
       fechaInicio: this.checkInDate,
       fechaFin: this.checkOutDate,
+      huespedes: this.guests,
     };
 
     this.destinoService.crearReserva(bookingRequest).subscribe({

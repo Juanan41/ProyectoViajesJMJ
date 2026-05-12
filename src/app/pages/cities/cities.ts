@@ -24,27 +24,81 @@ export class Cities implements OnInit {
 
   ngOnInit() {
     this.route.paramMap.subscribe((params) => {
-      const id = Number(params.get('id'));
-      if (id) {
-        this.loadData(id);
+      const country = params.get('country');
+      if (country) {
+        const decoded = decodeURIComponent(country);
+        this.loadData(decoded);
       }
     });
   }
 
-  loadData(id: number) {
+  private normalizeText(value: string): string {
+    return value
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
+  }
+
+  loadData(country: string) {
     this.isLoading.set(true);
+    this.countryName.set(country);
 
-    this.destinoService.getDestinoById(id).subscribe({
-      next: (dest) => {
-        this.countryName.set((dest.ciudad || dest.nombre || dest.pais || 'Destino') as string);
-      },
-      error: () => {},
-    });
-
-    this.destinoService.getAlojamientosByDestino(id).subscribe({
+    this.destinoService.getDestinosByPais(country).subscribe({
       next: (data) => {
-        this.cities.set(data || []);
-        this.isLoading.set(false);
+        const destinos = data || [];
+        const normalizedCountry = this.normalizeText(country);
+        const cityDestinos = destinos.filter(
+          (d) => this.normalizeText(d.nombre || '') !== normalizedCountry,
+        );
+
+        if (cityDestinos.length > 0) {
+          this.cities.set(
+            cityDestinos.map((d) => ({
+              ...d,
+              destinoId: d.id,
+              imagen: d.imagen || d.imagenUrl,
+            })),
+          );
+          this.isLoading.set(false);
+          return;
+        }
+
+        const fallbackDestinoId = destinos[0]?.id;
+
+        this.destinoService.getAlojamientos().subscribe({
+          next: (alojamientos) => {
+            const filtered = (alojamientos || []).filter(
+              (a) => this.normalizeText(a.pais || '') === normalizedCountry,
+            );
+            const byCity = new Map<string, any>();
+
+            filtered.forEach((a) => {
+              const cityName = a.ciudad || a.nombre;
+              if (!cityName) return;
+
+              const current = byCity.get(cityName);
+              const price = a.precioPorNoche || a.precio || 0;
+              if (!current || price < current.precio) {
+                byCity.set(cityName, {
+                  id: fallbackDestinoId || a.destinoId || a.id,
+                  destinoId: fallbackDestinoId || a.destinoId || a.id,
+                  nombre: cityName,
+                  descripcion: `Hoteles destacados en ${cityName}.`,
+                  imagen: a.imagen || a.imagenUrl,
+                  precio: price,
+                });
+              }
+            });
+
+            this.cities.set(Array.from(byCity.values()));
+            this.isLoading.set(false);
+          },
+          error: () => {
+            this.cities.set([]);
+            this.isLoading.set(false);
+          },
+        });
       },
       error: () => {
         this.cities.set([]);

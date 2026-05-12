@@ -1,31 +1,44 @@
 <div class="flex-1 w-full bg-[rgb(23,25,25)] min-h-screen">
-  <div class="max-w-7xl mx-auto px-4 py-12">
+  <div class="max-w-7xl mx-auto px-4 py-12 pb-32">
     <div class="flex items-center gap-4 mb-12">
       <a routerLink="/"
-        class="p-3 bg-[rgb(33,36,37)] border border-gray-800 text-white rounded-2xl hover:bg-gray-800 transition-all">
+        class="p-3 bg-[rgb(33,36,37)] border border-gray-800 text-white rounded-2xl hover:bg-gray-800 transition-all cursor-pointer">
         <lucide-icon [name]="ArrowLeftIcon" class="w-6 h-6"></lucide-icon>
       </a>
       <div>
         <h1 class="text-3xl font-bold text-white tracking-tight">{{ countryName() | translate }}</h1>
-        <p class="text-gray-500 text-sm">{{ 'Explora los mejores destinos en este país' | translate }}</p>
+        <p class="text-gray-500 text-sm">{{ 'Explora las ciudades disponibles' | translate }}</p>
       </div>
     </div>
 
+    @if (isLoading()) {
+    <div class="flex justify-center items-center py-20">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
+    </div>
+    } @else {
+    @if (cities().length === 0) {
+    <div class="text-center py-20 bg-[rgb(33,36,37)] rounded-[32px] border border-gray-800">
+      <h3 class="text-2xl font-bold text-white mb-2">{{ 'Aún no hay ciudades' | translate }}</h3>
+      <p class="text-gray-400">{{ 'Pronto añadiremos destinos increíbles en este país.' | translate }}</p>
+    </div>
+    } @else {
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       @for (city of cities(); track city.id) {
-      <div [routerLink]="['/hotels', city.id]"
+      <div [routerLink]="['/hotels', city.destinoId || city.id]" [queryParams]="{ city: city.nombre }"
         class="group bg-[rgb(33,36,37)] rounded-[32px] overflow-hidden border border-gray-800 hover:border-emerald-500/30 transition-all duration-500 cursor-pointer">
         <div class="relative h-64 overflow-hidden">
-          <img [src]="city.imagen" [alt]="city.nombre"
+          <img [src]="city.imagen || city.imagenUrl || 'assets/placeholder.jpg'" [alt]="city.nombre"
             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
           <div class="absolute inset-0 bg-gradient-to-t from-[rgb(33,36,37)] via-transparent to-transparent"></div>
         </div>
         <div class="p-8">
           <h3 class="text-2xl font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">{{ city.nombre |
             translate }}</h3>
-          <p class="text-gray-400 text-sm mb-6 line-clamp-2">{{ city.descripcion | translate }}</p>
+          <p class="text-gray-400 text-sm mb-6 line-clamp-2">{{ city.descripcion || 'Destino exclusivo' | translate
+            }}</p>
           <div class="flex items-center justify-between pt-6 border-t border-gray-800">
-            <span class="text-emerald-500 font-bold text-xl">{{ city.precio }}€</span>
+            <span class="text-emerald-500 font-bold text-xl">{{ city.precio || 0 }}€ <span
+                class="text-xs text-gray-500 font-normal">{{ 'desde' | translate }}</span></span>
             <lucide-icon [name]="ChevronRightIcon"
               class="w-6 h-6 text-gray-500 group-hover:text-emerald-500 transition-all"></lucide-icon>
           </div>
@@ -33,5 +46,7 @@
       </div>
       }
     </div>
+    }
+    }
   </div>
 </div>

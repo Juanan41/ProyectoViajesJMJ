@@ -108,18 +108,22 @@ export class Auth {
 
   obtenerTarjetas(): Observable<any[]> {
     return this.http
-      .get<any[]>(`${this.apiUrl}/cuentas/mis-cuentas`, {
+      .get<any[]>(`${this.apiUrl}/cuentas/me`, {
         headers: this.getAuthHeaders(),
       })
       .pipe(
-        map((cuentas) =>
-          cuentas.map((c) => ({
+        map((cuentas) => {
+          const list = Array.isArray(cuentas) ? cuentas : cuentas ? [cuentas] : [];
+          return list.map((c) => ({
             id: c.id,
+            numeroTarjeta: c.iban || c.numeroTarjeta || '',
+            titular: c.titular || c.holder || '',
+            fechaExpiracion: c.entidad ? c.entidad.replace('TARJETA ', '') : c.expiry || '12/25',
             last4: c.iban ? c.iban.slice(-4) : '0000',
-            holder: c.titular,
-            expiry: c.entidad ? c.entidad.replace('TARJETA ', '') : '12/25',
-          })),
-        ),
+            holder: c.titular || c.holder || '',
+            expiry: c.entidad ? c.entidad.replace('TARJETA ', '') : c.expiry || '12/25',
+          }));
+        }),
       );
   }
 
@@ -129,8 +133,8 @@ export class Auth {
     });
   }
 
-  borrarTarjeta(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/cuentas/${id}`, {
+  borrarTarjeta(): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/cuentas/me`, {
       headers: this.getAuthHeaders(),
     });
   }

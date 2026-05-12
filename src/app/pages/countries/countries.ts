@@ -21,7 +21,17 @@ export class Countries implements OnInit {
   readonly ChevronRightIcon = ChevronRight;
 
   continent = signal<any>(null);
-  countries = signal<DestinoDTO[]>([]);
+  countries = signal<
+    Array<{
+      id: string;
+      pais: string;
+      nombre: string;
+      descripcion: string;
+      imagen: string;
+      precio: number;
+      routeParam: string;
+    }>
+  >([]);
   isLoading = signal(true);
 
   ngOnInit() {
@@ -90,7 +100,45 @@ export class Countries implements OnInit {
     this.destinoService.getDestinos().subscribe({
       next: (destinos) => {
         const filtered = destinos.filter((d) => d.continenteId === contId);
-        this.countries.set(filtered);
+        const byCountry = new Map<string, DestinoDTO>();
+
+        filtered.forEach((dest) => {
+          const key = (dest.pais || '').trim();
+          if (!key) return;
+
+          const existing = byCountry.get(key);
+          if (!existing) {
+            byCountry.set(key, dest);
+            return;
+          }
+
+          const existingPrice = existing.precio ?? Number.MAX_SAFE_INTEGER;
+          const nextPrice = dest.precio ?? Number.MAX_SAFE_INTEGER;
+          if (nextPrice < existingPrice) {
+            byCountry.set(key, dest);
+          }
+        });
+
+        const cards = Array.from(byCountry.entries()).map(([pais, dest]) => {
+          const slug = pais
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/(^-|-$)+/g, '');
+
+          return {
+            id: slug || pais,
+            pais,
+            nombre: pais,
+            descripcion: `Destinos destacados en ${pais}.`,
+            imagen: dest.imagenUrl || dest.imagen || 'assets/placeholder.jpg',
+            precio: dest.precio || 0,
+            routeParam: pais,
+          };
+        });
+
+        this.countries.set(cards);
         this.isLoading.set(false);
       },
       error: (err) => {

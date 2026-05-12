@@ -14,8 +14,9 @@ import {
   Wifi,
   Coffee,
 } from 'lucide-angular';
-import { DestinoService, DestinoDTO } from '../../services/destino.service';
+import { DestinoService } from '../../services/destino.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-hotels',
@@ -40,6 +41,8 @@ export class Hotels implements OnInit {
   city = signal<any>(null);
   country = signal<any>(null);
   alojamientos = signal<any[]>([]);
+  isLoading = signal(true);
+  private cityFilter = '';
 
   filters = {
     maxPrice: 5000,
@@ -47,6 +50,11 @@ export class Hotels implements OnInit {
   };
 
   ngOnInit() {
+    this.route.queryParamMap.subscribe((params) => {
+      const city = params.get('city');
+      this.cityFilter = city ? this.normalizeText(city) : '';
+    });
+
     this.route.paramMap.subscribe((params) => {
       const id = params.get('id');
       if (id) {
@@ -55,33 +63,50 @@ export class Hotels implements OnInit {
     });
   }
 
+  private normalizeText(value: string): string {
+    return value
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
+  }
+
   loadData(id: number) {
+    this.isLoading.set(true);
+
     this.destinoService.getDestinoById(id).subscribe({
-      next: (data: DestinoDTO) => {
-        this.city.set({
-          name: data.nombre,
-          image: data.imagenUrl || data.imagen,
-          description: data.descripcion,
-        });
-        this.country.set({ id: data.continenteId || 1 });
+      next: (data) => {
+        if (data) {
+          this.city.set({
+            name: data.nombre,
+            image:
+              data.imagenUrl ||
+              data.imagen ||
+              'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=800',
+            description: data.descripcion,
+          });
+          this.country.set({ id: data.continenteId || 1 });
+        }
       },
-      error: (err: any) => console.error('Error cargando destino:', err),
     });
 
-    this.destinoService.getAlojamientosByDestino(id).subscribe({
-      next: (data: any[]) => this.alojamientos.set(data),
-      error: (err: any) => console.error('Error cargando alojamientos:', err),
-    });
+    this.destinoService
+      .getAlojamientosByDestino(id)
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        next: (data) => this.alojamientos.set(data || []),
+        error: () => this.alojamientos.set([]),
+      });
   }
 
   get filteredHotels() {
     return this.alojamientos().filter((h) => {
-      if (
-        this.filters.maxPrice < 5000 &&
-        (h.precioPorNoche || h.precio || 0) > this.filters.maxPrice
-      )
-        return false;
-      return true;
+      const priceOk = (h.precioPorNoche || h.precio || 0) <= this.filters.maxPrice;
+      if (!priceOk) return false;
+
+      if (!this.cityFilter) return true;
+      const city = this.normalizeText(h.ciudad || '');
+      return city === this.cityFilter;
     });
   }
 

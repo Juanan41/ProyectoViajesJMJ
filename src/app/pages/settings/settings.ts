@@ -40,9 +40,9 @@ export class Settings implements OnInit {
     });
   }
 
-  removeCard(id: number) {
+  removeCard() {
     if (confirm('¿Seguro que quieres borrar esta tarjeta de tu cuenta?')) {
-      this.authService.borrarTarjeta(id).subscribe({
+      this.authService.borrarTarjeta().subscribe({
         next: () => this.loadCards(),
         error: (err) => console.error('Error borrando tarjeta', err),
       });

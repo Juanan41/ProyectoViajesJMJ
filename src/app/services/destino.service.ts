@@ -33,6 +33,8 @@ export class DestinoService {
     'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?q=80&w=2076',
   ];
 
+  private defaultBackendImage = 'photo-1436491865332-7a61a109cc05';
+
   public getFullImageUrl(imagePath?: string): string {
     if (!imagePath) {
       return 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=800';
@@ -45,16 +47,34 @@ export class DestinoService {
   }
 
   private mapDestino(d: any): DestinoDTO {
-    let path = d.imagen || d.imagenUrl;
+    if (!d) return {} as DestinoDTO;
 
-    if (!path || path.includes('1436491865332')) {
-      const index = (d.id || 0) % this.fallbackImages.length;
-      path = this.fallbackImages[index];
+    let path = d.imagen || d.imagenUrl;
+    const nameForImage = (d.ciudad || d.nombre || d.pais || '').toString().trim();
+    const hasBackendDefault = path && path.includes(this.defaultBackendImage);
+
+    if (!path || hasBackendDefault) {
+      if (nameForImage) {
+        path = `https://source.unsplash.com/1600x900/?${encodeURIComponent(nameForImage)}`;
+      } else {
+        const index = (d.id || 0) % this.fallbackImages.length;
+        path = this.fallbackImages[index];
+      }
     }
     const fullUrl = this.getFullImageUrl(path);
 
     let contId = d.continenteId;
     if (d.continente && d.continente.id) contId = d.continente.id;
+
+    if (!contId && d.continente) {
+      const cont = d.continente.toString().toLowerCase();
+      if (cont.includes('europa')) contId = 1;
+      else if (cont.includes('asia')) contId = 2;
+      else if (cont.includes('áfrica') || cont.includes('africa')) contId = 3;
+      else if (cont.includes('américa del norte')) contId = 4;
+      else if (cont.includes('américa del sur')) contId = 5;
+      else if (cont.includes('oceanía') || cont.includes('oceania')) contId = 6;
+    }
 
     if (!contId) {
       const pais = (d.pais || '').toLowerCase();
@@ -69,6 +89,7 @@ export class DestinoService {
 
     return {
       ...d,
+      ciudad: d.ciudad || d.nombre,
       continenteId: Number(contId),
       imagen: fullUrl,
       imagenUrl: fullUrl,
@@ -78,29 +99,59 @@ export class DestinoService {
   getDestinos(): Observable<DestinoDTO[]> {
     return this.http
       .get<any[]>(this.apiUrl)
-      .pipe(map((destinos) => destinos.map((d) => this.mapDestino(d))));
+      .pipe(map((destinos) => (destinos || []).map((d) => this.mapDestino(d))));
   }
 
   getDestinoById(id: number): Observable<DestinoDTO> {
-    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(map((d) => this.mapDestino(d)));
+    return this.http
+      .get<any>(`${this.apiUrl}/${id}`)
+      .pipe(map((d) => (d ? this.mapDestino(d) : (null as any))));
   }
 
   getDestinosByPais(pais: string): Observable<DestinoDTO[]> {
     return this.http
-      .get<any[]>(`${this.apiUrl}/pais/${pais}`)
-      .pipe(map((destinos) => destinos.map((d) => this.mapDestino(d))));
+      .get<any[]>(`${this.apiUrl}/pais/${encodeURIComponent(pais)}`)
+      .pipe(map((destinos) => (destinos || []).map((d) => this.mapDestino(d))));
   }
 
   getHotelDetails(id: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(map((d) => this.mapDestino(d)));
+    return this.http.get<any>(`${environment.apiUrl}/alojamientos/${id}`).pipe(
+      map((h) =>
+        h
+          ? {
+              ...h,
+              nombre: h.nombre || h.name,
+              imagen: this.getFullImageUrl(h.imagen || h.imagenUrl),
+              imagenUrl: this.getFullImageUrl(h.imagen || h.imagenUrl),
+              image: this.getFullImageUrl(h.imagen || h.imagenUrl),
+              name: h.nombre || h.name,
+            }
+          : (null as any),
+      ),
+    );
   }
 
   getAlojamientosByDestino(destinoId: number): Observable<any[]> {
     return this.http.get<any[]>(`${environment.apiUrl}/alojamientos/destino/${destinoId}`).pipe(
       map((alojamientos) =>
-        alojamientos.map((a) => ({
+        (alojamientos || []).map((a) => ({
           ...a,
           imagen: this.getFullImageUrl(a.imagen || a.imagenUrl),
+          image: this.getFullImageUrl(a.imagen || a.imagenUrl),
+          name: a.nombre,
+        })),
+      ),
+    );
+  }
+
+  getAlojamientos(): Observable<any[]> {
+    return this.http.get<any[]>(`${environment.apiUrl}/alojamientos`).pipe(
+      map((alojamientos) =>
+        (alojamientos || []).map((a) => ({
+          ...a,
+          imagen: this.getFullImageUrl(a.imagen || a.imagenUrl),
+          image: this.getFullImageUrl(a.imagen || a.imagenUrl),
+          name: a.nombre,
         })),
       ),
     );
@@ -120,7 +171,7 @@ export class DestinoService {
     const q = query.toLowerCase().trim();
     return this.getDestinos().pipe(
       map((destinos: DestinoDTO[]) =>
-        destinos.filter(
+        (destinos || []).filter(
           (d) =>
             (d.nombre && d.nombre.toLowerCase().includes(q)) ||
             (d.ciudad && d.ciudad.toLowerCase().includes(q)) ||

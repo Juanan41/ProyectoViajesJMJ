@@ -94,31 +94,36 @@ export const continents: Continent[] = [
   {
     id: 'europe',
     name: 'Europa',
-    image: 'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=800&q=80',
+    image:
+      'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=800&q=80',
     description: 'Historia, cultura y arquitectura milenaria',
   },
   {
     id: 'asia',
     name: 'Asia',
-    image: 'https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=800&q=80',
+    image:
+      'https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=800&q=80',
     description: 'Tradición ancestral y modernidad vibrante',
   },
   {
     id: 'america',
     name: 'América',
-    image: 'https://images.unsplash.com/photo-1501466044931-62695aada8e9?auto=format&fit=crop&w=800&q=80',
+    image:
+      'https://images.unsplash.com/photo-1501466044931-62695aada8e9?auto=format&fit=crop&w=800&q=80',
     description: 'Naturaleza salvaje y ciudades cosmopolitas',
   },
   {
     id: 'africa',
     name: 'África',
-    image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=800&q=80',
+    image:
+      'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=800&q=80',
     description: 'Safari, desiertos y culturas ancestrales',
   },
   {
     id: 'oceania',
     name: 'Oceanía',
-    image: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=800&q=80',
+    image:
+      'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=800&q=80',
     description: 'Playas paradisiacas y naturaleza única',
   },
 ];
@@ -2413,6 +2418,25 @@ export function deleteStoredHotelReview(hotelId: string, reviewId: string) {
   writeHotelReviewStore(store);
 }
 
+export function getStoredReviewsForUser(userName: string | undefined | null): Review[] {
+  const normalizedName = (userName ?? '').trim().toLowerCase();
+  if (!normalizedName) return [];
+
+  const store = readHotelReviewStore();
+  const reviews: Review[] = [];
+
+  Object.values(store).forEach((list) => {
+    list.forEach((review) => {
+      if (review.userName?.trim().toLowerCase() === normalizedName) {
+        reviews.push(review);
+      }
+    });
+  });
+
+  reviews.sort((a, b) => b.date.localeCompare(a.date));
+  return reviews;
+}
+
 function readBookingStore(): BookingRecord[] {
   if (!canUseLocalStorage()) return [];
 
@@ -2634,7 +2658,11 @@ export function isBookingCanceled(booking: BookingRecord): boolean {
   return (booking.status ?? 'active') === 'canceled';
 }
 
-export function formatStayRange(checkIn: string, checkOut: string, locale: string = 'es-ES'): string {
+export function formatStayRange(
+  checkIn: string,
+  checkOut: string,
+  locale: string = 'es-ES',
+): string {
   const formattedCheckIn = formatBookingDate(checkIn, locale);
   const formattedCheckOut = formatBookingDate(checkOut, locale);
   return `${formattedCheckIn} - ${formattedCheckOut}`;
@@ -2706,4 +2734,3 @@ export function searchHotels(query: string): Hotel[] {
 
   return matchingHotels;
 }
-

@@ -26,7 +26,7 @@
     } @else {
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       @for (country of countries(); track country.id) {
-      <div [routerLink]="['/hotels', country.id]"
+      <div [routerLink]="['/countries', country.routeParam]"
         class="group bg-[rgb(33,36,37)] rounded-3xl overflow-hidden border border-gray-800 hover:border-emerald-500/50 transition-all duration-500 cursor-pointer shadow-xl hover:shadow-emerald-500/10">
         <div class="relative h-64 overflow-hidden">
           <img [src]="country.imagen || country.imagenUrl || 'assets/placeholder.jpg'" [alt]="country.nombre"

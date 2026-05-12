@@ -105,7 +105,12 @@ export class Home implements OnInit {
   ngOnInit() {
     this.destinoService.getDestinos().subscribe({
       next: (data) => {
-        this.destinos.set(data);
+        const filtered = (data || []).filter((d) => {
+          const name = (d.nombre || '').toLowerCase();
+          const country = (d.pais || '').toLowerCase();
+          return !(name && country && name === country);
+        });
+        this.destinos.set(filtered);
         this.isLoading.set(false);
       },
       error: (err) => {

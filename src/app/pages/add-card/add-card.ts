@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, ArrowLeft, CreditCard as CardIcon } from 'lucide-angular';
 import { Auth } from '../../services/auth';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-add-card',
@@ -13,10 +14,8 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
   templateUrl: './add-card.html',
 })
 export class AddCard {
-  constructor(
-    private authService: Auth,
-    private router: Router,
-  ) {}
+  private authService = inject(Auth);
+  private router = inject(Router);
 
   readonly ArrowLeftIcon = ArrowLeft;
   readonly CardIconType = CardIcon;
@@ -70,43 +69,31 @@ export class AddCard {
 
   handleAddCard(event: Event) {
     event.preventDefault();
+    if (!this.isValid) return;
+
+    this.isLoading = true;
     this.errorMessage = '';
 
-    if (this.isValid) {
-      this.isLoading = true;
+    const payload = {
+      titular: this.cardHolder,
+      iban: this.cardNumber.replace(/\s+/g, ''),
+      entidad: 'TARJETA ' + this.expiry,
+      swiftBic: this.cvv,
+      activa: true,
+    };
 
-      try {
-        const payload = {
-          titular: this.cardHolder,
-          iban: this.cardNumber.replace(/\s+/g, ''),
-          entidad: 'TARJETA ' + this.expiry,
-          swift_bic: this.cvv,
-          swiftBic: this.cvv,
-          activa: true,
-        };
-
-        this.authService.agregarTarjeta(payload).subscribe({
-          next: () => {
-            this.isLoading = false;
-            this.router.navigate(['/settings']);
-          },
-          error: (err) => {
-            this.isLoading = false;
-            if (err.status === 403 || err.status === 401) {
-              this.errorMessage = 'Sesión caducada. Por favor, vuelve a iniciar sesión.';
-            } else if (err.error && typeof err.error === 'string') {
-              this.errorMessage = err.error;
-            } else {
-              this.errorMessage = 'Error en el servidor al intentar guardar la tarjeta.';
-            }
-          },
-        });
-      } catch (error) {
-        this.isLoading = false;
-        this.errorMessage = 'Error interno en la aplicación.';
-      }
-    } else {
-      this.errorMessage = 'Por favor, revise los datos de la tarjeta.';
-    }
+    this.authService
+      .agregarTarjeta(payload)
+      .pipe(finalize(() => (this.isLoading = false)))
+      .subscribe({
+        next: () => this.router.navigate(['/settings']),
+        error: (err) => {
+          if (err.status === 403) {
+            this.errorMessage = 'No tienes permiso o tu sesión ha caducado.';
+          } else {
+            this.errorMessage = err.error?.message || 'Error al guardar la tarjeta.';
+          }
+        },
+      });
   }
 }

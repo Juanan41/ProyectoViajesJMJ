@@ -45,9 +45,13 @@ export class ReservaService {
   }
 
   cancelarReserva(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/reservas/${id}`, {
-      headers: this.getAuthHeaders(),
-    });
+    return this.http.post(
+      `${this.apiUrl}/reservas/${id}/cancelar`,
+      {},
+      {
+        headers: this.getAuthHeaders(),
+      },
+    );
   }
 
   private getAuthHeaders(): HttpHeaders {
