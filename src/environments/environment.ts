@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://proyectoviajesjmj.onrender.com/api'
+  apiUrl: 'http://localhost:8082/api',
 };

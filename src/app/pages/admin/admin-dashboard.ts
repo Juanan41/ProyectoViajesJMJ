@@ -16,12 +16,11 @@ import {
   TrendingUp,
   Search,
 } from 'lucide-angular';
-import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, LucideAngularModule], // <- TranslatePipe eliminado de aquí
   templateUrl: './admin-dashboard.html',
 })
 export class AdminDashboard implements OnInit {

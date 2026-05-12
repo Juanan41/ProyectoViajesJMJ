@@ -1,32 +1,42 @@
 @if (!continent()) {
-<div class="flex-1 flex flex-col items-center justify-center">
+<div class="flex-1 flex flex-col items-center justify-center min-h-screen bg-[rgb(23,25,25)]">
   <div class="loading loading-spinner loading-lg text-emerald-500 mb-4"></div>
   <p class="text-gray-400"> {{ 'Cargando continente...' | translate }} </p>
 </div>
 } @if (continent()) {
-<div class="flex-1 w-full">
+<div class="flex-1 w-full bg-[rgb(23,25,25)] min-h-screen">
+
   <div class="relative h-[40vh] min-h-[300px] w-full flex items-center justify-center overflow-hidden">
-    <div class="absolute inset-0 bg-[rgb(23,25,25)]"></div>
-    <div class="absolute inset-0 bg-gradient-to-b from-transparent to-[rgb(23,25,25)]"></div>
+    <img [src]="continent()?.image" [alt]="continent()?.name"
+      class="absolute inset-0 w-full h-full object-cover opacity-50" />
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-[rgb(23,25,25)]/60 to-[rgb(23,25,25)]"></div>
     <div class="relative z-10 text-center px-4 max-w-4xl">
-      <h1 class="text-5xl md:text-7xl font-bold text-white mb-4">{{ continent()?.name | translate }}</h1>
-      <p class="text-gray-400 text-lg">{{ continent()?.description | translate }}</p>
+      <h1 class="text-5xl md:text-7xl font-bold text-white mb-4 drop-shadow-lg">{{ continent()?.name | translate }}</h1>
+      <p class="text-gray-300 text-lg font-medium drop-shadow-md">{{ continent()?.description | translate }}</p>
     </div>
   </div>
 
   <div class="max-w-7xl mx-auto px-4 py-12">
+    @if (countries().length === 0) {
+    <div class="text-center py-20">
+      <div class="text-6xl mb-4">🌍</div>
+      <h3 class="text-2xl font-bold text-white mb-2">{{ 'Aún no hay destinos' | translate }}</h3>
+      <p class="text-gray-400">{{ 'Pronto añadiremos viajes increíbles a este continente.' | translate }}</p>
+    </div>
+    } @else {
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       @for (country of countries(); track country.id) {
-      <div [routerLink]="['/city', country.id]"
+      <div [routerLink]="['/hotels', country.id]"
         class="group bg-[rgb(33,36,37)] rounded-3xl overflow-hidden border border-gray-800 hover:border-emerald-500/50 transition-all duration-500 cursor-pointer shadow-xl hover:shadow-emerald-500/10">
         <div class="relative h-64 overflow-hidden">
-          <img [src]="country.imagen" [alt]="country.nombre"
+          <img [src]="country.imagen || country.imagenUrl || 'assets/placeholder.jpg'" [alt]="country.nombre"
             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
           <div class="absolute inset-0 bg-gradient-to-t from-[rgb(33,36,37)] via-transparent to-transparent"></div>
           <div
             class="absolute top-4 right-4 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 flex items-center gap-2">
             <img [src]="getFlagUrl(country.pais)" class="w-5 h-3.5 object-cover rounded-sm" />
-            <span class="text-xs font-medium text-white tracking-wider uppercase">{{ getCodigoPais(country.pais) }}</span>
+            <span class="text-xs font-medium text-white tracking-wider uppercase">{{ getCodigoPais(country.pais)
+              }}</span>
           </div>
         </div>
 
@@ -60,6 +70,7 @@
       </div>
       }
     </div>
+    }
   </div>
 </div>
 }
