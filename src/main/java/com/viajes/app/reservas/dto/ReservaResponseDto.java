@@ -6,64 +6,107 @@ import java.time.LocalDateTime;
 public class ReservaResponseDto {
 
     private Long id;
-    private String destino;
-    private String hotel;
-    private String transporte;
-    private String tipoHabitacion;
-    private LocalDate fechaInicio;
-    private LocalDate fechaFin;
+    private Long destinoId;
+    private Long alojamientoId;
+    private Long habitacionId;
+    private String destinoNombre;
+    private String alojamientoNombre;
+    private String imagenUrl;
+    private LocalDate checkIn;
+    private LocalDate checkOut;
+    private Long noches;
+    private Integer huespedes;
     private Double precioTotal;
     private String estado;
     private LocalDateTime fechaReserva;
+    private String transporteTipo;
+    private String transporteNombre;
+    private String transporteHora;
+    private String transporteAsiento;
+    private String transportePuerta;
 
     public ReservaResponseDto(Long id,
-                              String destino,
-                              String hotel,
-                              String transporte,
-                              String tipoHabitacion,
-                              LocalDate fechaInicio,
-                              LocalDate fechaFin,
+                              Long destinoId,
+                              Long alojamientoId,
+                              Long habitacionId,
+                              String destinoNombre,
+                              String alojamientoNombre,
+                              String imagenUrl,
+                              LocalDate checkIn,
+                              LocalDate checkOut,
+                              Long noches,
+                              Integer huespedes,
                               Double precioTotal,
                               String estado,
-                              LocalDateTime fechaReserva) {
+                              LocalDateTime fechaReserva,
+                              String transporteTipo,
+                              String transporteNombre,
+                              String transporteHora,
+                              String transporteAsiento,
+                              String transportePuerta) {
         this.id = id;
-        this.destino = destino;
-        this.hotel = hotel;
-        this.transporte = transporte;
-        this.tipoHabitacion = tipoHabitacion;
-        this.fechaInicio = fechaInicio;
-        this.fechaFin = fechaFin;
+        this.destinoId = destinoId;
+        this.alojamientoId = alojamientoId;
+        this.habitacionId = habitacionId;
+        this.destinoNombre = destinoNombre;
+        this.alojamientoNombre = alojamientoNombre;
+        this.imagenUrl = imagenUrl;
+        this.checkIn = checkIn;
+        this.checkOut = checkOut;
+        this.noches = noches;
+        this.huespedes = huespedes;
         this.precioTotal = precioTotal;
         this.estado = estado;
         this.fechaReserva = fechaReserva;
+        this.transporteTipo = transporteTipo;
+        this.transporteNombre = transporteNombre;
+        this.transporteHora = transporteHora;
+        this.transporteAsiento = transporteAsiento;
+        this.transportePuerta = transportePuerta;
     }
 
     public Long getId() {
         return id;
     }
 
-    public String getDestino() {
-        return destino;
+    public Long getDestinoId() {
+        return destinoId;
     }
 
-    public String getHotel() {
-        return hotel;
+    public Long getAlojamientoId() {
+        return alojamientoId;
     }
 
-    public String getTransporte() {
-        return transporte;
+    public Long getHabitacionId() {
+        return habitacionId;
     }
 
-    public String getTipoHabitacion() {
-        return tipoHabitacion;
+    public String getDestinoNombre() {
+        return destinoNombre;
     }
 
-    public LocalDate getFechaInicio() {
-        return fechaInicio;
+    public String getAlojamientoNombre() {
+        return alojamientoNombre;
     }
 
-    public LocalDate getFechaFin() {
-        return fechaFin;
+    public String getImagenUrl() {
+        return imagenUrl;
+    }
+
+    public LocalDate getCheckIn() {
+        return checkIn;
+    }
+
+    public LocalDate getCheckOut() {
+        return checkOut;
+    }
+
+    public Long getNoches() {
+        return noches;
+    }
+
+    public Integer getHuespedes() {
+        return huespedes;
     }
 
     public Double getPrecioTotal() {
@@ -76,5 +119,25 @@ public class ReservaResponseDto {
 
     public LocalDateTime getFechaReserva() {
         return fechaReserva;
+    }
+
+    public String getTransporteTipo() {
+        return transporteTipo;
+    }
+
+    public String getTransporteNombre() {
+        return transporteNombre;
+    }
+
+    public String getTransporteHora() {
+        return transporteHora;
+    }
+
+    public String getTransporteAsiento() {
+        return transporteAsiento;
+    }
+
+    public String getTransportePuerta() {
+        return transportePuerta;
     }
 }

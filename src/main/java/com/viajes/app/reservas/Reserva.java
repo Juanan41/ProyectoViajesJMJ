@@ -28,6 +28,7 @@ public class Reserva {
 
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
+    private Integer huespedes;
     private Double precioTotal;
     private String estado;
     private LocalDateTime fechaReserva;
@@ -76,6 +77,14 @@ public class Reserva {
 
     public void setFechaFin(LocalDate fechaFin) {
         this.fechaFin = fechaFin;
+    }
+
+    public Integer getHuespedes() {
+        return huespedes;
+    }
+
+    public void setHuespedes(Integer huespedes) {
+        this.huespedes = huespedes;
     }
 
     public Double getPrecioTotal() {

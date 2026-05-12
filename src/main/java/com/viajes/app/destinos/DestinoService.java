@@ -4,6 +4,8 @@ import com.viajes.app.api.UnsplashService;
 import com.viajes.app.destinos.dto.DestinoDTO;
 
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @Service
@@ -26,25 +28,24 @@ public class DestinoService {
 
         return destinoRepository.findAll()
                 .stream()
-                .map(destino -> {
-
-                    String imagen = destino.getImagen();
-
-                    if (imagen == null || imagen.isEmpty()) {
-                        imagen = unsplashService.obtenerImagen(destino.getNombre());
-                    }
-
-                    return new DestinoDTO(
-                            destino.getId(),
-                            destino.getNombre(),
-                            destino.getDescripcion(),
-                            destino.getPrecio(),
-                            destino.getPais(),
-                            destino.getContinente().getNombre(),
-                            imagen
-                    );
-                })
+                .map(this::mapToDto)
                 .collect(java.util.stream.Collectors.toList());
+    }
+
+    public DestinoDTO obtenerDestino(Long id) {
+        return destinoRepository.findById(id)
+                .map(this::mapToDto)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Destino no encontrado"));
+    }
+
+    public List<DestinoDTO> listarDestinosPorPais(String pais) {
+        if (pais == null || pais.isBlank()) {
+            return List.of();
+        }
+        return destinoRepository.findByPaisIgnoreCase(pais.trim())
+                .stream()
+                .map(this::mapToDto)
+                .toList();
     }
 
     // ✅ GUARDAR (DTO → ENTITY → DTO)
@@ -77,6 +78,24 @@ public class DestinoService {
                 guardado.getPais(),
                 guardado.getContinente().getNombre(),
                 guardado.getImagen()
+        );
+    }
+
+    private DestinoDTO mapToDto(Destino destino) {
+        String imagen = destino.getImagen();
+
+        if (imagen == null || imagen.isEmpty()) {
+            imagen = unsplashService.obtenerImagen(destino.getNombre());
+        }
+
+        return new DestinoDTO(
+                destino.getId(),
+                destino.getNombre(),
+                destino.getDescripcion(),
+                destino.getPrecio(),
+                destino.getPais(),
+                destino.getContinente().getNombre(),
+                imagen
         );
     }
 }

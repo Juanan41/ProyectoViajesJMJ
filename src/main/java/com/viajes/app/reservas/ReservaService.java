@@ -2,6 +2,9 @@ package com.viajes.app.reservas;
 
 import com.viajes.app.alojamientos.Habitacion;
 import com.viajes.app.alojamientos.HabitacionRepository;
+import com.viajes.app.api.UnsplashService;
+import com.viajes.app.alojamientos.Alojamiento;
+import com.viajes.app.destinos.Destino;
 import com.viajes.app.reservas.dto.ReservaRequestDto;
 import com.viajes.app.reservas.dto.ReservaResponseDto;
 import com.viajes.app.users.Usuario;
@@ -20,13 +23,16 @@ public class ReservaService {
     private final ReservaRepository reservaRepository;
     private final UsuarioRepository usuarioRepository;
     private final HabitacionRepository habitacionRepository;
+    private final UnsplashService unsplashService;
 
     public ReservaService(ReservaRepository reservaRepository,
                           UsuarioRepository usuarioRepository,
-                          HabitacionRepository habitacionRepository) {
+                          HabitacionRepository habitacionRepository,
+                          UnsplashService unsplashService) {
         this.reservaRepository = reservaRepository;
         this.usuarioRepository = usuarioRepository;
         this.habitacionRepository = habitacionRepository;
+        this.unsplashService = unsplashService;
     }
 
     public ReservaResponseDto crearReserva(ReservaRequestDto dto, String emailUsuario) {
@@ -54,7 +60,9 @@ public class ReservaService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transporte inválido");
         }
 
-        double precioTotal = habitacion.getPrecioPorNoche() * noches;
+        int huespedes = dto.getHuespedes() != null && dto.getHuespedes() > 0 ? dto.getHuespedes() : 1;
+        double transporteCoste = getTransporteCoste(transporte);
+        double precioTotal = (habitacion.getPrecioPorNoche() * noches * huespedes) + transporteCoste;
 
         Reserva reserva = new Reserva();
         reserva.setUsuario(usuario);
@@ -62,6 +70,7 @@ public class ReservaService {
         reserva.setTransporte(transporte);
         reserva.setFechaInicio(dto.getFechaInicio());
         reserva.setFechaFin(dto.getFechaFin());
+        reserva.setHuespedes(huespedes);
         reserva.setPrecioTotal(precioTotal);
         reserva.setEstado("CONFIRMADA");
         reserva.setFechaReserva(LocalDateTime.now());
@@ -96,28 +105,66 @@ public class ReservaService {
     }
 
     private ReservaResponseDto mapToDto(Reserva reserva) {
-        String destino = reserva.getHabitacion()
-                .getAlojamiento()
-                .getDestino()
-                .getNombre();
+        Alojamiento alojamiento = reserva.getHabitacion().getAlojamiento();
+        Destino destino = alojamiento.getDestino();
 
-        String hotel = reserva.getHabitacion()
-                .getAlojamiento()
-                .getNombre();
+        String destinoNombre = destino.getNombre();
+        String destinoPais = destino.getPais();
+        String destinoLabel = destinoPais != null && !destinoPais.isBlank()
+                ? destinoNombre + ", " + destinoPais
+                : destinoNombre;
 
-        String tipoHabitacion = reserva.getHabitacion().getTipo();
+        String imagenUrl = destino.getImagen();
+        if (imagenUrl == null || imagenUrl.isBlank()) {
+            imagenUrl = unsplashService.obtenerImagen(destinoLabel);
+        }
+
+        long noches = ChronoUnit.DAYS.between(reserva.getFechaInicio(), reserva.getFechaFin());
+        int huespedes = reserva.getHuespedes() != null && reserva.getHuespedes() > 0
+                ? reserva.getHuespedes()
+                : 1;
+
+        TransporteTipo transporte = reserva.getTransporte();
+        String transporteTipo = transporte != null ? transporte.name() : null;
 
         return new ReservaResponseDto(
                 reserva.getId(),
-                destino,
-                hotel,
-                reserva.getTransporte().name(),
-                tipoHabitacion,
+                destino.getId(),
+                alojamiento.getId(),
+                reserva.getHabitacion().getId(),
+                destinoLabel,
+                alojamiento.getNombre(),
+                imagenUrl,
                 reserva.getFechaInicio(),
                 reserva.getFechaFin(),
+                noches,
+                huespedes,
                 reserva.getPrecioTotal(),
                 reserva.getEstado(),
-                reserva.getFechaReserva()
+                reserva.getFechaReserva(),
+                transporteTipo,
+                getTransporteNombre(transporte),
+                null,
+                null,
+                null
         );
+    }
+
+    private double getTransporteCoste(TransporteTipo transporte) {
+        if (transporte == null) return 0;
+        return switch (transporte) {
+            case AVION -> 150;
+            case TREN -> 50;
+            case BARCO -> 100;
+        };
+    }
+
+    private String getTransporteNombre(TransporteTipo transporte) {
+        if (transporte == null) return null;
+        return switch (transporte) {
+            case AVION -> "Vuelo";
+            case TREN -> "Tren";
+            case BARCO -> "Barco";
+        };
     }
 }

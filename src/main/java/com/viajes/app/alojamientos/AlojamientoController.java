@@ -11,9 +11,11 @@ import java.util.Map;
 public class AlojamientoController {
 
     private final AlojamientoService alojamientoService;
+    private final HabitacionService habitacionService;
 
-    public AlojamientoController(AlojamientoService alojamientoService) {
+    public AlojamientoController(AlojamientoService alojamientoService, HabitacionService habitacionService) {
         this.alojamientoService = alojamientoService;
+        this.habitacionService = habitacionService;
     }
 
     @GetMapping
@@ -41,6 +43,11 @@ public class AlojamientoController {
                 .orElseThrow(() -> new RuntimeException("Alojamiento no encontrado"));
 
         return convertirADto(alojamiento);
+    }
+
+    @GetMapping("/{id}/habitaciones")
+    public List<Habitacion> listarHabitaciones(@PathVariable Long id) {
+        return habitacionService.buscarPorAlojamiento(id);
     }
 
     private Map<String, Object> convertirADto(Alojamiento alojamiento) {

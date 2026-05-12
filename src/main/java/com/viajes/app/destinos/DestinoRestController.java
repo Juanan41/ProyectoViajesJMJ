@@ -19,6 +19,16 @@ public class DestinoRestController {
         return destinoService.listarDestinos();
     }
 
+    @GetMapping("/{id}")
+    public DestinoDTO getDestino(@PathVariable Long id) {
+        return destinoService.obtenerDestino(id);
+    }
+
+    @GetMapping("/pais/{pais}")
+    public List<DestinoDTO> getDestinosPorPais(@PathVariable String pais) {
+        return destinoService.listarDestinosPorPais(pais);
+    }
+
     @PostMapping
     public DestinoDTO crear(@RequestBody DestinoDTO dto) {
         return destinoService.guardarDesdeDTO(dto);

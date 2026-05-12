@@ -8,6 +8,7 @@ public class ReservaRequestDto {
     private String transporte;
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
+    private Integer huespedes;
 
     public Long getHabitacionId() {
         return habitacionId;
@@ -39,5 +40,13 @@ public class ReservaRequestDto {
 
     public void setFechaFin(LocalDate fechaFin) {
         this.fechaFin = fechaFin;
+    }
+
+    public Integer getHuespedes() {
+        return huespedes;
+    }
+
+    public void setHuespedes(Integer huespedes) {
+        this.huespedes = huespedes;
     }
 }
