@@ -23,10 +23,10 @@ public class UnsplashService {
     public String obtenerImagen(String query) {
         // 1. Si no hay clave real, devolvemos imagen por defecto directamente sin llamar a la API
         if (accessKey == null || accessKey.equals("TU_CLAVE_LOCAL") || accessKey.isEmpty()) {
-            return "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=800";
+            return "https://images.unsplash.com/photo-1436491865332-7a61a109cc05q=80&w=800";
         }
 
-        String url = "https://api.unsplash.com/search/photos?page=1&query=" + query + "&client_id=" + accessKey;
+        String url = "https://api.unsplash.com/search/photospage=1&query=" + query + "&client_id=" + accessKey;
 
         // 2. Intentamos buscar la foto, si falla, lo atrapamos sin romper la aplicación
         try {
@@ -42,6 +42,6 @@ public class UnsplashService {
         }
 
         // 3. Foto por defecto genérica de viaje (landscape)
-        return "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=800";
+        return "https://images.unsplash.com/photo-1436491865332-7a61a109cc05q=80&w=800";
     }
 }

@@ -47,63 +47,63 @@ INSERT INTO continente (nombre) VALUES
 -- =====================
 -- 🌏 DESTINOS EUROPA
 -- =====================
-INSERT INTO destinos (nombre, descripcion, precio, pais, continente_id) VALUES
-                                                                            ('España', 'Cultura, gastronomía y diversidad', 1700, 'España', 1),
-                                                                            ('París', 'Ciudad del amor, arte y moda', 2300, 'Francia', 1),
-                                                                            ('Roma', 'Historia romana y cultura italiana', 1800, 'Italia', 1),
-                                                                            ('Londres', 'Ciudad moderna con historia', 2200, 'Reino Unido', 1),
-                                                                            ('Atenas', 'Cuna de la civilización griega', 1600, 'Grecia', 1),
-                                                                            ('Viena', 'Elegancia, música y cultura imperial', 1900, 'Austria', 1);
+INSERT INTO destinos (nombre, descripcion, precio, pais, imagen, continente_id) VALUES
+    ('Madrid', 'Cultura, gastronomía y diversidad', 1700, 'España', 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Madrid_-_Sky_Bar_360%C2%BA_%28Hotel_Riu_Plaza_Espa%C3%B1a%29%2C_vistas_19.jpg/3840px-Madrid_-_Sky_Bar_360%C2%BA_%28Hotel_Riu_Plaza_Espa%C3%B1a%29%2C_vistas_19.jpg', 1),
+    ('París', 'Ciudad del amor, arte y moda', 2300, 'Francia', 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/La_Tour_Eiffel_vue_de_la_Tour_Saint-Jacques%2C_Paris_ao%C3%BBt_2014_%282%29.jpg/3840px-La_Tour_Eiffel_vue_de_la_Tour_Saint-Jacques%2C_Paris_ao%C3%BBt_2014_%282%29.jpg', 1),
+    ('Roma', 'Historia romana y cultura italiana', 1800, 'Italia', 'https://upload.wikimedia.org/wikipedia/commons/7/7e/Trevi_Fountain%2C_Rome%2C_Italy_2_-_May_2007.jpg', 1),
+    ('Londres', 'Ciudad moderna con historia', 2200, 'Reino Unido', 'https://upload.wikimedia.org/wikipedia/commons/6/67/London_Skyline_%28125508655%29.jpeg', 1),
+    ('Atenas', 'Cuna de la civilización griega', 1600, 'Grecia', 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Monastiraki_Square_and_Acropolis_in_Athens_%2844149181684%29.jpg/3840px-Monastiraki_Square_and_Acropolis_in_Athens_%2844149181684%29.jpg', 1),
+    ('Viena', 'Elegancia, música y cultura imperial', 1900, 'Austria', 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Schoenbrunn_philharmoniker_2012.jpg/3840px-Schoenbrunn_philharmoniker_2012.jpg', 1);
 -- =====================
 -- 🌏 DESTINOS ASIA
 -- =====================
-INSERT INTO destinos (nombre, descripcion, precio, pais, continente_id) VALUES
-                                                                            ('Tokio', 'Tecnología avanzada, cultura tradicional y vida urbana vibrante', 2200, 'Japón', 2),
-                                                                            ('Bangkok', 'Templos, mercados y vida nocturna exótica', 1400, 'Tailandia', 2),
-                                                                            ('Pekín', 'Historia imperial, cultura china y monumentos icónicos', 1700, 'China', 2),
-                                                                            ('Dubái', 'Lujo, rascacielos y experiencias en el desierto', 2500, 'Emiratos Árabes Unidos', 2),
-                                                                            ('Nueva Delhi', 'Cultura milenaria, gastronomía y contrastes urbanos', 1600, 'India', 2),
-                                                                            ('Seúl', 'Tecnología, cultura moderna y tradición coreana', 2000, 'Corea del Sur', 2);
+INSERT INTO destinos (nombre, descripcion, precio, pais, imagen, continente_id) VALUES
+    ('Tokio', 'Tecnología avanzada, cultura tradicional y vida urbana vibrante', 2200, 'Japón', 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=2000', 2),
+    ('Bangkok', 'Templos, mercados y vida nocturna exótica', 1400, 'Tailandia', 'https://images.unsplash.com/photo-1508009603885-50cf7c579365?q=80&w=2000', 2),
+    ('Pekín', 'Historia imperial, cultura china y monumentos icónicos', 1700, 'China', 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?q=80&w=2000', 2),
+    ('Dubái', 'Lujo, rascacielos y experiencias en el desierto', 2500, 'Emiratos Árabes Unidos', 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=2000', 2),
+    ('Nueva Delhi', 'Cultura milenaria, gastronomía y contrastes urbanos', 1600, 'India', 'https://images.unsplash.com/photo-1587474260584-136574528ed5?q=80&w=2000', 2),
+    ('Seúl', 'Tecnología, cultura moderna y tradición coreana', 2000, 'Corea del Sur', 'https://images.unsplash.com/photo-1538485399081-7191377e8241?q=80&w=2000', 2);
 -- =====================
 -- 🌍 DESTINOS ÁFRICA
 -- =====================
-INSERT INTO destinos (nombre, descripcion, precio, pais, continente_id) VALUES
-                                                                            ('El Cairo', 'Historia antigua, pirámides y cultura egipcia', 1500, 'Egipto', 3),
-                                                                            ('Marrakech', 'Mercados tradicionales, cultura marroquí y arquitectura exótica', 1200, 'Marruecos', 3),
-                                                                            ('Nairobi', 'Safari africano y naturaleza salvaje', 2000, 'Kenia', 3),
-                                                                            ('Zanzibar', 'Playas paradisíacas y aguas cristalinas', 1800, 'Tanzania', 3),
-                                                                            ('Sahara', 'Aventura en el desierto y paisajes únicos', 1400, 'Marruecos', 3),
-                                                                            ('Ciudad del Cabo', 'Naturaleza, montaña y costa espectacular', 2200, 'Sudáfrica', 3);
+INSERT INTO destinos (nombre, descripcion, precio, pais, imagen, continente_id) VALUES
+    ('El Cairo', 'Historia antigua, pirámides y cultura egipcia', 1500, 'Egipto', 'https://images.unsplash.com/photo-1572252009286-268acec5ca0a?q=80&w=2000', 3),
+    ('Marrakech', 'Mercados tradicionales, cultura marroquí y arquitectura exótica', 1200, 'Marruecos', 'https://images.unsplash.com/photo-1597212720419-bd37616e35bc?q=80&w=2000', 3),
+    ('Nairobi', 'Safari africano y naturaleza salvaje', 2000, 'Kenia', 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?q=80&w=2000', 3),
+    ('Zanzibar', 'Playas paradisíacas y aguas cristalinas', 1800, 'Tanzania', 'https://images.unsplash.com/photo-1586861635167-e5223aadc9fe?q=80&w=2000', 3),
+    ('Sahara', 'Aventura en el desierto y paisajes únicos', 1400, 'Marruecos', 'https://images.unsplash.com/photo-1509316785289-025f5b846b35?q=80&w=2000', 3),
+    ('Ciudad del Cabo', 'Naturaleza, montaña y costa espectacular', 2200, 'Sudáfrica', 'https://images.unsplash.com/photo-1580060839134-75a5edca2e99?q=80&w=2000', 3);
 -- =====================
 -- 🌏 DESTINOS OCEANÍA
 -- =====================
-INSERT INTO destinos (nombre, descripcion, precio, pais, continente_id) VALUES
-                                                                            ('Sidney', 'Ópera icónica, playas y cultura urbana australiana', 2600, 'Australia', 4),
-                                                                            ('Melbourne', 'Arte, cultura y vida cosmopolita', 2400, 'Australia', 4),
-                                                                            ('Auckland', 'Volcanes, naturaleza y aventura', 2300, 'Nueva Zelanda', 4),
-                                                                            ('Fiyi', 'Playas paradisíacas y relax total', 3000, 'Fiyi', 4),
-                                                                            ('Bora Bora', 'Destino romántico con aguas turquesas y lujo', 3500, 'Polinesia Francesa', 4),
-                                                                            ('Perth', 'Ciudad moderna con naturaleza salvaje', 2200, 'Australia', 4);
+INSERT INTO destinos (nombre, descripcion, precio, pais, imagen, continente_id) VALUES
+    ('Sidney', 'Ópera icónica, playas y cultura urbana australiana', 2600, 'Australia', 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?q=80&w=2000', 4),
+    ('Melbourne', 'Arte, cultura y vida cosmopolita', 2400, 'Australia', 'https://images.unsplash.com/photo-1514395462725-fb4566210144?q=80&w=2000', 4),
+    ('Auckland', 'Volcanes, naturaleza y aventura', 2300, 'Nueva Zelanda', 'https://images.unsplash.com/photo-1507699622108-4be3abd695ad?q=80&w=2000', 4),
+    ('Fiyi', 'Playas paradisíacas y relax total', 3000, 'Fiyi', 'https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?q=80&w=2000', 4),
+    ('Bora Bora', 'Destino romántico con aguas turquesas y lujo', 3500, 'Polinesia Francesa', 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2000', 4),
+    ('Perth', 'Ciudad moderna con naturaleza salvaje', 2200, 'Australia', 'https://images.unsplash.com/photo-1524586410818-196d249560e4?q=80&w=2000', 4);
 -- =====================
 -- 🌎 DESTINOS AMÉRICA DEL NORTE
 -- =====================
-INSERT INTO destinos (nombre, descripcion, precio, pais, continente_id) VALUES
-                                                                            ('Nueva York', 'Rascacielos, cultura urbana y la ciudad que nunca duerme', 2800, 'Estados Unidos', 5),
-                                                                            ('Ciudad de México', 'Historia, cultura y gastronomía mexicana', 1700, 'México', 5),
-                                                                            ('Toronto', 'Ciudad moderna con multiculturalidad y rascacielos', 2400, 'Canadá', 5),
-                                                                            ('San Francisco', 'Puentes icónicos, tecnología y cultura alternativa', 2600, 'Estados Unidos', 5),
-                                                                            ('Cancún', 'Playas paradisíacas y relax en el Caribe', 2200, 'México', 5),
-                                                                            ('Chicago', 'Arquitectura, música y ambiente urbano', 2300, 'Estados Unidos', 5);
+INSERT INTO destinos (nombre, descripcion, precio, pais, imagen, continente_id) VALUES
+    ('Nueva York', 'Rascacielos, cultura urbana y la ciudad que nunca duerme', 2800, 'Estados Unidos', 'https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?q=80&w=2000', 5),
+    ('Ciudad de México', 'Historia, cultura y gastronomía mexicana', 1700, 'México', 'https://images.unsplash.com/photo-1518638150340-f706e86654de?q=80&w=2000', 5),
+    ('Toronto', 'Ciudad moderna con multiculturalidad y rascacielos', 2400, 'Canadá', 'https://images.unsplash.com/photo-1517090504586-fde19ea6066f?q=80&w=2000', 5),
+    ('San Francisco', 'Puentes icónicos, tecnología y cultura alternativa', 2600, 'Estados Unidos', 'https://images.unsplash.com/photo-1501594907352-04cda38eb2f7?q=80&w=2000', 5),
+    ('Cancún', 'Playas paradisíacas y relax en el Caribe', 2200, 'México', 'https://images.unsplash.com/photo-1552074284-5e88ef1aef18?q=80&w=2000', 5),
+    ('Chicago', 'Arquitectura, música y ambiente urbano', 2300, 'Estados Unidos', 'https://images.unsplash.com/photo-1494522855154-9297ac14b55f?q=80&w=2000', 5);
 -- =====================
 -- 🌎 DESTINOS AMÉRICA DEL SUR
 -- =====================
-INSERT INTO destinos (nombre, descripcion, precio, pais, continente_id) VALUES
-                                                                            ('Rio de Janeiro', 'Playas, carnaval y paisajes icónicos como el Cristo Redentor', 1900, 'Brasil', 6),
-                                                                            ('Buenos Aires', 'Cultura, tango y gastronomía argentina', 1600, 'Argentina', 6),
-                                                                            ('Machu Picchu', 'Historia inca y maravilla del mundo en los Andes', 2100, 'Perú', 6),
-                                                                            ('Cartagena', 'Ciudad colonial con playas y encanto caribeño', 1800, 'Colombia', 6),
-                                                                            ('Santiago de Chile', 'Ciudad moderna rodeada de montañas y naturaleza', 2000, 'Chile', 6),
-                                                                            ('Montevideo', 'Ciudad costera tranquila con cultura y relax', 1700, 'Uruguay', 6);
+INSERT INTO destinos (nombre, descripcion, precio, pais, imagen, continente_id) VALUES
+    ('Rio de Janeiro', 'Playas, carnaval y paisajes icónicos como el Cristo Redentor', 1900, 'Brasil', 'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?q=80&w=2000', 6),
+    ('Buenos Aires', 'Cultura, tango y gastronomía argentina', 1600, 'Argentina', 'https://images.unsplash.com/photo-1589909202802-8f4aadce1849?q=80&w=2000', 6),
+    ('Machu Picchu', 'Historia inca y maravilla del mundo en los Andes', 2100, 'Perú', 'https://images.unsplash.com/photo-1587595431973-160d0d94add1?q=80&w=2000', 6),
+    ('Cartagena', 'Ciudad colonial con playas y encanto caribeño', 1800, 'Colombia', 'https://images.unsplash.com/photo-1583997052103-b4a1cb974ce5?q=80&w=2000', 6),
+    ('Santiago de Chile', 'Ciudad moderna rodeada de montañas y naturaleza', 2000, 'Chile', 'https://images.unsplash.com/photo-1597006438013-5ef96c154098?q=80&w=2000', 6),
+    ('Montevideo', 'Ciudad costera tranquila con cultura y relax', 1700, 'Uruguay', 'https://images.unsplash.com/photo-1619546952812-520e98064a52?q=80&w=2000', 6);
 
 -- =====================
 -- 🏨 ALOJAMIENTOS EUROPA

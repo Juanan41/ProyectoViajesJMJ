@@ -6,8 +6,10 @@ import com.viajes.app.users.Usuario;
 import com.viajes.app.users.UsuarioRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
@@ -102,11 +104,16 @@ public class CuentaBancariaService {
         return mapToDto(actualizada);
     }
 
+    @Transactional
     public void eliminarCuenta(String emailUsuario) {
         CuentaBancaria cuenta = cuentaBancariaRepository.findByUsuarioEmail(emailUsuario)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe cuenta bancaria para este usuario"));
 
+        Usuario usuario = cuenta.getUsuario();
         cuentaBancariaRepository.delete(cuenta);
+
+        usuario.setSaldo(BigDecimal.ZERO);
+        usuarioRepository.save(usuario);
     }
 
     private CuentaBancariaResponseDto mapToDto(CuentaBancaria cuenta) {

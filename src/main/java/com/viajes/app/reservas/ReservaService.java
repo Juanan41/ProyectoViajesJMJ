@@ -11,10 +11,13 @@ import com.viajes.app.users.Usuario;
 import com.viajes.app.users.UsuarioRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -35,6 +38,7 @@ public class ReservaService {
         this.unsplashService = unsplashService;
     }
 
+    @Transactional
     public ReservaResponseDto crearReserva(ReservaRequestDto dto, String emailUsuario) {
 
         Usuario usuario = usuarioRepository.findByEmail(emailUsuario)
@@ -63,6 +67,11 @@ public class ReservaService {
         int huespedes = dto.getHuespedes() != null && dto.getHuespedes() > 0 ? dto.getHuespedes() : 1;
         double transporteCoste = getTransporteCoste(transporte);
         double precioTotal = (habitacion.getPrecioPorNoche() * noches * huespedes) + transporteCoste;
+        BigDecimal precioTotalSaldo = BigDecimal.valueOf(precioTotal);
+
+        if (usuario.getSaldo().compareTo(precioTotalSaldo) < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Saldo insuficiente");
+        }
 
         Reserva reserva = new Reserva();
         reserva.setUsuario(usuario);
@@ -76,13 +85,26 @@ public class ReservaService {
         reserva.setFechaReserva(LocalDateTime.now());
 
         Reserva guardada = reservaRepository.save(reserva);
+        usuario.setSaldo(usuario.getSaldo().subtract(precioTotalSaldo));
+        usuarioRepository.save(usuario);
 
         return mapToDto(guardada);
     }
 
     public List<ReservaResponseDto> obtenerReservasDeUsuario(String emailUsuario) {
-        return reservaRepository.findByUsuarioEmail(emailUsuario)
+        return reservaRepository.findByUsuarioEmailOrderByFechaReservaDesc(emailUsuario)
                 .stream()
+                .map(this::mapToDto)
+                .toList();
+    }
+
+    public List<ReservaResponseDto> obtenerTodasReservas() {
+        return reservaRepository.findAll()
+                .stream()
+                .sorted(Comparator.comparing(
+                        Reserva::getFechaReserva,
+                        Comparator.nullsLast(Comparator.naturalOrder())
+                ).reversed())
                 .map(this::mapToDto)
                 .toList();
     }
@@ -97,6 +119,10 @@ public class ReservaService {
     public ReservaResponseDto cancelarReserva(Long id, String emailUsuario) {
         Reserva reserva = reservaRepository.findByIdAndUsuarioEmail(id, emailUsuario)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reserva no encontrada"));
+
+        if ("CANCELADA".equalsIgnoreCase(reserva.getEstado())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La reserva ya esta cancelada");
+        }
 
         reserva.setEstado("CANCELADA");
 

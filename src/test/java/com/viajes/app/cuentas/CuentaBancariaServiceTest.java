@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -273,6 +274,7 @@ class CuentaBancariaServiceTest {
     void debeEliminarCuentaCorrectamente() {
         String emailUsuario = "cliente1@viajes.com";
         Usuario usuario = crearUsuario(1L, "cliente1", emailUsuario, Rol.USER);
+        usuario.setSaldo(BigDecimal.valueOf(250));
 
         CuentaBancaria cuenta = crearCuenta(
                 10L,
@@ -288,6 +290,8 @@ class CuentaBancariaServiceTest {
         assertDoesNotThrow(() -> cuentaBancariaService.eliminarCuenta(emailUsuario));
 
         verify(cuentaBancariaRepository).delete(cuenta);
+        assertEquals(BigDecimal.ZERO, usuario.getSaldo());
+        verify(usuarioRepository).save(usuario);
     }
 
     @Test

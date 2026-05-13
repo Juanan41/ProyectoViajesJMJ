@@ -3,6 +3,7 @@ package com.viajes.app.reservas;
 import com.viajes.app.alojamientos.Alojamiento;
 import com.viajes.app.alojamientos.Habitacion;
 import com.viajes.app.alojamientos.HabitacionRepository;
+import com.viajes.app.api.UnsplashService;
 import com.viajes.app.destinos.Destino;
 import com.viajes.app.reservas.dto.ReservaRequestDto;
 import com.viajes.app.reservas.dto.ReservaResponseDto;
@@ -38,6 +39,9 @@ class ReservaServiceTest {
     @Mock
     private HabitacionRepository habitacionRepository;
 
+    @Mock
+    private UnsplashService unsplashService;
+
     @InjectMocks
     private ReservaService reservaService;
 
@@ -68,15 +72,17 @@ class ReservaServiceTest {
 
         assertNotNull(response);
         assertEquals(10L, response.getId());
-        assertEquals("París", response.getDestino());
-        assertEquals("Hotel Central", response.getHotel());
-        assertEquals("AVION", response.getTransporte());
-        assertEquals("DOBLE", response.getTipoHabitacion());
-        assertEquals(LocalDate.of(2026, 5, 10), response.getFechaInicio());
-        assertEquals(LocalDate.of(2026, 5, 15), response.getFechaFin());
-        assertEquals(500.0, response.getPrecioTotal());
+        assertEquals("París", response.getDestinoNombre());
+        assertEquals("Hotel Central", response.getAlojamientoNombre());
+        assertEquals("AVION", response.getTransporteTipo());
+        assertEquals(1L, response.getHabitacionId());
+        assertEquals(LocalDate.of(2026, 5, 10), response.getCheckIn());
+        assertEquals(LocalDate.of(2026, 5, 15), response.getCheckOut());
+        assertEquals(650.0, response.getPrecioTotal());
         assertEquals("CONFIRMADA", response.getEstado());
         assertNotNull(response.getFechaReserva());
+        assertEquals(BigDecimal.valueOf(4350.0), usuario.getSaldo());
+        verify(usuarioRepository).save(usuario);
     }
 
     @Test
@@ -223,7 +229,7 @@ class ReservaServiceTest {
 
         ReservaResponseDto response = reservaService.crearReserva(dto, emailUsuario);
 
-        assertEquals(240.0, response.getPrecioTotal());
+        assertEquals(290.0, response.getPrecioTotal());
     }
 
     @Test
@@ -266,7 +272,7 @@ class ReservaServiceTest {
 
         assertNotNull(response);
         assertEquals(1L, response.getId());
-        assertEquals("París", response.getDestino());
+        assertEquals("París", response.getDestinoNombre());
     }
 
     @Test
@@ -314,7 +320,7 @@ class ReservaServiceTest {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> reservaService.cancelarReserva(1L, emailUsuario));
 
-        assertEquals("400 BAD_REQUEST \"La reserva ya está cancelada\"", exception.getMessage());
+        assertEquals("400 BAD_REQUEST \"La reserva ya esta cancelada\"", exception.getMessage());
     }
 
     private Usuario crearUsuario(Long id, String username, String email, Rol rol) {
@@ -324,7 +330,7 @@ class ReservaServiceTest {
         usuario.setEmail(email);
         usuario.setPassword("hash");
         usuario.setRole(rol);
-        usuario.setSaldo(BigDecimal.ZERO);
+        usuario.setSaldo(BigDecimal.valueOf(5000.0));
         return usuario;
     }
 
@@ -332,6 +338,7 @@ class ReservaServiceTest {
         Destino destino = new Destino();
         ReflectionTestUtils.setField(destino, "id", 1L);
         destino.setNombre(nombreDestino);
+        destino.setImagen("https://example.com/destino.jpg");
 
         Alojamiento alojamiento = new Alojamiento();
         ReflectionTestUtils.setField(alojamiento, "id", 1L);

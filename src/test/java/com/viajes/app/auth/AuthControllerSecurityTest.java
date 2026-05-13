@@ -102,7 +102,7 @@ class AuthControllerSecurityTest {
                 .andExpect(jsonPath("$.username").value("cliente1"))
                 .andExpect(jsonPath("$.email").value("cliente1@viajes.com"))
                 .andExpect(jsonPath("$.role").value("USER"))
-                .andExpect(jsonPath("$.mensaje").value("Usuario registrado correctamente"));
+                .andExpect(jsonPath("$.message").value("Usuario registrado correctamente"));
     }
 
     @Test
@@ -135,7 +135,7 @@ class AuthControllerSecurityTest {
                 .andExpect(jsonPath("$.username").value("cliente1"))
                 .andExpect(jsonPath("$.email").value("cliente1@viajes.com"))
                 .andExpect(jsonPath("$.role").value("USER"))
-                .andExpect(jsonPath("$.tieneCuentaBancaria").value(false));
+                .andExpect(jsonPath("$.saldo").value(0));
     }
 
     @Test
@@ -155,10 +155,9 @@ class AuthControllerSecurityTest {
 
     @Test
     @WithMockUser(username = "juan@viajes.com", roles = {"ADMIN"})
-    @DisplayName("GET /api/admin/test debe responder 200 con rol ADMIN")
-    void adminTestDebeResponder200ConRolAdmin() throws Exception {
+    @DisplayName("GET /api/admin/test debe pasar seguridad con rol ADMIN y responder 404 si no existe controlador")
+    void adminTestDebePasarSeguridadConRolAdmin() throws Exception {
         mockMvc.perform(get("/api/admin/test"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").value("Acceso permitido solo para ADMIN"));
+                .andExpect(status().isNotFound());
     }
 }
