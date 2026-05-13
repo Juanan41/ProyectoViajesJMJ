@@ -82,7 +82,7 @@ export class Hotels implements OnInit {
             image:
               data.imagenUrl ||
               data.imagen ||
-              'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=800',
+              'https://images.unsplash.com/photo-1436491865332-7a61a109cc05q=80&w=800',
             description: data.descripcion,
           });
           this.country.set({ id: data.continenteId || 1 });

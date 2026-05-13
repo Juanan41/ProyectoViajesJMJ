@@ -18,6 +18,8 @@ import { Auth } from '../../services/auth';
 import { TranslationService } from '../../services/translation';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { ReservaService, ReservaResponse } from '../../services/reserva.service';
+import { OpinionDTO, OpinionService } from '../../services/opinion.service';
+import { catchError, forkJoin, of } from 'rxjs';
 
 export interface Trip {
   bookingId: string;
@@ -54,6 +56,7 @@ export class Profile implements OnInit {
   private authService = inject(Auth);
   private translationService = inject(TranslationService);
   private reservaService = inject(ReservaService);
+  private opinionService = inject(OpinionService);
   private router = inject(Router);
 
   readonly MapPinIcon = MapPin;
@@ -70,6 +73,7 @@ export class Profile implements OnInit {
   selectedTicket = signal<Trip | null>(null);
   activeTrips = signal<Trip[]>([]);
   pastTrips = signal<Trip[]>([]);
+  reviews = signal<OpinionDTO[]>([]);
   isLoading = signal(true);
 
   ngOnInit() {
@@ -85,17 +89,30 @@ export class Profile implements OnInit {
   }
 
   cargarReservas() {
-    this.reservaService.getMisReservas().subscribe({
-      next: (reservas) => {
+    forkJoin({
+      reservas: this.reservaService.getMisReservas().pipe(
+        catchError((err) => {
+          console.error('Error cargando reservas', err);
+          return of([]);
+        }),
+      ),
+      reviews: this.opinionService.getMisOpiniones().pipe(
+        catchError((err) => {
+          console.error('Error cargando resenas', err);
+          return of([]);
+        }),
+      ),
+    }).subscribe({
+      next: ({ reservas, reviews }) => {
         const trips = reservas.map((res) => this.toTrip(res));
         const now = new Date().toISOString().split('T')[0];
 
         this.activeTrips.set(trips.filter((t) => t.estado !== 'CANCELADA' && t.checkOut >= now));
         this.pastTrips.set(trips.filter((t) => t.estado !== 'CANCELADA' && t.checkOut < now));
+        this.reviews.set(reviews);
         this.isLoading.set(false);
       },
-      error: (err) => {
-        console.error('Error cargando reservas', err);
+      error: () => {
         this.isLoading.set(false);
       },
     });

@@ -2,7 +2,7 @@ const API_BASE_URL_STORAGE_KEY = 'jmj_api_base_url';
 
 declare global {
   interface Window {
-    __JMJ_API_BASE_URL__?: string;
+    __JMJ_API_BASE_URL__: string;
   }
 }
 

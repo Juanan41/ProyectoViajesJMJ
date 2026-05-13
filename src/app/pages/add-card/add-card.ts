@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, ArrowLeft, CreditCard as CardIcon } from 'lucide-angular';
 import { Auth } from '../../services/auth';
 import { TranslatePipe } from '../../pipes/translate.pipe';
-import { finalize } from 'rxjs';
+import { finalize, timeout } from 'rxjs';
 
 @Component({
   selector: 'app-add-card',
@@ -67,9 +67,8 @@ export class AddCard {
     );
   }
 
-  handleAddCard(event: Event) {
-    event.preventDefault();
-    if (!this.isValid) return;
+  handleAddCard() {
+    if (!this.isValid || this.isLoading) return;
 
     this.isLoading = true;
     this.errorMessage = '';
@@ -84,14 +83,21 @@ export class AddCard {
 
     this.authService
       .agregarTarjeta(payload)
-      .pipe(finalize(() => (this.isLoading = false)))
+      .pipe(
+        timeout(10000),
+        finalize(() => (this.isLoading = false)),
+      )
       .subscribe({
         next: () => this.router.navigate(['/settings']),
         error: (err) => {
-          if (err.status === 403) {
-            this.errorMessage = 'No tienes permiso o tu sesión ha caducado.';
+          if (err.name === 'TimeoutError') {
+            this.errorMessage = 'El servidor no ha respondido. Comprueba que el backend esta arrancado.';
+          } else if (err.status === 0) {
+            this.errorMessage = 'No se puede conectar con el backend.';
+          } else if (err.status === 403) {
+            this.errorMessage = 'No tienes permiso o tu sesion ha caducado.';
           } else {
-            this.errorMessage = err.error?.message || 'Error al guardar la tarjeta.';
+            this.errorMessage = err.error.message || 'Error al guardar la tarjeta.';
           }
         },
       });

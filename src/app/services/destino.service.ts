@@ -4,17 +4,17 @@ import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface DestinoDTO {
-  id?: number;
+  id: number;
   nombre: string;
   ciudad: string;
   pais: string;
-  continenteId?: number;
-  descripcion?: string;
-  imagenUrl?: string;
-  imagen?: string;
-  estrellas?: number;
-  precio?: number;
-  precioPorNoche?: number;
+  continenteId: number;
+  descripcion: string;
+  imagenUrl: string;
+  imagen: string;
+  estrellas: number;
+  precio: number;
+  precioPorNoche: number;
 }
 
 @Injectable({
@@ -26,18 +26,18 @@ export class DestinoService {
   private serverUrl = environment.apiUrl.replace('/api', '');
 
   private fallbackImages = [
-    'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?q=80&w=2020',
-    'https://images.unsplash.com/photo-1464817739973-0128fe77aaa1?q=80&w=2070',
-    'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?q=80&w=1972',
-    'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?q=80&w=2070',
-    'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?q=80&w=2076',
+    'https://images.unsplash.com/photo-1499856871958-5b9627545d1aq=80&w=2020',
+    'https://images.unsplash.com/photo-1464817739973-0128fe77aaa1q=80&w=2070',
+    'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5q=80&w=1972',
+    'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9q=80&w=2070',
+    'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5q=80&w=2076',
   ];
 
   private defaultBackendImage = 'photo-1436491865332-7a61a109cc05';
 
-  public getFullImageUrl(imagePath?: string): string {
+  public getFullImageUrl(imagePath: string): string {
     if (!imagePath) {
-      return 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=800';
+      return 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05q=80&w=800';
     }
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
       return imagePath;
@@ -55,7 +55,8 @@ export class DestinoService {
 
     if (!path || hasBackendDefault) {
       if (nameForImage) {
-        path = `https://source.unsplash.com/1600x900/?${encodeURIComponent(nameForImage)}`;
+        // Enlazar de forma estática con unplash usando query (source.unsplash no funciona ya tan bien)
+        path = `https://images.unsplash.com/photo-1436491865332-7a61a109cc05q=80&w=1600`;
       } else {
         const index = (d.id || 0) % this.fallbackImages.length;
         path = this.fallbackImages[index];

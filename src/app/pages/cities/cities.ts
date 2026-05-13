@@ -64,7 +64,7 @@ export class Cities implements OnInit {
           return;
         }
 
-        const fallbackDestinoId = destinos[0]?.id;
+        const fallbackDestinoId = destinos[0].id;
 
         this.destinoService.getAlojamientos().subscribe({
           next: (alojamientos) => {

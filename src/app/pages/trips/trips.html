@@ -13,7 +13,7 @@
   <div class="flex-1 flex items-center justify-center py-20">
     <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
   </div>
-  } @else if (trips().length === 0) {
+  } @else if (trips().length === 0 && reviews().length === 0) {
   <div class="bg-[rgb(23,25,25)] p-12 rounded-3xl border border-white/5 text-center shadow-xl">
     <lucide-icon [name]="HistoryIcon" class="w-16 h-16 mx-auto mb-4 text-gray-600"></lucide-icon>
     <h2 class="text-2xl font-bold text-white mb-2">{{ 'Aún no tienes viajes' | translate }}</h2>
@@ -25,8 +25,12 @@
     </a>
   </div>
   } @else {
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    @for (trip of trips(); track trip.id) {
+  @if (activeTrips().length > 0) {
+  <div class="mb-4">
+    <h2 class="text-2xl font-bold text-white">{{ 'Viajes Activos / Completados' | translate }}</h2>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+    @for (trip of activeTrips(); track trip.id) {
     <div
       class="bg-[rgb(23,25,25)] rounded-2xl overflow-hidden border border-white/5 group hover:border-emerald-500/30 transition-colors relative flex flex-col">
 
@@ -54,14 +58,14 @@
           <div class="flex items-center justify-between text-sm">
             <div class="flex items-center gap-2 text-gray-300">
               <lucide-icon [name]="CalendarIcon" class="w-4 h-4 text-emerald-500"></lucide-icon>
-              <span>Check In</span>
+              <span>{{ 'Check-in' | translate }}</span>
             </div>
             <span class="font-bold text-white">{{ trip.checkIn | date:'dd/MM/yyyy' }}</span>
           </div>
           <div class="flex items-center justify-between text-sm">
             <div class="flex items-center gap-2 text-gray-300">
               <lucide-icon [name]="CalendarIcon" class="w-4 h-4 text-emerald-500"></lucide-icon>
-              <span>Check Out</span>
+              <span>{{ 'Check-out' | translate }}</span>
             </div>
             <span class="font-bold text-white">{{ trip.checkOut | date:'dd/MM/yyyy' }}</span>
           </div>
@@ -75,12 +79,103 @@
           @if (trip.estado !== 'CANCELADA') {
           <button (click)="cancelTrip(trip.id)"
             class="w-12 h-12 flex items-center justify-center bg-red-500/10 text-red-500 rounded-xl border border-red-500/20 hover:bg-red-500 hover:text-white transition-colors cursor-pointer"
-            title="Cancelar viaje">
+            [title]="'Cancelar viaje' | translate">
             <lucide-icon [name]="TrashIcon" class="w-5 h-5"></lucide-icon>
           </button>
           }
         </div>
       </div>
+    </div>
+    }
+  </div>
+  }
+
+  @if (canceledTrips().length > 0) {
+  <div class="mb-4">
+    <h2 class="text-2xl font-bold text-white opacity-70">{{ 'Viajes Cancelados' | translate }}</h2>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 opacity-75">
+    @for (trip of canceledTrips(); track trip.id) {
+    <div
+      class="bg-[rgb(23,25,25)] rounded-2xl overflow-hidden border border-white/5 group transition-colors relative flex flex-col grayscale hover:grayscale-0">
+
+      <div class="aspect-video relative overflow-hidden">
+        <img [src]="trip.imagenUrl || 'assets/placeholder.jpg'" [alt]="trip.destinoNombre"
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+        <div class="absolute inset-0 bg-gradient-to-t from-[rgb(23,25,25)] to-transparent"></div>
+        <div
+          class="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest border backdrop-blur-md"
+          [ngClass]="getStatusClass(trip.estado)">
+          {{ trip.estado | translate }}
+        </div>
+      </div>
+
+      <div class="p-6 flex-1 flex flex-col">
+        <div class="mb-4">
+          <h3 class="text-xl font-bold text-white mb-1 line-through">{{ trip.destinoNombre }}</h3>
+          <div class="flex items-center gap-2 text-gray-400 text-sm">
+            <lucide-icon [name]="MapPinIcon" class="w-4 h-4"></lucide-icon>
+            <span class="line-through">{{ trip.alojamientoNombre }}</span>
+          </div>
+        </div>
+
+        <div class="bg-white/5 p-4 rounded-xl mb-6 space-y-3">
+          <div class="flex items-center justify-between text-sm">
+            <div class="flex items-center gap-2 text-gray-300">
+              <lucide-icon [name]="CalendarIcon" class="w-4 h-4 text-gray-500"></lucide-icon>
+              <span>{{ 'Check-in' | translate }}</span>
+            </div>
+            <span class="font-bold text-gray-400">{{ trip.checkIn | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <div class="flex items-center gap-2 text-gray-300">
+              <lucide-icon [name]="CalendarIcon" class="w-4 h-4 text-gray-500"></lucide-icon>
+              <span>{{ 'Check-out' | translate }}</span>
+            </div>
+            <span class="font-bold text-gray-400">{{ trip.checkOut | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+
+        <div class="mt-auto flex items-center gap-3">
+          <a [routerLink]="['/receipt', trip.id]"
+            class="flex-1 bg-white/5 text-gray-300 font-bold text-sm py-3 rounded-xl border border-white/10 hover:border-white/30 hover:text-white transition-colors text-center uppercase tracking-widest">
+            {{ 'Ver Recibo' | translate }}
+          </a>
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+  }
+
+  <div class="mt-12">
+    <div class="mb-4">
+      <h2 class="text-2xl font-bold text-white">{{ 'Mis Reseñas' | translate }}</h2>
+    </div>
+
+    @if (reviews().length === 0) {
+    <div class="bg-[rgb(23,25,25)] p-8 rounded-2xl border border-white/5 text-center">
+      <p class="text-gray-400">{{ 'Aún no has escrito ninguna reseña.' | translate }}</p>
+    </div>
+    } @else {
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      @for (review of reviews(); track review.id) {
+      <div class="bg-[rgb(23,25,25)] rounded-2xl border border-white/5 p-6">
+        <div class="flex items-start justify-between gap-4 mb-4">
+          <div>
+            <h3 class="text-lg font-bold text-white">{{ review.alojamientoNombre || 'Hotel' }}</h3>
+            <p class="text-sm text-gray-400">{{ review.destinoNombre || 'Destino' }}</p>
+          </div>
+          <div class="flex items-center gap-1 text-yellow-500">
+            @for (_ of getArray(review.puntuacion || 0); track $index) {
+            <lucide-icon [name]="StarIcon" class="w-4 h-4 fill-yellow-500"></lucide-icon>
+            }
+          </div>
+        </div>
+        <p class="text-gray-300 mb-4">{{ review.comentario }}</p>
+        <p class="text-xs text-gray-500 font-mono">{{ review.fechaOpinion | date:'dd/MM/yyyy' }}</p>
+      </div>
+      }
     </div>
     }
   </div>

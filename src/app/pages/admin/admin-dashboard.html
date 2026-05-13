@@ -1,24 +1,24 @@
 <div class="min-h-screen bg-[rgb(23,25,25)] flex">
   <aside class="w-64 border-r border-white/5 flex flex-col p-6 gap-2">
     <div class="mb-8">
-      <p class="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-1">Panel de Control</p>
-      <h2 class="text-xl font-bold text-white uppercase tracking-tighter">Administración</h2>
+      <p class="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-1">{{ 'Panel de Control' | translate }}</p>
+      <h2 class="text-xl font-bold text-white uppercase tracking-tighter">{{ 'Administración' | translate }}</h2>
     </div>
 
     <button (click)="setTab('stats')" [class.bg-white/5]="activeTab() === 'stats'"
       class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all hover:bg-white/5"
       [class.text-emerald-500]="activeTab() === 'stats'" [class.text-gray-400]="activeTab() !== 'stats'">
-      <lucide-icon [name]="DashboardIcon" class="w-4 h-4"></lucide-icon> Dashboard
+      <lucide-icon [name]="DashboardIcon" class="w-4 h-4"></lucide-icon> {{ 'Dashboard' | translate }}
     </button>
     <button (click)="setTab('users')" [class.bg-white/5]="activeTab() === 'users'"
       class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all hover:bg-white/5"
       [class.text-emerald-500]="activeTab() === 'users'" [class.text-gray-400]="activeTab() !== 'users'">
-      <lucide-icon [name]="UsersIcon" class="w-4 h-4"></lucide-icon> Usuarios
+      <lucide-icon [name]="UsersIcon" class="w-4 h-4"></lucide-icon> {{ 'Usuarios' | translate }}
     </button>
     <button (click)="setTab('destinos')" [class.bg-white/5]="activeTab() === 'destinos'"
       class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all hover:bg-white/5"
       [class.text-emerald-500]="activeTab() === 'destinos'" [class.text-gray-400]="activeTab() !== 'destinos'">
-      <lucide-icon [name]="MapIcon" class="w-4 h-4"></lucide-icon> Destinos
+      <lucide-icon [name]="MapIcon" class="w-4 h-4"></lucide-icon> {{ 'Destinos' | translate }}
     </button>
   </aside>
 
@@ -27,16 +27,16 @@
     @if (activeTab() === 'stats') {
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
       <div class="bg-white/5 p-8 rounded-[2rem] border border-white/5">
-        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Total Usuarios</p>
+        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{{ 'Total Usuarios' | translate }}</p>
         <h3 class="text-4xl font-black text-white">{{ usuarios().length }}</h3>
       </div>
       <div class="bg-white/5 p-8 rounded-[2rem] border border-white/5">
-        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Destinos Activos</p>
+        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{{ 'Destinos Activos' | translate }}</p>
         <h3 class="text-4xl font-black text-white">{{ destinos().length }}</h3>
       </div>
       <div class="bg-emerald-500/10 p-8 rounded-[2rem] border border-emerald-500/10">
-        <p class="text-xs font-bold text-emerald-500 uppercase tracking-widest mb-2">Estado Sistema</p>
-        <h3 class="text-4xl font-black text-emerald-500">ONLINE</h3>
+        <p class="text-xs font-bold text-emerald-500 uppercase tracking-widest mb-2">{{ 'Total Reservas' | translate }}</p>
+        <h3 class="text-4xl font-black text-emerald-500">{{ reservas().length }}</h3>
       </div>
     </div>
     }
@@ -47,10 +47,10 @@
         <thead class="bg-white/5 text-[10px] font-black text-gray-500 uppercase tracking-widest">
           <tr>
             <th class="px-8 py-6">ID</th>
-            <th class="px-8 py-6">Nombre</th>
+            <th class="px-8 py-6">{{ 'Nombre' | translate }}</th>
             <th class="px-8 py-6">Email</th>
-            <th class="px-8 py-6">Rol</th>
-            <th class="px-8 py-6 text-right">Acciones</th>
+            <th class="px-8 py-6">{{ 'Rol' | translate }}</th>
+            <th class="px-8 py-6 text-right">{{ 'Acciones' | translate }}</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-white/5">
@@ -80,7 +80,7 @@
 
     @if (activeTab() === 'destinos') {
     <div class="flex justify-between items-center mb-8">
-      <h2 class="text-2xl font-black text-white uppercase tracking-tighter">Lista de Destinos</h2>
+      <h2 class="text-2xl font-black text-white uppercase tracking-tighter">{{ 'Lista de Destinos' | translate }}</h2>
       <button
         class="bg-emerald-500 text-[rgb(23,25,25)] font-black px-6 py-3 rounded-xl text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-emerald-400 transition-all">
         <lucide-icon [name]="PlusIcon" class="w-4 h-4"></lucide-icon> Añadir Destino

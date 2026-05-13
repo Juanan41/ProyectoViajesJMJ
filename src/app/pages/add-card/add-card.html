@@ -15,7 +15,7 @@
       </div>
       }
 
-      <form class="space-y-5" (submit)="handleAddCard($event)">
+      <form class="space-y-5" (ngSubmit)="handleAddCard()">
         <div>
           <label class="text-sm font-medium text-gray-300 block mb-1.5">{{ 'Número de Tarjeta' | translate }}</label>
           <div class="relative">

@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { Auth } from '../../services/auth';
 import { LucideAngularModule, CreditCard, Trash2, Plus, ArrowLeft } from 'lucide-angular';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-settings',
@@ -21,6 +22,7 @@ export class Settings implements OnInit {
 
   tarjetas = signal<any[]>([]);
   isLoading = signal(true);
+  isDeleting = signal(false);
 
   ngOnInit() {
     this.loadCards();
@@ -41,11 +43,17 @@ export class Settings implements OnInit {
   }
 
   removeCard() {
-    if (confirm('¿Seguro que quieres borrar esta tarjeta de tu cuenta?')) {
-      this.authService.borrarTarjeta().subscribe({
-        next: () => this.loadCards(),
-        error: (err) => console.error('Error borrando tarjeta', err),
-      });
+    if (confirm('Seguro que quieres borrar esta tarjeta de tu cuenta')) {
+      this.isDeleting.set(true);
+      this.authService
+        .borrarTarjeta()
+        .pipe(finalize(() => this.isDeleting.set(false)))
+        .subscribe({
+          next: () => {
+            this.tarjetas.set([]);
+          },
+          error: (err) => console.error('Error borrando tarjeta', err),
+        });
     }
   }
 }

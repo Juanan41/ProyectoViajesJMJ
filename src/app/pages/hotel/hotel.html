@@ -6,8 +6,8 @@
 } @else {
 <div class="flex-1 w-full bg-[rgb(23,25,25)] min-h-screen">
   <div class="relative w-full h-[50vh] md:h-[60vh]">
-    <img loading="lazy" [src]="hotel()?.imagenUrl || hotel()?.image || 'assets/placeholder.jpg'"
-      [alt]="hotel()?.nombre || hotel()?.name" class="w-full h-full object-cover" />
+    <img loading="lazy" [src]="hotel().imagenUrl || hotel().image || 'assets/placeholder.jpg'"
+      [alt]="hotel().nombre || hotel().name" class="w-full h-full object-cover" />
     <div
       class="absolute inset-0 bg-gradient-to-t from-[rgb(23,25,25)] via-[rgb(23,25,25)]/40 to-transparent flex items-end">
       <div class="max-w-7xl mx-auto px-4 w-full pb-10">
@@ -16,15 +16,15 @@
           <lucide-icon [name]="ArrowLeftIcon" class="w-4 h-4"></lucide-icon> {{ 'Volver a explorar' | translate }}
         </a>
         <div class="flex items-center gap-2 mb-2">
-          @for (_ of getArray(hotel()?.estrellas || hotel()?.rating || 5); track _) {
+          @for (_ of getArray(hotel().estrellas || hotel().rating || 5); track _) {
           <lucide-icon [name]="StarIcon" class="w-5 h-5 fill-yellow-500 text-yellow-500"></lucide-icon>
           }
         </div>
-        <h1 class="text-4xl md:text-6xl font-bold text-white mb-3 tracking-tight">{{ hotel()?.nombre || hotel()?.name |
+        <h1 class="text-4xl md:text-6xl font-bold text-white mb-3 tracking-tight">{{ hotel().nombre || hotel().name |
           translate }}</h1>
         <p class="text-gray-300 flex items-center gap-2 text-lg">
           <lucide-icon [name]="MapPinIcon" class="w-5 h-5 text-emerald-500"></lucide-icon>
-          {{ hotel()?.ciudad | translate }}
+          {{ hotel().ciudad | translate }}
         </p>
       </div>
     </div>
@@ -36,7 +36,7 @@
         <h2 class="text-2xl font-bold text-white mb-6 uppercase tracking-widest text-emerald-500"> {{ 'Acerca del hotel'
           | translate }} </h2>
         <p class="text-gray-400 leading-relaxed text-lg">
-          {{ hotel()?.descripcion || hotel()?.description | translate }}
+          {{ hotel().descripcion || hotel().description | translate }}
         </p>
       </section>
 
@@ -63,12 +63,12 @@
         </div>
       </section>
 
-      @if (hotel()?.additionalPhotos && hotel()?.additionalPhotos.length > 0) {
+      @if (hotel().additionalPhotos && hotel().additionalPhotos.length > 0) {
       <section>
         <h2 class="text-2xl font-bold text-white mb-6 uppercase tracking-widest text-emerald-500"> {{ 'Galería' |
           translate }} </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          @for (photo of hotel()?.additionalPhotos; track photo) {
+          @for (photo of hotel().additionalPhotos; track photo) {
           <img loading="lazy" [src]="photo" class="w-full h-64 object-cover rounded-xl border border-gray-800"
             alt="Galeria hotel" />
           }
@@ -95,9 +95,6 @@
                 <span class="text-sm text-gray-400 font-mono">{{ review.date }}</span>
                 @if (isMyReview(review)) {
                 <div class="flex gap-2">
-                  <button (click)="startEditReview(review)"
-                    class="text-emerald-500 hover:text-emerald-400 text-xs font-bold uppercase tracking-widest transition-colors">
-                    {{ 'Editar' | translate }} </button>
                   <button (click)="deleteReview(review.id)"
                     class="text-red-500 hover:text-red-400 text-xs font-bold uppercase tracking-widest transition-colors">
                     {{ 'Borrar' | translate }} </button>
@@ -119,16 +116,12 @@
         <div class="relative mt-8 p-[1px] rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500">
           <div class="bg-[rgb(23,25,25)] p-6 md:p-8 rounded-[15px] w-full h-full">
             <h3 class="text-2xl font-bold mb-6 text-white">
-              @if (!editReviewId) {
               {{ 'Deja tu reseña' | translate }}
-              } @else {
-              {{ 'Editar Reseña' | translate }}
-              }
             </h3>
             <form (ngSubmit)="addReview()">
               <div class="mb-6">
                 <label class="block text-sm font-bold text-gray-400 uppercase tracking-widest mb-3">
-                  {{ '¿Cómo calificarías tu estancia?' | translate }}
+                  {{ '¿Cómo calificarías tu estancia' | translate }}
                 </label>
                 <div class="flex items-center gap-2">
                   @for (star of [1, 2, 3, 4, 5]; track star) {
@@ -148,23 +141,13 @@
                 <label class="block text-sm font-bold text-gray-400 uppercase tracking-widest mb-3"> {{ 'Tu experiencia'
                   | translate }} </label>
                 <textarea name="comment" [(ngModel)]="newReviewComment" rows="4"
-                  [placeholder]="'¿Qué fue lo que más te gustó?' | translate"
+                  [placeholder]="'¿Qué fue lo que más te gustó' | translate"
                   class="w-full bg-[rgb(33,36,37)] border border-gray-700 text-white rounded-xl p-4 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all resize-none"></textarea>
               </div>
               <div class="flex justify-end gap-3">
-                @if (editReviewId) {
-                <button type="button" (click)="cancelEditReview()"
-                  class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-xl transition-all border border-gray-700 uppercase tracking-widest text-xs">
-                  {{ 'Cancelar' | translate }}
-                </button>
-                }
                 <button type="submit" [disabled]="!newReviewComment.trim()"
                   class="bg-emerald-500 hover:bg-emerald-400 disabled:bg-gray-800 disabled:text-gray-500 text-[rgb(23,25,25)] font-bold py-3 px-6 rounded-xl transition-all uppercase tracking-widest text-xs shadow-lg shadow-emerald-500/20 disabled:shadow-none">
-                  @if (!editReviewId) {
                   {{ 'Publicar reseña' | translate }}
-                  } @else {
-                  {{ 'Guardar cambios' | translate }}
-                  }
                 </button>
               </div>
             </form>
@@ -182,7 +165,7 @@
             <span class="text-gray-500 text-xs block mb-1 uppercase tracking-widest font-bold">{{ 'Precio por noche' |
               translate }}</span>
             <div class="flex items-baseline gap-2">
-              <span class="text-white text-5xl font-black">{{ hotel()?.precioPorNoche }}€</span>
+              <span class="text-white text-5xl font-black">{{ hotel().precioPorNoche }}€</span>
             </div>
           </div>
 
@@ -242,7 +225,7 @@
           <div class="bg-[rgb(23,25,25)] rounded-2xl p-5 mb-6 border border-gray-800">
             <div class="flex justify-between items-center text-sm mb-3 text-gray-400">
               <span>{{ nights }} {{ 'noches' | translate }}</span>
-              <span>{{ (hotel()?.precioPorNoche || 0) * nights }}€</span>
+              <span>{{ (hotel().precioPorNoche || 0) * nights }}€</span>
             </div>
             <div class="flex justify-between items-center text-white font-black text-xl pt-4 border-t border-gray-800">
               <span class="uppercase tracking-widest text-xs text-gray-500">{{ 'Total a pagar' | translate }}</span>
@@ -257,7 +240,10 @@
 
           @if (nights <= 0) { <p class="text-red-400 text-xs text-center mt-3 font-medium"> {{ 'Selecciona fechas
             válidas.' | translate }} </p>
-            } @else if (!canBook && auth.credits() < totalPrice) { <p
+            } @else if (!isCheckingCard() && !hasPaymentCard()) { <p
+              class="text-red-400 text-xs text-center mt-3 font-medium"> {{
+              'Necesitas tener una tarjeta asociada a tu cuenta para reservar.' | translate }} </p>
+              } @else if (!canBook && auth.credits() < totalPrice) { <p
               class="text-red-400 text-xs text-center mt-3 font-medium"> {{ 'Saldo insuficiente en tu cartera.' |
               translate }} </p>
               }

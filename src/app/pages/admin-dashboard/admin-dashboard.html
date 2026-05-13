@@ -11,14 +11,14 @@
         <div class="flex flex-wrap gap-3">
             <button (click)="setTab('overview')"
                 [class]="selectedTab() === 'overview'
-          ? 'rounded-full border border-amber-300 bg-amber-400/20 px-4 py-2 text-sm font-semibold text-amber-100'
+           'rounded-full border border-amber-300 bg-amber-400/20 px-4 py-2 text-sm font-semibold text-amber-100'
           : 'rounded-full border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-slate-400'">
                 Vista general
             </button>
 
             <button (click)="setTab('users')"
                 [class]="selectedTab() === 'users'
-          ? 'rounded-full border border-amber-300 bg-amber-400/20 px-4 py-2 text-sm font-semibold text-amber-100'
+           'rounded-full border border-amber-300 bg-amber-400/20 px-4 py-2 text-sm font-semibold text-amber-100'
           : 'rounded-full border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-slate-400'">
                 Gestión de usuarios
             </button>
@@ -121,7 +121,7 @@
                             <td class="px-4 py-3">
                                 <span
                                     [class]="user.role === 'admin'
-                    ? 'rounded-full border border-amber-300/40 bg-amber-500/10 px-2 py-1 text-xs font-semibold text-amber-200'
+                     'rounded-full border border-amber-300/40 bg-amber-500/10 px-2 py-1 text-xs font-semibold text-amber-200'
                     : 'rounded-full border border-slate-600 bg-slate-800 px-2 py-1 text-xs font-semibold text-slate-300'">
                                     {{ user.role }}
                                 </span>
@@ -234,8 +234,8 @@
                                 </td>
                                 <td class="px-4 py-3">
                                     <span
-                                        [class]="(booking.status ?? 'active') === 'canceled'
-                                            ? 'rounded-full border border-rose-300/30 bg-rose-500/10 px-2 py-1 text-xs font-semibold text-rose-300'
+                                        [class]="(booking.status  'active') === 'canceled'
+                                             'rounded-full border border-rose-300/30 bg-rose-500/10 px-2 py-1 text-xs font-semibold text-rose-300'
                                             : 'rounded-full border border-emerald-300/30 bg-emerald-500/10 px-2 py-1 text-xs font-semibold text-emerald-300'">
                                         {{ (booking.status ?? 'active') === 'canceled' ? 'Cancelada' : 'Activa' }}
                                     </span>

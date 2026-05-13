@@ -18,6 +18,7 @@ import {
 } from 'lucide-angular';
 import { Auth } from '../../services/auth';
 import { DestinoService } from '../../services/destino.service';
+import { OpinionService, CreateOpinionDTO, OpinionDTO } from '../../services/opinion.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { TranslationService } from '../../services/translation';
 
@@ -32,6 +33,7 @@ export class HotelComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private destinoService = inject(DestinoService);
+  private opinionService = inject(OpinionService);
   public auth = inject(Auth);
   public translationService = inject(TranslationService);
 
@@ -57,10 +59,12 @@ export class HotelComponent implements OnInit {
   checkOutDate = '';
   guests = 1;
   selectedTransport: 'AVION' | 'TREN' | 'BARCO' = 'AVION';
+  hasPaymentCard = signal(false);
+  isCheckingCard = signal(true);
 
   newReviewRating = 5;
   newReviewComment = '';
-  editReviewId: string | null = null;
+  editingReviewId: number | null = null;
 
   ngOnInit() {
     this.route.paramMap.subscribe((params) => {
@@ -78,8 +82,46 @@ export class HotelComponent implements OnInit {
         this.loadRooms(id);
         this.loadRecommendations();
         this.initializeStayDates();
-        this.reviews.set(data.reviews || []);
+        this.loadOpiniones(id);
+        this.loadPaymentCardStatus();
       },
+    });
+  }
+
+  private loadPaymentCardStatus() {
+    if (!this.auth.isLoggedIn()) {
+      this.hasPaymentCard.set(false);
+      this.isCheckingCard.set(false);
+      return;
+    }
+
+    this.isCheckingCard.set(true);
+    this.auth.obtenerTarjetas().subscribe({
+      next: (cards) => {
+        this.hasPaymentCard.set((cards || []).length > 0);
+        this.isCheckingCard.set(false);
+      },
+      error: () => {
+        this.hasPaymentCard.set(false);
+        this.isCheckingCard.set(false);
+      },
+    });
+  }
+
+  private loadOpiniones(id: number) {
+    this.opinionService.getOpinionesByAlojamiento(id).subscribe({
+      next: (data) => {
+        // Map backend's 'nombreUsuario' back to 'userName' to avoid breaking the html template immediately
+        const mapped = data.map((o) => ({
+          ...o,
+          userName: o.nombreUsuario,
+          rating: o.puntuacion,
+          comment: o.comentario,
+          date: o.fechaOpinion.substring(0, 10) || new Date().toISOString().split('T')[0],
+        }));
+        this.reviews.set(mapped);
+      },
+      error: (e) => console.error('Error cargando opiniones', e),
     });
   }
 
@@ -117,7 +159,12 @@ export class HotelComponent implements OnInit {
   }
 
   get canBook(): boolean {
-    return this.nights > 0 && this.auth.credits() >= this.totalPrice;
+    return (
+      this.nights > 0 &&
+      this.hasPaymentCard() &&
+      !this.isCheckingCard() &&
+      this.auth.credits() >= this.totalPrice
+    );
   }
 
   getArray(length: number): any[] {
@@ -144,20 +191,30 @@ export class HotelComponent implements OnInit {
     return user ? user.name === review.userName : false;
   }
 
+  deleteReview(id: number) {
+    const hotelId = this.hotel().id;
+    if (!hotelId) return;
+
+    if (!confirm(this.translationService.translate('Seguro que quieres borrar esta reseña'))) {
+      return;
+    }
+
+    this.opinionService.deleteOpinion(id).subscribe({
+      next: () => this.loadOpiniones(hotelId),
+      error: (err) => console.error('Error deleting review', err),
+    });
+  }
+
   startEditReview(review: any) {
-    this.editReviewId = review.id;
-    this.newReviewRating = review.rating;
-    this.newReviewComment = review.comment;
+    this.editingReviewId = review.id;
+    this.newReviewRating = review.rating || 5;
+    this.newReviewComment = review.comment || '';
   }
 
   cancelEditReview() {
-    this.editReviewId = null;
+    this.editingReviewId = null;
     this.newReviewRating = 5;
     this.newReviewComment = '';
-  }
-
-  deleteReview(id: string) {
-    this.reviews.update((revs) => revs.filter((r) => r.id !== id));
   }
 
   addReview() {
@@ -165,43 +222,44 @@ export class HotelComponent implements OnInit {
     const currentUser = this.auth.user();
     if (!currentUser) return;
 
-    if (this.editReviewId) {
-      this.reviews.update((revs) =>
-        revs.map((r) =>
-          r.id === this.editReviewId
-            ? {
-                ...r,
-                rating: this.newReviewRating,
-                comment: this.newReviewComment,
-                date: new Date().toISOString().split('T')[0],
-              }
-            : r,
-        ),
-      );
-      this.editReviewId = null;
-    } else {
-      const newReview = {
-        id: Math.random().toString(36).substr(2, 9),
-        userName: currentUser.name,
-        rating: this.newReviewRating,
-        comment: this.newReviewComment,
-        date: new Date().toISOString().split('T')[0],
-      };
-      this.reviews.update((revs) => [...revs, newReview]);
-    }
+    const dto: CreateOpinionDTO = {
+      puntuacion: this.newReviewRating,
+      comentario: this.newReviewComment,
+    };
 
-    this.newReviewComment = '';
-    this.newReviewRating = 5;
+    const hotelId = this.hotel().id;
+    if (!hotelId) return;
+
+    const request$ = this.editingReviewId
+      ? this.opinionService.updateOpinion(this.editingReviewId, dto)
+      : this.opinionService.addOpinion(hotelId, dto);
+
+    request$.subscribe({
+      next: () => {
+        this.loadOpiniones(hotelId);
+        this.cancelEditReview();
+      },
+      error: (err) => console.error('Error creating review', err),
+    });
   }
 
   reservar() {
+    if (!this.hasPaymentCard()) {
+      alert(
+        this.translationService.translate(
+          'Necesitas tener una tarjeta asociada a tu cuenta para reservar.',
+        ),
+      );
+      return;
+    }
+
     if (this.habitaciones().length === 0) {
       alert(this.translationService.translate('No hay habitaciones disponibles en este hotel.'));
       return;
     }
 
     const bookingRequest = {
-      habitacionId: this.habitaciones()[0]?.id,
+      habitacionId: this.habitaciones()[0].id,
       transporte: this.selectedTransport,
       fechaInicio: this.checkInDate,
       fechaFin: this.checkOutDate,
@@ -210,8 +268,14 @@ export class HotelComponent implements OnInit {
 
     this.destinoService.crearReserva(bookingRequest).subscribe({
       next: (res) => {
-        this.auth.updateCredits(-this.totalPrice);
-        this.router.navigate(['/receipt', res.id]);
+        this.auth.obtenerSaldo().subscribe({
+          next: (saldoRes) => {
+            this.auth.credits.set(saldoRes.saldo);
+            this.auth.updateUser({ saldo: saldoRes.saldo });
+            this.router.navigate(['/receipt', res.id]);
+          },
+          error: () => this.router.navigate(['/receipt', res.id]),
+        });
       },
       error: (err) => {
         console.error('Error al realizar la reserva:', err);

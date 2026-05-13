@@ -37,7 +37,7 @@ export class Receipt implements OnInit {
   readonly UserIcon = User;
   readonly CreditCardIcon = CreditCard;
 
-  booking = signal<any>(null);
+  booking = signal<ReservaResponse | null>(null);
   isLoading = signal(true);
 
   ngOnInit() {
@@ -52,12 +52,7 @@ export class Receipt implements OnInit {
   loadReceipt(id: number) {
     this.reservaService.getReservaPorId(id).subscribe({
       next: (data: ReservaResponse) => {
-        this.booking.set({
-          ...data,
-          pais: data.destinoNombre?.split(',')[1]?.trim() || 'Destino',
-          fechaInicio: data.checkIn,
-          transporte: data.transporteTipo || 'AVION',
-        });
+        this.booking.set(data);
         this.isLoading.set(false);
       },
       error: (err: any) => {
@@ -73,5 +68,10 @@ export class Receipt implements OnInit {
 
   download() {
     window.print();
+  }
+
+  get transporteLabel(): string {
+    const booking = this.booking();
+    return booking?.transporteNombre || booking?.transporteTipo || 'Transporte';
   }
 }

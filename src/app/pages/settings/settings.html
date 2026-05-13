@@ -45,8 +45,8 @@
               card.fechaExpiracion }}</p>
           </div>
         </div>
-        <button (click)="removeCard()"
-          class="text-gray-600 hover:text-red-500 bg-white/5 hover:bg-red-500/10 p-3 rounded-xl transition-colors">
+        <button (click)="removeCard()" [disabled]="isDeleting()"
+          class="text-gray-600 hover:text-red-500 bg-white/5 hover:bg-red-500/10 p-3 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
           <lucide-icon [name]="TrashIcon" class="w-4 h-4"></lucide-icon>
         </button>
       </div>

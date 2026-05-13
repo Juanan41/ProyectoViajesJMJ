@@ -134,9 +134,16 @@ export class Auth {
   }
 
   borrarTarjeta(): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/cuentas/me`, {
-      headers: this.getAuthHeaders(),
-    });
+    return this.http
+      .delete(`${this.apiUrl}/cuentas/me`, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(
+        tap(() => {
+          this.credits.set(0);
+          this.updateUser({ saldo: 0 });
+        }),
+      );
   }
 
   logout() {
@@ -186,6 +193,12 @@ export class Auth {
   private restoreSession() {
     const token = localStorage.getItem('token');
     const storedUser = localStorage.getItem('user');
+
+    if (token && this.isTokenExpired(token)) {
+      this.logout();
+      return;
+    }
+
     if (token && storedUser) {
       this.user.set(JSON.parse(storedUser));
       this.isLoggedIn.set(true);
@@ -193,6 +206,16 @@ export class Auth {
         this.credits.set(res.saldo);
         this.updateUser({ saldo: res.saldo });
       });
+    }
+  }
+
+  private isTokenExpired(token: string): boolean {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (!payload.exp) return false;
+      return payload.exp * 1000 <= Date.now();
+    } catch {
+      return true;
     }
   }
 }

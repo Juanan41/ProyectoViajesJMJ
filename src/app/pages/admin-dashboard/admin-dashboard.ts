@@ -19,9 +19,9 @@ interface PersistedAccountState {
         id: string;
         name: string;
         email: string;
-        role?: 'admin' | 'user';
-        avatarUrl?: string;
-        balance?: number;
+        role: 'admin' | 'user';
+        avatarUrl: string;
+        balance: number;
     };
     credits: number;
     cards: Array<{ id: string; last4: string; holder: string; expiry: string }>;
@@ -86,7 +86,7 @@ export class AdminDashboard implements OnInit {
 
     readonly totalRevenue = computed(() =>
         this.currentBookings()
-            .filter((booking) => (booking.status ?? 'active') !== 'canceled')
+            .filter((booking) => (booking.status  'active') !== 'canceled')
             .reduce((sum, booking) => sum + booking.totalAmount, 0),
     );
 
@@ -94,7 +94,7 @@ export class AdminDashboard implements OnInit {
         const counts = new Map<string, number>();
 
         this.currentBookings().forEach((booking) => {
-            if ((booking.status ?? 'active') === 'canceled') return;
+            if ((booking.status  'active') === 'canceled') return;
             const key = booking.destination;
             counts.set(key, (counts.get(key) ?? 0) + 1);
         });
@@ -115,11 +115,11 @@ export class AdminDashboard implements OnInit {
 
     readonly revenueDelta = computed(() => {
         const current = this.currentBookings()
-            .filter((booking) => (booking.status ?? 'active') !== 'canceled')
+            .filter((booking) => (booking.status  'active') !== 'canceled')
             .reduce((sum, booking) => sum + booking.totalAmount, 0);
 
         const previous = this.previousBookings()
-            .filter((booking) => (booking.status ?? 'active') !== 'canceled')
+            .filter((booking) => (booking.status  'active') !== 'canceled')
             .reduce((sum, booking) => sum + booking.totalAmount, 0);
 
         return this.getPercentageChange(previous, current);
@@ -140,7 +140,7 @@ export class AdminDashboard implements OnInit {
         if (!email) return [];
 
         return this.allBookings()
-            .filter((booking) => (booking.userEmail ?? '').trim().toLowerCase() === email)
+            .filter((booking) => (booking.userEmail  '').trim().toLowerCase() === email)
             .sort((left, right) => right.bookingDate.localeCompare(left.bookingDate));
     });
 
@@ -216,7 +216,7 @@ export class AdminDashboard implements OnInit {
         if (!name) return;
 
         const safeBalance = Number.isFinite(this.editUserBalance)
-            ? Math.max(0, Number(this.editUserBalance))
+             Math.max(0, Number(this.editUserBalance))
             : 0;
 
         const store = await this.readAccountStore();
@@ -226,7 +226,7 @@ export class AdminDashboard implements OnInit {
             return;
         }
 
-        if ((account.user.role ?? 'user') === 'admin') return;
+        if ((account.user.role  'user') === 'admin') return;
 
         account.user.name = name;
         account.user.balance = safeBalance;
@@ -241,7 +241,7 @@ export class AdminDashboard implements OnInit {
         event.stopPropagation();
         if (!this.canManageUser(user)) return;
 
-        const confirmed = window.confirm(`¿Seguro que quieres borrar a ${user.name}?`);
+        const confirmed = window.confirm(`¿Seguro que quieres borrar a ${user.name}`);
         if (!confirmed) return;
 
         const userEmail = user.email.trim().toLowerCase();
@@ -291,7 +291,7 @@ export class AdminDashboard implements OnInit {
     }
 
     formatDelta(value: number): string {
-        const sign = value > 0 ? '+' : '';
+        const sign = value > 0  '+' : '';
         return `${sign}${value.toFixed(1)}%`;
     }
 
@@ -343,7 +343,7 @@ export class AdminDashboard implements OnInit {
             const raw = window.localStorage.getItem(HOTEL_BOOKING_STORAGE_KEY);
             const allBookings = raw ? (JSON.parse(raw) as BookingRecord[]) : [];
             return allBookings.filter((booking) => {
-                const bookingEmail = (booking.userEmail ?? '').trim().toLowerCase();
+                const bookingEmail = (booking.userEmail  '').trim().toLowerCase();
                 return bookingEmail !== email;
             });
         } catch {
@@ -365,16 +365,16 @@ export class AdminDashboard implements OnInit {
         Object.entries(accounts).forEach(([accountKey, state]) => {
             const email = (state.user.email || accountKey).trim().toLowerCase();
             const relatedBookings = bookings.filter((booking) => {
-                const bookingEmail = (booking.userEmail ?? '').trim().toLowerCase();
+                const bookingEmail = (booking.userEmail  '').trim().toLowerCase();
                 return bookingEmail === email;
             });
 
             const canceledBookings = relatedBookings.filter(
-                (booking) => (booking.status ?? 'active') === 'canceled',
+                (booking) => (booking.status  'active') === 'canceled',
             ).length;
             const activeBookings = relatedBookings.length - canceledBookings;
             const totalSpent = relatedBookings
-                .filter((booking) => (booking.status ?? 'active') !== 'canceled')
+                .filter((booking) => (booking.status  'active') !== 'canceled')
                 .reduce((sum, booking) => sum + booking.totalAmount, 0);
 
             rows.push({
@@ -382,7 +382,7 @@ export class AdminDashboard implements OnInit {
                 name: state.user.name || 'Usuario',
                 email,
                 role: state.user.role ?? (email === 'admin@admin.com' ? 'admin' : 'user'),
-                balance: state.credits ?? 0,
+                balance: state.credits  0,
                 bookings: relatedBookings.length,
                 activeBookings,
                 canceledBookings,
@@ -393,16 +393,16 @@ export class AdminDashboard implements OnInit {
         const knownEmails = new Set(rows.map((row) => row.email));
 
         bookings.forEach((booking) => {
-            const bookingEmail = (booking.userEmail ?? '').trim().toLowerCase();
+            const bookingEmail = (booking.userEmail  '').trim().toLowerCase();
             if (!bookingEmail || knownEmails.has(bookingEmail)) return;
 
-            const relatedBookings = bookings.filter((item) => (item.userEmail ?? '').trim().toLowerCase() === bookingEmail);
+            const relatedBookings = bookings.filter((item) => (item.userEmail  '').trim().toLowerCase() === bookingEmail);
             const canceledBookings = relatedBookings.filter(
-                (item) => (item.status ?? 'active') === 'canceled',
+                (item) => (item.status  'active') === 'canceled',
             ).length;
             const activeBookings = relatedBookings.length - canceledBookings;
             const totalSpent = relatedBookings
-                .filter((item) => (item.status ?? 'active') !== 'canceled')
+                .filter((item) => (item.status  'active') !== 'canceled')
                 .reduce((sum, item) => sum + item.totalAmount, 0);
 
             rows.push({

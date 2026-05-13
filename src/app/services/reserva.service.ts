@@ -18,11 +18,11 @@ export interface ReservaResponse {
   huespedes: number;
   precioTotal: number;
   estado: string;
-  transporteTipo?: string;
-  transporteNombre?: string;
-  transporteHora?: string;
-  transporteAsiento?: string;
-  transportePuerta?: string;
+  transporteTipo: string;
+  transporteNombre: string;
+  transporteHora: string;
+  transporteAsiento: string;
+  transportePuerta: string;
 }
 
 @Injectable({

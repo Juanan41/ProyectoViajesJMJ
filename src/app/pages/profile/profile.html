@@ -97,32 +97,33 @@
       <h2 class="text-2xl font-bold text-white"> {{ 'Mis Reseñas' | translate }} </h2>
     </div>
     <div class="space-y-6">
-      @if (!user.reviews?.length) {
+      @if (reviews().length === 0) {
       <div class="text-center py-12 text-gray-400">
         <lucide-icon [name]="StarIcon" class="w-12 h-12 mx-auto mb-4 opacity-50"></lucide-icon>
         <p> {{ 'Aún no has escrito ninguna reseña.' | translate }} </p>
       </div>
       }
-      @for (review of user.reviews || []; track review.id) {
+      @for (review of reviews(); track review.id) {
       <div class="bg-[rgb(23,25,25)] p-6 rounded-2xl border border-gray-800">
         <div class="flex justify-between items-start mb-4">
           <div>
-            @if (review.hotelId) {
-            <a [routerLink]="['/hotel', review.hotelId]" class="text-lg font-bold text-white mb-1 hover:underline">
-              {{ review.hotelName || 'Hotel' }}
+            @if (review.alojamientoId) {
+            <a [routerLink]="['/hotel', review.alojamientoId]" class="text-lg font-bold text-white mb-1 hover:underline">
+              {{ review.alojamientoNombre || 'Hotel' }}
             </a>
             } @else {
-            <h3 class="text-lg font-bold text-white mb-1">{{ review.hotelName }}</h3>
+            <h3 class="text-lg font-bold text-white mb-1">{{ review.alojamientoNombre || 'Hotel' }}</h3>
             }
-            <p class="text-sm text-gray-500">{{ review.date }}</p>
+            <p class="text-sm text-gray-500">{{ review.destinoNombre || 'Destino' }}</p>
+            <p class="text-xs text-gray-500 font-mono">{{ review.fechaOpinion | date:'dd/MM/yyyy' }}</p>
           </div>
           <div class="flex gap-1">
-            @for (_ of getArray(review.rating); track _) {
+            @for (_ of getArray(review.puntuacion); track _) {
             <lucide-icon [name]="StarIcon" class="w-4 h-4 fill-yellow-500 text-yellow-500"></lucide-icon>
             }
           </div>
         </div>
-        <p class="text-gray-300"> {{ review.comment }} </p>
+        <p class="text-gray-300"> {{ review.comentario }} </p>
       </div>
       }
     </div>
