@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
-import { DestinoService, DestinoDTO } from '../../services/destino.service';
+import { DestinoService } from '../../services/destino.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { LucideAngularModule, ArrowLeft, ChevronRight } from 'lucide-angular';
 
@@ -19,12 +19,14 @@ export class Cities implements OnInit {
   readonly ChevronRightIcon = ChevronRight;
 
   countryName = signal<string>('');
+  backContinentId = signal<number | null>(null);
   cities = signal<any[]>([]);
   isLoading = signal(true);
 
   ngOnInit() {
     this.route.paramMap.subscribe((params) => {
       const country = params.get('country');
+
       if (country) {
         const decoded = decodeURIComponent(country);
         this.loadData(decoded);
@@ -43,11 +45,23 @@ export class Cities implements OnInit {
   loadData(country: string) {
     this.isLoading.set(true);
     this.countryName.set(country);
+    this.cities.set([]);
+    this.backContinentId.set(null);
 
     this.destinoService.getDestinosByPais(country).subscribe({
       next: (data) => {
         const destinos = data || [];
+
+        if (destinos.length === 0) {
+          this.cities.set([]);
+          this.isLoading.set(false);
+          return;
+        }
+
+        this.backContinentId.set(destinos[0].continenteId || null);
+
         const normalizedCountry = this.normalizeText(country);
+
         const cityDestinos = destinos.filter(
           (d) => this.normalizeText(d.nombre || '') !== normalizedCountry,
         );
@@ -57,20 +71,26 @@ export class Cities implements OnInit {
             cityDestinos.map((d) => ({
               ...d,
               destinoId: d.id,
-              imagen: d.imagen || d.imagenUrl,
+              nombre: d.nombre,
+              descripcion: d.descripcion || `Hoteles destacados en ${d.nombre}.`,
+              imagen: d.imagen || d.imagenUrl || 'assets/placeholder.jpg',
+              precio: d.precio || d.precioPorNoche || 0,
+              queryCity: d.nombre,
             })),
           );
+
           this.isLoading.set(false);
           return;
         }
 
-        const fallbackDestinoId = destinos[0].id;
+        const fallbackDestinoId = destinos[0]?.id;
 
         this.destinoService.getAlojamientos().subscribe({
           next: (alojamientos) => {
             const filtered = (alojamientos || []).filter(
               (a) => this.normalizeText(a.pais || '') === normalizedCountry,
             );
+
             const byCity = new Map<string, any>();
 
             filtered.forEach((a) => {
@@ -79,14 +99,16 @@ export class Cities implements OnInit {
 
               const current = byCity.get(cityName);
               const price = a.precioPorNoche || a.precio || 0;
+
               if (!current || price < current.precio) {
                 byCity.set(cityName, {
                   id: fallbackDestinoId || a.destinoId || a.id,
                   destinoId: fallbackDestinoId || a.destinoId || a.id,
                   nombre: cityName,
                   descripcion: `Hoteles destacados en ${cityName}.`,
-                  imagen: a.imagen || a.imagenUrl,
+                  imagen: a.imagen || a.imagenUrl || 'assets/placeholder.jpg',
                   precio: price,
+                  queryCity: cityName,
                 });
               }
             });

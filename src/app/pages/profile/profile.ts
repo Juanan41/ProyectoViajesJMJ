@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import {
   LucideAngularModule,
   MapPin,
@@ -13,6 +14,8 @@ import {
   Train,
   Ship,
   Star,
+  Trash2,
+  Pencil,
 } from 'lucide-angular';
 import { Auth } from '../../services/auth';
 import { TranslationService } from '../../services/translation';
@@ -48,7 +51,7 @@ export interface Trip {
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, RouterModule, LucideAngularModule, TranslatePipe],
+  imports: [CommonModule, RouterModule, FormsModule, LucideAngularModule, TranslatePipe],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })
@@ -69,12 +72,22 @@ export class Profile implements OnInit {
   readonly TrainIcon = Train;
   readonly ShipIcon = Ship;
   readonly StarIcon = Star;
+  readonly TrashIcon = Trash2;
+  readonly PencilIcon = Pencil;
 
   selectedTicket = signal<Trip | null>(null);
   activeTrips = signal<Trip[]>([]);
   pastTrips = signal<Trip[]>([]);
   reviews = signal<OpinionDTO[]>([]);
   isLoading = signal(true);
+
+  editingReviewId: number | null = null;
+  editReviewRating = 5;
+  editReviewComment = '';
+
+  reviewToDelete = signal<OpinionDTO | null>(null);
+  isDeletingReview = signal(false);
+  deleteReviewError = signal('');
 
   ngOnInit() {
     if (this.user) {
@@ -123,7 +136,9 @@ export class Profile implements OnInit {
   }
 
   openReceipt(trip: Trip) {
-    this.router.navigate(['/receipt', trip.bookingId]);
+    this.router.navigate(['/receipt', trip.bookingId], {
+      queryParams: { from: 'profile' },
+    });
   }
 
   closeTicket() {
@@ -131,13 +146,89 @@ export class Profile implements OnInit {
   }
 
   getTransportIcon(type: string | undefined | null) {
-    if (type?.toLowerCase() === 'tren') return this.TrainIcon;
-    if (type?.toLowerCase() === 'barco') return this.ShipIcon;
+    const normalized = (type || '').toLowerCase();
+
+    if (normalized.includes('tren')) return this.TrainIcon;
+    if (normalized.includes('barco')) return this.ShipIcon;
+
     return this.PlaneTakeoffIcon;
   }
 
-  getArray(length: number) {
-    return new Array(length);
+  getArray(length: number | undefined | null) {
+    return new Array(length || 0);
+  }
+
+  getTicketCode(bookingId: string | undefined | null): string {
+    return `TKM-${String(bookingId || '0').padStart(8, '0')}`;
+  }
+
+  startEditReview(review: OpinionDTO) {
+    this.editingReviewId = review.id;
+    this.editReviewRating = review.puntuacion || 5;
+    this.editReviewComment = review.comentario || '';
+  }
+
+  setEditReviewRating(star: number) {
+    this.editReviewRating = star;
+  }
+
+  cancelEditReview() {
+    this.editingReviewId = null;
+    this.editReviewRating = 5;
+    this.editReviewComment = '';
+  }
+
+  saveReview(review: OpinionDTO) {
+    if (!this.editReviewComment.trim()) return;
+
+    this.opinionService
+      .updateOpinion(review.id, {
+        puntuacion: this.editReviewRating,
+        comentario: this.editReviewComment,
+      })
+      .subscribe({
+        next: (updatedReview) => {
+          this.reviews.set(
+            this.reviews().map((r) => (r.id === updatedReview.id ? updatedReview : r)),
+          );
+          this.cancelEditReview();
+        },
+        error: (err) => console.error('Error actualizando reseña', err),
+      });
+  }
+
+  askDeleteReview(review: OpinionDTO) {
+    this.deleteReviewError.set('');
+    this.reviewToDelete.set(review);
+  }
+
+  closeDeleteReviewModal() {
+    if (this.isDeletingReview()) return;
+
+    this.deleteReviewError.set('');
+    this.reviewToDelete.set(null);
+  }
+
+  confirmDeleteReview() {
+    const review = this.reviewToDelete();
+
+    if (!review || this.isDeletingReview()) return;
+
+    this.isDeletingReview.set(true);
+    this.deleteReviewError.set('');
+
+    this.opinionService.deleteOpinion(review.id).subscribe({
+      next: () => {
+        this.reviews.set(this.reviews().filter((r) => r.id !== review.id));
+        this.isDeletingReview.set(false);
+        this.reviewToDelete.set(null);
+      },
+      error: (err) => {
+        console.error('Error borrando reseña', err);
+        this.isDeletingReview.set(false);
+        this.deleteReviewError.set('No se pudo borrar la reseña. Inténtalo de nuevo.');
+      },
+    });
   }
 
   downloadPDF(elementId: string, filename: string) {
@@ -146,7 +237,9 @@ export class Profile implements OnInit {
 
   formatTicketDate(value: string | undefined | null): string {
     if (!value) return '';
+
     const date = new Date(value);
+
     return date.toLocaleDateString(this.getCurrentLocale(), {
       day: '2-digit',
       month: 'short',
@@ -158,21 +251,43 @@ export class Profile implements OnInit {
     return this.translationService.currentLang() === 'en' ? 'en-US' : 'es-ES';
   }
 
+  private generateSeat(id: number): string {
+    const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+    const row = ((id * 3) % 30) + 1;
+    const letter = letters[id % letters.length];
+
+    return `${row}${letter}`;
+  }
+
+  private generateGate(id: number): string {
+    const gateNumber = ((id * 7) % 24) + 1;
+    return `G${String(gateNumber).padStart(2, '0')}`;
+  }
+
   private toTrip(reserva: ReservaResponse): Trip {
     let transportObj = null;
+
     if (reserva.transporteTipo) {
       transportObj = {
         type: reserva.transporteTipo,
         name: reserva.transporteNombre || 'Transporte',
         time: reserva.transporteHora || '12:00',
-        seat: reserva.transporteAsiento || '-',
-        gate: reserva.transportePuerta || '-',
+        seat: reserva.transporteAsiento || this.generateSeat(reserva.id),
+        gate: reserva.transportePuerta || this.generateGate(reserva.id),
       };
     }
 
     const checkInDate = new Date(reserva.checkIn);
     const checkOutDate = new Date(reserva.checkOut);
-    const dateStr = `${checkInDate.toLocaleDateString(this.getCurrentLocale(), { day: '2-digit', month: 'short' })} - ${checkOutDate.toLocaleDateString(this.getCurrentLocale(), { day: '2-digit', month: 'short', year: 'numeric' })}`;
+
+    const dateStr = `${checkInDate.toLocaleDateString(this.getCurrentLocale(), {
+      day: '2-digit',
+      month: 'short',
+    })} - ${checkOutDate.toLocaleDateString(this.getCurrentLocale(), {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    })}`;
 
     return {
       bookingId: String(reserva.id),

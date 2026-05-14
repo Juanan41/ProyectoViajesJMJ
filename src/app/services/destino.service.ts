@@ -26,24 +26,78 @@ export class DestinoService {
   private serverUrl = environment.apiUrl.replace('/api', '');
 
   private fallbackImages = [
-    'https://images.unsplash.com/photo-1499856871958-5b9627545d1aq=80&w=2020',
-    'https://images.unsplash.com/photo-1464817739973-0128fe77aaa1q=80&w=2070',
-    'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5q=80&w=1972',
-    'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9q=80&w=2070',
-    'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5q=80&w=2076',
+    'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?q=80&w=2020',
+    'https://images.unsplash.com/photo-1464817739973-0128fe77aaa1?q=80&w=2070',
+    'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?q=80&w=1972',
+    'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?q=80&w=2070',
+    'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?q=80&w=2076',
   ];
 
   private defaultBackendImage = 'photo-1436491865332-7a61a109cc05';
 
+  private englishAliases: Record<string, string[]> = {
+    madrid: ['madrid', 'spain'],
+    paris: ['paris', 'france'],
+    roma: ['rome', 'italy'],
+    londres: ['london', 'united kingdom', 'uk', 'england'],
+    atenas: ['athens', 'greece'],
+    viena: ['vienna', 'austria'],
+
+    tokio: ['tokyo', 'japan'],
+    bangkok: ['bangkok', 'thailand'],
+    pekin: ['beijing', 'china'],
+    dubai: ['dubai', 'united arab emirates', 'uae'],
+    'nueva delhi': ['new delhi', 'delhi', 'india'],
+    seul: ['seoul', 'south korea', 'korea'],
+
+    'el cairo': ['cairo', 'egypt'],
+    marrakech: ['marrakesh', 'morocco'],
+    nairobi: ['nairobi', 'kenya'],
+    zanzibar: ['zanzibar', 'tanzania'],
+    sahara: ['sahara', 'desert', 'morocco'],
+    'ciudad del cabo': ['cape town', 'south africa'],
+
+    sidney: ['sydney', 'australia'],
+    melbourne: ['melbourne', 'australia'],
+    auckland: ['auckland', 'new zealand'],
+    fiyi: ['fiji'],
+    'bora bora': ['bora bora', 'french polynesia'],
+    perth: ['perth', 'australia'],
+
+    'nueva york': ['new york', 'usa', 'united states', 'america'],
+    'ciudad de mexico': ['mexico city', 'mexico'],
+    toronto: ['toronto', 'canada'],
+    'san francisco': ['san francisco', 'usa', 'united states'],
+    cancun: ['cancun', 'mexico'],
+    chicago: ['chicago', 'usa', 'united states'],
+
+    'rio de janeiro': ['rio de janeiro', 'brazil'],
+    'buenos aires': ['buenos aires', 'argentina'],
+    'machu picchu': ['machu picchu', 'peru'],
+    cartagena: ['cartagena', 'colombia'],
+    'santiago de chile': ['santiago', 'santiago chile', 'chile'],
+    montevideo: ['montevideo', 'uruguay'],
+  };
+
   public getFullImageUrl(imagePath: string): string {
     if (!imagePath) {
-      return 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05q=80&w=800';
+      return 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=800';
     }
+
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
       return imagePath;
     }
+
     const cleanPath = imagePath.startsWith('/') ? imagePath.substring(1) : imagePath;
     return `${this.serverUrl}/${cleanPath}`;
+  }
+
+  private normalizeText(value: string): string {
+    return (value || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
   }
 
   private mapDestino(d: any): DestinoDTO {
@@ -55,13 +109,13 @@ export class DestinoService {
 
     if (!path || hasBackendDefault) {
       if (nameForImage) {
-        // Enlazar de forma estática con unplash usando query (source.unsplash no funciona ya tan bien)
-        path = `https://images.unsplash.com/photo-1436491865332-7a61a109cc05q=80&w=1600`;
+        path = 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1600';
       } else {
         const index = (d.id || 0) % this.fallbackImages.length;
         path = this.fallbackImages[index];
       }
     }
+
     const fullUrl = this.getFullImageUrl(path);
 
     let contId = d.continenteId;
@@ -69,22 +123,41 @@ export class DestinoService {
 
     if (!contId && d.continente) {
       const cont = d.continente.toString().toLowerCase();
+
       if (cont.includes('europa')) contId = 1;
       else if (cont.includes('asia')) contId = 2;
       else if (cont.includes('áfrica') || cont.includes('africa')) contId = 3;
-      else if (cont.includes('américa del norte')) contId = 4;
-      else if (cont.includes('américa del sur')) contId = 5;
-      else if (cont.includes('oceanía') || cont.includes('oceania')) contId = 6;
+      else if (cont.includes('américa del norte') || cont.includes('america del norte')) contId = 5;
+      else if (cont.includes('américa del sur') || cont.includes('america del sur')) contId = 6;
+      else if (cont.includes('oceanía') || cont.includes('oceania')) contId = 4;
     }
 
     if (!contId) {
-      const pais = (d.pais || '').toLowerCase();
-      if (['españa', 'francia', 'italia', 'alemania', 'reino unido'].includes(pais)) contId = 1;
-      else if (['japón', 'china', 'india', 'tailandia'].includes(pais)) contId = 2;
-      else if (['egipto', 'marruecos', 'kenia', 'sudáfrica'].includes(pais)) contId = 3;
-      else if (['estados unidos', 'méxico', 'canadá'].includes(pais)) contId = 4;
-      else if (['brasil', 'argentina', 'colombia', 'chile', 'perú'].includes(pais)) contId = 5;
-      else if (['australia', 'nueva zelanda'].includes(pais)) contId = 6;
+      const pais = this.normalizeText(d.pais || '');
+
+      if (
+        ['espana', 'francia', 'italia', 'alemania', 'reino unido', 'grecia', 'austria'].includes(
+          pais,
+        )
+      )
+        contId = 1;
+      else if (
+        [
+          'japon',
+          'china',
+          'india',
+          'tailandia',
+          'emiratos arabes unidos',
+          'corea del sur',
+        ].includes(pais)
+      )
+        contId = 2;
+      else if (['egipto', 'marruecos', 'kenia', 'sudafrica', 'tanzania'].includes(pais)) contId = 3;
+      else if (['australia', 'nueva zelanda', 'fiyi', 'polinesia francesa'].includes(pais))
+        contId = 4;
+      else if (['estados unidos', 'mexico', 'canada'].includes(pais)) contId = 5;
+      else if (['brasil', 'argentina', 'colombia', 'chile', 'peru', 'uruguay'].includes(pais))
+        contId = 6;
       else contId = 1;
     }
 
@@ -138,6 +211,7 @@ export class DestinoService {
         (alojamientos || []).map((a) => ({
           ...a,
           imagen: this.getFullImageUrl(a.imagen || a.imagenUrl),
+          imagenUrl: this.getFullImageUrl(a.imagen || a.imagenUrl),
           image: this.getFullImageUrl(a.imagen || a.imagenUrl),
           name: a.nombre,
         })),
@@ -151,6 +225,7 @@ export class DestinoService {
         (alojamientos || []).map((a) => ({
           ...a,
           imagen: this.getFullImageUrl(a.imagen || a.imagenUrl),
+          imagenUrl: this.getFullImageUrl(a.imagen || a.imagenUrl),
           image: this.getFullImageUrl(a.imagen || a.imagenUrl),
           name: a.nombre,
         })),
@@ -169,17 +244,30 @@ export class DestinoService {
   }
 
   searchDestinos(query: string): Observable<DestinoDTO[]> {
-    const q = query.toLowerCase().trim();
+    const q = this.normalizeText(query);
+
     return this.getDestinos().pipe(
-      map((destinos: DestinoDTO[]) =>
-        (destinos || []).filter(
-          (d) =>
-            (d.nombre && d.nombre.toLowerCase().includes(q)) ||
-            (d.ciudad && d.ciudad.toLowerCase().includes(q)) ||
-            (d.pais && d.pais.toLowerCase().includes(q)) ||
-            (d.descripcion && d.descripcion.toLowerCase().includes(q)),
-        ),
-      ),
+      map((destinos: DestinoDTO[]) => {
+        if (!q) return destinos || [];
+
+        return (destinos || []).filter((d) => {
+          const nombre = this.normalizeText(d.nombre || '');
+          const ciudad = this.normalizeText(d.ciudad || '');
+          const pais = this.normalizeText(d.pais || '');
+          const descripcion = this.normalizeText(d.descripcion || '');
+          const aliases = this.englishAliases[nombre] || [];
+
+          const searchableText = [
+            nombre,
+            ciudad,
+            pais,
+            descripcion,
+            ...aliases.map((a) => this.normalizeText(a)),
+          ].join(' ');
+
+          return searchableText.includes(q);
+        });
+      }),
     );
   }
 }

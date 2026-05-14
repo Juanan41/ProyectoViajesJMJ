@@ -32,7 +32,7 @@
         <div>
           <label class="text-sm font-medium text-gray-300 block mb-1.5">{{ 'Titular de la Tarjeta' | translate
             }}</label>
-          <input type="text" placeholder="JUAN PÉREZ" maxlength="40" [(ngModel)]="cardHolder"
+          <input type="text" [placeholder]="'Juan Pérez' | translate" maxlength="40" [(ngModel)]="cardHolder"
             (ngModelChange)="cardHolder = $event.toUpperCase()" name="cardHolder"
             class="w-full bg-[rgb(33,36,37)] text-white border border-gray-700 rounded-xl py-3 px-4 focus:outline-none focus:border-emerald-500 transition-all uppercase"
             required />

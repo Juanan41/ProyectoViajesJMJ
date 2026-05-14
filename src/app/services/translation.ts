@@ -8,443 +8,1105 @@ export type Language = 'es' | 'en';
 export class TranslationService {
   currentLang = signal<Language>('es');
 
+  private readonly storageKey = 'jmj_language';
+
   private dictionary: Record<Language, Record<string, string>> = {
     es: {},
     en: {
-      'Destinos': 'Destinations',
+      // General
+      'JMJ Viajes': 'JMJ Travel',
+      ViajesJMJ: 'JMJ Travel',
+      Buscar: 'Search',
+      'Buscar...': 'Search...',
+      Volver: 'Back',
+      Cancelar: 'Cancel',
+      'Guardar cambios': 'Save changes',
+      'Guardando...': 'Saving...',
+      'Eliminando...': 'Deleting...',
+      'Borrando...': 'Deleting...',
+      Entendido: 'Got it',
+      Editar: 'Edit',
+      Borrar: 'Delete',
+      Eliminar: 'Delete',
+      Nombre: 'Name',
+      Email: 'Email',
+      Precio: 'Price',
+      Imagen: 'Image',
+      Descripción: 'Description',
+      País: 'Country',
+      Continente: 'Continent',
+      Destino: 'Destination',
+      Destinos: 'Destinations',
+      Desde: 'From',
+      desde: 'from',
+      Total: 'Total',
+      Fecha: 'Date',
+      Hora: 'Time',
+      Pasajero: 'Passenger',
+      Puerta: 'Gate',
+      Asiento: 'Seat',
+      'Boarding Pass': 'Boarding Pass',
+      Avión: 'Plane',
+      Tren: 'Train',
+      Barco: 'Ship',
+      Transporte: 'Transport',
+      Alojamiento: 'Accommodation',
+      Huéspedes: 'Guests',
+      Noches: 'Nights',
+      noche: 'night',
+      noches: 'nights',
+      'por noche': 'per night',
+      'Check-in': 'Check-in',
+      'Check-out': 'Check-out',
+      Entrada: 'Check-in',
+      Salida: 'Check-out',
+      'Confirmar Reserva': 'Confirm Booking',
+      Reservar: 'Book',
+      'Ver detalles': 'View details',
+      'Ver hotel': 'View hotel',
+      'Ver hoteles': 'View hotels',
+      'Ver destinos': 'View destinations',
+      Explorar: 'Explore',
+      'Explorar destinos': 'Explore destinations',
+      'Explorar continentes': 'Explore continents',
+      'Cargando...': 'Loading...',
+      'Conectando...': 'Connecting...',
+      Limpiar: 'Clear',
+      'Limpiar filtros': 'Clear filters',
+      'Aplicar filtros': 'Apply filters',
+      Filtros: 'Filters',
+      'Filtrar resultados': 'Filter results',
+      'Filtrar búsqueda': 'Filter search',
+      Mostrando: 'Showing',
+      'opciones disponibles': 'available options',
+
+      // Navbar
+      'Mis Viajes': 'My Trips',
+      Viajes: 'Trips',
+      'Mi Perfil': 'My Profile',
+      Entrar: 'Sign in',
+      Registro: 'Register',
+      Salir: 'Sign out',
+      'Cerrar Sesión': 'Sign out',
+      'Iniciar Sesión': 'Sign in',
+      'Iniciar sesión': 'Sign in',
+      Registrarse: 'Register',
+      'Gestionar Saldo': 'Manage Balance',
+      Ingresar: 'Deposit',
+      Retirar: 'Withdraw',
+      Sacar: 'Withdraw',
+      'Saldo actual': 'Current balance',
+      'Balance actual': 'Current balance',
+      'Cantidad a operar': 'Amount',
+      'Saldo ingresado correctamente': 'Balance added successfully',
+      'Saldo retirado correctamente': 'Balance withdrawn successfully',
+
+      // Footer
+      Privacidad: 'Privacy',
+      Términos: 'Terms',
+      Contacto: 'Contact',
+      'Información legal': 'Legal information',
+      'Condiciones de uso': 'Terms of use',
+      Soporte: 'Support',
+      'Usaremos tus datos únicamente para gestionar cuentas, reservas, reseñas y métodos de pago simulados.':
+        'We will use your data only to manage accounts, bookings, reviews, and simulated payment methods.',
+      'No compartimos información con terceros porque esta aplicación es demostrativa.':
+        'We do not share information with third parties because this application is for demonstration purposes.',
+      'Todas las reservas y pagos forman parte de un entorno de demostración.':
+        'All bookings and payments are part of a demonstration environment.',
+      'Los importes, tarjetas y billetes se usan solo para simular el flujo del proyecto y no representan compras reales.':
+        'Amounts, cards, and tickets are used only to simulate the project flow and do not represent real purchases.',
+      'Puedes contactar con el equipo del proyecto para revisar dudas sobre reservas, usuarios o funcionamiento de la aplicación.':
+        'You can contact the project team to ask about bookings, users, or how the application works.',
+
+      // Pantalla carga
+      Estamos: 'We are',
+      'arrancando...': 'starting...',
+      'Preparando los motores para generarte el viaje perfecto':
+        'Preparing everything to create your perfect trip',
+      'Buscando destinos, hoteles y experiencias para ti':
+        'Searching destinations, hotels, and experiences for you',
+
+      // Home
+      'Descubre tu próximo': 'Discover your next',
+      'Descubre tu próximo gran destino': 'Discover your next great destination',
+      'Minimalismo, elegancia y experiencias inolvidables en todo el mundo.':
+        'Minimalism, elegance, and unforgettable experiences around the world.',
+      'Explora nuestra selección exclusiva de alojamientos y vive experiencias inolvidables en todo el mundo.':
+        'Explore our exclusive selection of accommodation and enjoy unforgettable experiences around the world.',
+      Categorías: 'Categories',
+      'Explora por Continente': 'Explore by Continent',
+      'Mejores Vuelos': 'Best Flights',
+      'Conectamos con las rutas más cómodas para que tu viaje empiece desde el primer minuto.':
+        'We connect you with the most comfortable routes so your trip starts from the first minute.',
+      'Conexiones directas y cómodas para que tu única preocupación sea disfrutar del viaje.':
+        'Direct and comfortable connections so your only concern is enjoying the trip.',
+      'Hoteles Premium': 'Premium Hotels',
+      'Alojamientos seleccionados por calidad, ubicación y experiencia para cada destino.':
+        'Accommodation selected for quality, location, and experience in every destination.',
+      'Dormirás en los mejores alojamientos, seleccionados cuidadosamente por su calidad y ubicación.':
+        'You will stay in the best accommodation, carefully selected for quality and location.',
+      'Seguro Total': 'Full Protection',
+      'Viaja con tranquilidad gracias a reservas organizadas y detalles siempre disponibles.':
+        'Travel with peace of mind thanks to organized bookings and always-available details.',
+      'Viaja con la tranquilidad de estar protegido en todo momento con nuestra cobertura exclusiva.':
+        'Travel with peace of mind knowing you are protected at all times with our exclusive coverage.',
+
+      // Continents / Countries / Cities
+      'Explora el Mundo': 'Explore the World',
+      'Selecciona un continente para descubrir destinos increíbles':
+        'Select a continent to discover incredible destinations',
+      'Cargando continente...': 'Loading continent...',
+      'Aún no hay destinos': 'No destinations yet',
+      'Pronto añadiremos viajes increíbles a este continente.':
+        'We will add incredible trips to this continent soon.',
+      'Explora las ciudades disponibles': 'Explore the available cities',
+      'Aún no hay ciudades': 'No cities yet',
+      'Pronto añadiremos destinos increíbles en este país.':
+        'We will add incredible destinations in this country soon.',
+      'Destino exclusivo': 'Exclusive destination',
+      'Destinos destacados en España.': 'Featured destinations in Spain.',
+      'Destinos destacados en Francia.': 'Featured destinations in France.',
+      'Destinos destacados en Italia.': 'Featured destinations in Italy.',
+      'Destinos destacados en Reino Unido.': 'Featured destinations in the United Kingdom.',
+      'Destinos destacados en Alemania.': 'Featured destinations in Germany.',
+      'Destinos destacados en Grecia.': 'Featured destinations in Greece.',
+      'Destinos destacados en Austria.': 'Featured destinations in Austria.',
+      'Destinos destacados en Japón.': 'Featured destinations in Japan.',
+      'Destinos destacados en China.': 'Featured destinations in China.',
+      'Destinos destacados en Emiratos Árabes Unidos.':
+        'Featured destinations in the United Arab Emirates.',
+      'Destinos destacados en Tailandia.': 'Featured destinations in Thailand.',
+      'Destinos destacados en India.': 'Featured destinations in India.',
+      'Destinos destacados en Corea del Sur.': 'Featured destinations in South Korea.',
+      'Destinos destacados en Egipto.': 'Featured destinations in Egypt.',
+      'Destinos destacados en Marruecos.': 'Featured destinations in Morocco.',
+      'Destinos destacados en Sudáfrica.': 'Featured destinations in South Africa.',
+      'Destinos destacados en Kenia.': 'Featured destinations in Kenya.',
+      'Destinos destacados en Tanzania.': 'Featured destinations in Tanzania.',
+      'Destinos destacados en Estados Unidos.': 'Featured destinations in the United States.',
+      'Destinos destacados en México.': 'Featured destinations in Mexico.',
+      'Destinos destacados en Canadá.': 'Featured destinations in Canada.',
+      'Destinos destacados en Argentina.': 'Featured destinations in Argentina.',
+      'Destinos destacados en Brasil.': 'Featured destinations in Brazil.',
+      'Destinos destacados en Colombia.': 'Featured destinations in Colombia.',
+      'Destinos destacados en Perú.': 'Featured destinations in Peru.',
+      'Destinos destacados en Chile.': 'Featured destinations in Chile.',
+      'Destinos destacados en Australia.': 'Featured destinations in Australia.',
+      'Destinos destacados en Nueva Zelanda.': 'Featured destinations in New Zealand.',
+      'Destinos destacados en Fiyi.': 'Featured destinations in Fiji.',
+
+      // Hotels list
+      'Cargando alojamientos...': 'Loading accommodation...',
+      'Volver a destinos': 'Back to destinations',
+      'Precio máximo': 'Maximum price',
+      'Comodidades principales': 'Main amenities',
+      'Wifi gratuito': 'Free Wi-Fi',
+      'Desayuno incluido': 'Breakfast included',
+      'Aire acondicionado': 'Air conditioning',
+      'Camas King size': 'King-size beds',
+      'No hay alojamientos que coincidan con esos filtros.':
+        'There are no accommodations matching those filters.',
+      Wifi: 'Wi-Fi',
+      Desayuno: 'Breakfast',
+      'A/C': 'A/C',
+      King: 'King',
+      Hotel: 'Hotel',
+      Apartamento: 'Apartment',
+      Resort: 'Resort',
+      Hostal: 'Hostel',
+
+      // Hotel detail
+      'Cargando información del alojamiento...': 'Loading accommodation information...',
+      'Volver a explorar': 'Back to explore',
+      'Acerca del hotel': 'About the hotel',
+      Galería: 'Gallery',
+      Reseñas: 'Reviews',
+      'No hay reseñas todavía. ¡Sé el primero en opinar!':
+        'There are no reviews yet. Be the first to leave one!',
+      'Editar reseña': 'Edit review',
+      'Deja tu reseña': 'Leave your review',
+      '¿Cómo calificarías tu estancia?': 'How would you rate your stay?',
+      Excelente: 'Excellent',
+      'Muy bueno': 'Very good',
+      Bueno: 'Good',
+      Regular: 'Fair',
+      Malo: 'Poor',
+      'Tu experiencia': 'Your experience',
+      '¿Qué fue lo que más te gustó?': 'What did you like the most?',
+      'Publicar reseña': 'Publish review',
+      'Precio por noche': 'Price per night',
+      'Total a pagar': 'Total to pay',
+      'Selecciona fechas válidas.': 'Select valid dates.',
+      'Necesitas tener una tarjeta asociada a tu cuenta para reservar.':
+        'You need to have a card linked to your account to book.',
+      'Saldo insuficiente en tu cartera.': 'Insufficient balance in your wallet.',
+      'Hoteles similares': 'Similar hotels',
+      'Borrar reseña': 'Delete review',
+      '¿Seguro que quieres borrar esta reseña?': 'Are you sure you want to delete this review?',
+      'No, volver': 'No, go back',
+      'Sí, borrar': 'Yes, delete',
+      'No se pudo borrar la reseña. Inténtalo de nuevo.':
+        'The review could not be deleted. Please try again.',
+      'Reserva completada': 'Booking completed',
+      'Reserva exitosa!': 'Booking successful!',
+      'Tu reserva se ha realizado correctamente.': 'Your booking has been completed successfully.',
+      'Esta es una reserva simulada. No existen cargos reales asociados a esta cuenta.':
+        'This is a simulated booking. There are no real charges associated with this account.',
+
+      // Trips
+      'Gestiona tu historial de reservas y billetes': 'Manage your booking history and tickets',
+      'Aún no tienes viajes': 'You do not have any trips yet.',
+      'Parece que tu pasaporte está pidiendo algo de acción.':
+        'Looks like your passport is asking for some action.',
+      'Viajes Próximos': 'Upcoming trips',
+      'Viajes Completados': 'Completed trips',
+      'Viajes Cancelados': 'Canceled trips',
+      Completado: 'Completed',
+      Confirmada: 'Confirmed',
+      CONFIRMADA: 'CONFIRMED',
+      COMPLETADA: 'COMPLETED',
+      CANCELADA: 'CANCELED',
+      PENDIENTE: 'PENDING',
+      'Ver Ticket': 'View Ticket',
+      'Ver ticket': 'View ticket',
+      'Cancelar viaje': 'Cancel trip',
+      'Cancelar reserva': 'Cancel booking',
+      '¿Seguro que quieres cancelar este viaje?': 'Are you sure you want to cancel this trip?',
+      'Cancelando...': 'Canceling...',
+      'Sí, cancelar': 'Yes, cancel',
+      'No se pudo cancelar la reserva. Inténtalo de nuevo.':
+        'The booking could not be canceled. Please try again.',
+
+      // Profile
+      'Por favor, inicia sesión para ver tu perfil.': 'Please sign in to view your profile.',
+      'Gestiona tus viajes, entradas y preferencias.':
+        'Manage your trips, tickets, and preferences.',
+      'Editar Opciones': 'Edit options',
+      'Viajes Activos': 'Active trips',
+      'Destinos Visitados': 'Visited destinations',
+      'Saldo Disponible': 'Available balance',
+      'No tienes viajes próximos.': 'You do not have any upcoming trips.',
+      '¡Explorar destinos!': 'Explore destinations!',
+      'Ver recibo': 'View receipt',
+      'Mis Reseñas': 'My Reviews',
+      'Aún no has escrito ninguna reseña.': "You haven't written any reviews yet.",
+      Puntuación: 'Rating',
+
+      // Receipt
+      'Recibo no encontrado': 'Receipt not found',
+      'No hemos podido encontrar esta reserva.': 'We could not find this booking.',
+      'Abriendo PDF...': 'Opening PDF...',
+      'Generando PDF...': 'Generating PDF...',
+      'Descargar PDF': 'Download PDF',
+      'Reserva confirmada': 'Booking confirmed',
+      'Recibo de viaje': 'Travel receipt',
+      'Gracias por reservar con ViajesJMJ.': 'Thank you for booking with JMJ Travel.',
+      'Código de recibo': 'Receipt code',
+      Fechas: 'Dates',
+      'Resumen de pago': 'Payment summary',
+      Estancia: 'Stay',
+      'Total cobrado': 'Total charged',
+      'Pago realizado con saldo de la cartera JMJ.': 'Payment made using JMJ wallet balance.',
+      '1 noche': '1 night',
+
+      // Login / Register
+      'Bienvenido de nuevo': 'Welcome back',
+      'Tu próxima aventura te espera': 'Your next adventure is waiting for you',
+      'Correo electrónico': 'Email',
+      Contraseña: 'Password',
+      'tu@email.com': 'your@email.com',
+      '¿No tienes cuenta': "Don't have an account",
+      'Regístrate aquí': 'Sign up here',
+      'Únete a ViajesJMJ': 'Join ViajesJMJ',
+      'Crea tu cuenta gratis': 'Create your free account',
+      'Juan Pérez': 'John Smith',
+      'Confirmar Contraseña': 'Confirm Password',
+      'Creando cuenta...': 'Creating account...',
+      'Crear Cuenta': 'Create Account',
+      '¿Ya tienes cuenta': 'Already have an account',
+      'Inicia sesión': 'Sign in',
+
+      // Settings / Cards
+      'Métodos de Pago': 'Payment Methods',
+      'Tus tarjetas': 'Your cards',
+      'Gestiona tus métodos de pago para cargar tu saldo':
+        'Manage your payment methods to top up your balance',
+      'Añadir nueva': 'Add new',
+      'Cartera vacía': 'Empty wallet',
+      'No tienes tarjetas vinculadas a tu cuenta.':
+        'You do not have any cards linked to your account.',
+      'Eliminar tarjeta': 'Delete card',
+      'Si eliminas tu tarjeta, tu saldo pasará automáticamente a 0. Esta acción no se puede deshacer.':
+        'If you delete your card, your balance will automatically become 0. This action cannot be undone.',
+      'Volver a configuración': 'Back to settings',
+      'Añadir Tarjeta': 'Add Card',
+      'Guardar Tarjeta': 'Save Card',
+      'Número de Tarjeta': 'Card Number',
+      'Titular de la Tarjeta': 'Card Holder',
+      Titular: 'Holder',
+      Expiración: 'Expiration',
+      Caduca: 'Expires',
+      CVV: 'CVV',
+      'Tu Nombre': 'Your Name',
+
+      // Search
+      'Resultados de búsqueda': 'Search results',
+      Buscando: 'Searching',
+      'destinos encontrados para tu próxima aventura': 'destinations found for your next adventure',
+      'Buscando en el mapa...': 'Searching on the map...',
+      'No hemos encontrado nada': 'We could not find anything',
+      'No hay destinos que coincidan con tu búsqueda. Prueba con otros términos o explora por continentes.':
+        'There are no destinations matching your search. Try other terms or explore by continent.',
+
+      // Admin
       'Panel de Control': 'Control Panel',
-      'Administración': 'Administration',
-      'Dashboard': 'Dashboard',
-      'Usuarios': 'Users',
+      Administración: 'Administration',
+      Dashboard: 'Dashboard',
+      Usuarios: 'Users',
+      Hoteles: 'Hotels',
+      'Buscar usuario': 'Search user',
+      'Buscar destino': 'Search destination',
+      'Buscar hotel': 'Search hotel',
       'Total Usuarios': 'Total Users',
       'Destinos Activos': 'Active Destinations',
       'Total Reservas': 'Total Bookings',
-      'Rol': 'Role',
-      'Acciones': 'Actions',
+      'Ingresos totales': 'Total revenue',
+      'Reservas activas': 'Active bookings',
+      'Reservas completadas': 'Completed bookings',
+      'Reservas canceladas': 'Canceled bookings',
+      'Usuario con más reservas': 'User with most bookings',
+      'Gestión de reservas': 'Booking management',
+      'Buscar reserva': 'Search booking',
+      Todas: 'All',
+      Completada: 'Completed',
+      'Detalle de reserva': 'Booking details',
+      'No hay reservas que coincidan con los filtros.': 'No bookings match the filters.',
+      'Gestion de hoteles': 'Hotel management',
+      'Anadir hotel': 'Add hotel',
+      'Editar hotel': 'Edit hotel',
+      'Ordenar por nombre': 'Sort by name',
+      'Ordenar por destino': 'Sort by destination',
+      'Ordenar por precio': 'Sort by price',
+      'Ordenar por reservas': 'Sort by bookings',
+      Ciudad: 'City',
+      Tipo: 'Type',
+      'Precio noche': 'Price per night',
+      'No hay hoteles que coincidan con los filtros.': 'No hotels match the filters.',
+      HOTEL: 'HOTEL',
+      APARTAMENTO: 'APARTMENT',
+      RESORT: 'RESORT',
+      HOSTAL: 'HOSTEL',
+      'Hotel creado': 'Hotel created',
+      'Hotel actualizado': 'Hotel updated',
+      'Hotel eliminado': 'Hotel deleted',
+      'Los cambios del hotel se han guardado correctamente.': 'The hotel changes have been saved successfully.',
+      'El hotel se ha eliminado correctamente.': 'The hotel has been deleted successfully.',
+      'Eliminar hotel': 'Delete hotel',
+      'No se pudo eliminar el hotel': 'The hotel could not be deleted',
+      'No se pudo eliminar el hotel.': 'The hotel could not be deleted.',
+      'No se pudo guardar el hotel.': 'The hotel could not be saved.',
+      'No se puede borrar un alojamiento con reservas asociadas':
+        'Accommodation with associated bookings cannot be deleted',
+      'El nombre y el destino son obligatorios.': 'Name and destination are required.',
+      Rol: 'Role',
+      Saldo: 'Balance',
+      Acciones: 'Actions',
       'Lista de Destinos': 'Destination List',
       'Añadir Destino': 'Add Destination',
-      'Estamos': 'We are',
-      'arrancando...': 'starting...',
-      'Preparando los motores para generarte el viaje perfecto': 'Preparing everything to create your perfect trip',
-      'Buscando destinos, hoteles y experiencias para ti': 'Searching destinations, hotels, and experiences for you',
-      'JMJ Viajes': 'JMJ Travel',
-      'Mis Viajes': 'My Trips',
-      'Mi Perfil': 'My Profile',
-      'Configuraci?n': 'Settings',
-      'Volver a configuraci?n': 'Back to settings',
-      'Informaci?n Personal': 'Personal Information',
-      'M?todos de Pago': 'Payment Methods',
-      'Gestiona tus tarjetas para ingresos y reservas.': 'Manage your cards for deposits and bookings.',
-      'Iniciar Sesi?n': 'Sign in',
-      'Iniciar sesion': 'Sign in',
-      'Cerrar Sesi?n': 'Sign out',
-      'Registrarse': 'Register',
-      'Iniciar sesi?n': 'Sign in',
-      'Buscar': 'Search',
-      'Descubre tu pr?ximo gran destino': 'Discover your next great destination',
-      'Minimalismo, elegancia y experiencias inolvidables en todo el mundo.': 'Minimalism, elegance, and unforgettable experiences around the world.',
-      'Pa?s no encontrado': 'Country not found',
-      'Descubre las mejores ciudades': 'Discover the best cities',
-      'Correo electr?nico': 'Email',
-      'Contrase?a': 'Password',
-      'Buscar por pa?s o ciudad...': 'Search by country or city...',
-      'Guardar cambios': 'Save changes',
-      'Guardar Tarjeta': 'Save card',
-      'A?adir Tarjeta': 'Add card',
-      'A?adir nueva tarjeta': 'Add new card',
-      'Titular de la Tarjeta': 'Card Holder',
-      'N?mero de Tarjeta': 'Card Number',
-      'Expiraci?n': 'Expiration',
-      'Confirma Contrase?a': 'Confirm Password',
-      'Tu contrase?a': 'Your password',
-      'Repite tu contrase?a': 'Repeat your password',
-      'Volver al perfil': 'Back to profile',
-      'Volver al hotel': 'Back to hotel',
-      'Ver detalles': 'View details',
-      'Ver hoteles ?': 'View hotels ?',
-      'Reservar': 'Book',
-      'Saldo insuficiente': 'Insufficient balance',
-      'Recibo de Pago': 'Payment receipt',
-      'Detalles de la Reserva': 'Booking details',
-      'M?todo de Pago': 'Payment method',
-      'Bienvenido de nuevo': 'Welcome back',
-      'Inicia sesi?n para continuar con tu aventura.': 'Sign in to continue your adventure.',
-      '?Olvidaste tu contrase?a': 'Forgot your password',
-      '?No tienes una cuenta': "Don't have an account",
-      'Reg?strate ahora': 'Sign up now',
-      'Comienza tu viaje': 'Start your journey',
-      'Crea una cuenta para descubrir el mundo.': 'Create an account to discover the world.',
-      '?Ya tienes una cuenta': 'Already have an account',
-      '?A d?nde viajamos hoy': 'Where are we traveling today',
-      '?Hola,': 'Hello,',
-      'Gestionar Dinero': 'Manage Balance',
-      'Saldo actual': 'Current balance',
-      'Cantidad a operar': 'Amount',
-      'Ingresar': 'Deposit',
-      'Sacar': 'Withdraw',
-      'A?n no has escrito ninguna rese?a.': "You haven't written any reviews yet.",
-      'Explora el Mundo': 'Explore the World',
-      'Selecciona un continente para descubrir destinos incre?bles': 'Select a continent to discover incredible destinations',
-      'Explorar': 'Explore',
-      'Continente no encontrado': 'Continent not found',
-      'Volver a continentes': 'Back to continents',
-      'Volver a pa?ses': 'Back to countries',
-      'Ver ciudades': 'View cities',
-      'Ciudad no encontrada': 'City not found',
-      'hotel disponible': 'hotel available',
-      'hoteles disponibles': 'hotels available',
-      'Filtros': 'Filters',
-      'Filtrar b?squeda': 'Filter search',
-      'Precio por noche': 'Price per night',
-      'Calificaci?n m?nima': 'Minimum rating',
-      'Todas las calificaciones': 'All ratings',
-      '3+ estrellas': '3+ stars',
-      '4+ estrellas': '4+ stars',
-      '5 estrellas': '5 stars',
-      'Categor?a': 'Category',
-      'Todas las categor?as': 'All categories',
-      'Lujo': 'Luxury',
-      'Boutique': 'Boutique',
-      'Econ?mico': 'Budget',
-      'Servicios': 'Amenities',
-      'Wifi gratuito': 'Free Wi-Fi',
-      'Balance actual': 'Current balance',
-      'Piscina': 'Pool',
-      'Gimnasio': 'Gym',
-      'Restaurante': 'Restaurant',
-      'Parking': 'Parking',
-      'Aplicar filtros': 'Apply filters',
-      'No se encontraron hoteles con estos filtros': 'No hotels found with these filters',
-      'Limpiar filtros': 'Clear filters',
-      'Ver hotel': 'View hotel',
-      'Desde': 'From',
-      'Wifi': 'Wi-Fi',
-      'Gym': 'Gym',
-      'Resultados para': 'Results for',
-      'Resultados de tu B?squeda de Presupuesto': 'Budget search results',
-      'hotel encontrado': 'hotel found',
-      'hoteles encontrados': 'hotels found',
-      'Gestiona tus pr?ximos viajes y mira tu historial.': 'Manage your upcoming trips and view your history.',
-      'Viajes Pr?ximos': 'Upcoming trips',
-      'Viajes Pasados': 'Past trips',
-      'Viajes cancelados': 'Canceled trips',
-      'A?n no tienes viajes cancelados.': "You don't have any canceled trips yet.",
-      'Cancelar reserva': 'Cancel booking',
-      'Cancelado': 'Canceled',
-      'Reembolso procesado:': 'Refund processed:',
-      'Viajes Activos': 'Active trips',
-      'Viajes Activos / Completados': 'Active / Completed trips',
-      'Aún no tienes viajes': 'You do not have any trips yet.',
-      'Parece que tu pasaporte está pidiendo algo de acción.': 'Looks like your passport is asking for some action.',
-      'Explorar destinos': 'Explore destinations',
-      'Cancelar viaje': 'Cancel trip',
-      'Destinos Visitados': 'Visited destinations',
-      'Km Recorridos': 'Km traveled',
-      'Gestiona tus viajes, entradas y preferencias.': 'Manage your trips, tickets, and preferences.',
-      'Editar Opciones': 'Edit options',
-      'Mis Rese?as': 'My Reviews',
-      'Ver ticket': 'View ticket',
-      'Ver recibo': 'View receipt',
-      'En 1 mes': 'In 1 month',
-      'Visitado': 'Visited',
-      'Pasajero': 'Passenger',
-      'Fecha': 'Date',
-      'Puerta': 'Gate',
-      'Asiento': 'Seat',
-      'Descargar PDF': 'Download PDF',
-      'Por favor, inicia sesi?n para ver tu perfil.': 'Please sign in to view your profile.',
-      'Por favor, inicia sesi?n para ver tus viajes.': 'Please sign in to view your trips.',
-      'Por favor, inicia sesi?n para ver la configuraci?n.': 'Please sign in to view settings.',
-      'Volver a mis viajes': 'Back to my trips',
-      'Acerca del hotel': 'About the hotel',
-      'Comodidades principales': 'Main amenities',
-      'Aire acondicionado': 'Air conditioning',
-      'Desayuno incluido': 'Breakfast included',
-      'Camas King size': 'King-size beds',
-      'Galer?a': 'Gallery',
-      'Rese?as': 'Reviews',
-      'No hay rese?as todav?a.': 'There are no reviews yet.',
-      'Editar': 'Edit',
-      'Borrar': 'Delete',
-      'Deja tu rese?a': 'Leave your review',
-      'Editar Rese?a': 'Edit review',
-      '?C?mo calificar?as tu estancia': 'How would you rate your stay',
-      'Excelente': 'Excellent',
-      'Muy bueno': 'Very good',
-      'Bueno': 'Good',
-      'Regular': 'Fair',
-      'Malo': 'Poor',
-      'Cu?ntanos m?s sobre tu experiencia': 'Tell us more about your experience',
-      '?Qu? fue lo que m?s te gust?': 'What did you like the most',
-      'Cancelar': 'Cancel',
-      'Publicar rese?a': 'Publish review',
-      'Precio Total': 'Total price',
-      'Entrada': 'Check-in',
-      'Salida': 'Check-out',
-      'Hu?spedes': 'Guests',
-      'Noches': 'Nights',
-      'Transporte': 'Transport',
-      'Avi?n': 'Plane',
-      'Tren': 'Train',
-      'Barco': 'Ship',
-      'Selecciona fechas v?lidas.': 'Select valid dates.',
-      'Necesitas tener una tarjeta': 'You need to have a card',
-      'Necesitas tener una tarjeta asociada a tu cuenta para reservar.': 'You need to have a card linked to your account to book.',
-      'No tienes saldo suficiente.': "You don't have enough balance.",
-      'Selecciona una fecha de entrada y salida v?lida.': 'Select a valid check-in and check-out date.',
-      'Reserva exitosa!': 'Booking successful!',
-      'Esta es una reserva simulada. No existen cargos reales asociados a esta cuenta.': 'This is a simulated booking. There are no real charges associated with this account.',
-      'Esta es una reserva simulada. No existen cargos\n                reales\n                asociados a esta cuenta.': 'This is a simulated booking. There are no real charges associated with this account.',
-      'Hoteles similares': 'Similar hotels',
-      '/noche': '/night',
-      'Recibo no encontrado': 'Receipt not found',
-      'JMJ Viajes - Confirmaci?n de Reserva': 'JMJ Travel - Booking confirmation',
-      'C?digo de confirmaci?n': 'Confirmation code',
-      'Fecha de reserva': 'Booking date',
-      'Adultos': 'Adults',
-      'Resumen de Pago': 'Payment summary',
-      'Alojamiento': 'Accommodation',
-      'noches': 'nights',
-      'hu?spedes': 'guests',
-      'Impuestos': 'Taxes',
-      'Incluidos': 'Included',
-      'Total': 'Total',
-      'Pagado el': 'Paid on',
-      'Check-in': 'Check-in',
-      'Check-out': 'Check-out',
-      'Nombre': 'Name',
-      'Email': 'Email',
-      'Nueva Contrase?a': 'New password',
-      'Dejar en blanco para mantener actual': 'Leave blank to keep current',
-      '?Cambios guardados!': 'Changes saved!',
-      'Expira:': 'Expires:',
-      'No tienes tarjetas guardadas todav?a.': "You don't have saved cards yet.",
-      'Cambiar foto': 'Change photo',
-      'CVV': 'CVV',
-      'Valid Thru': 'Valid Thru',
-      'Tu Nombre': 'Your Name',
-      'Europa': 'Europe',
-      'Asia': 'Asia',
-      'Am?rica': 'America',
-      '?frica': 'Africa',
-      'Ocean?a': 'Oceania',
-      'Francia': 'France',
-      'Espa?a': 'Spain',
-      'Italia': 'Italy',
+      'Añadir destino': 'Add destination',
+      'Editar destino': 'Edit destination',
+      'Editar usuario': 'Edit user',
+      'Eliminar usuario': 'Delete user',
+      'Eliminar destino': 'Delete destination',
+      '¿Seguro que quieres eliminar este usuario? Esta acción no se puede deshacer.':
+        'Are you sure you want to delete this user? This action cannot be undone.',
+      '¿Seguro que quieres eliminar este destino? Si tiene reservas asociadas, puede que no se pueda borrar.':
+        'Are you sure you want to delete this destination? If it has associated bookings, it may not be possible to delete it.',
+      'Usuario eliminado': 'User deleted',
+      'El usuario se ha eliminado correctamente.': 'The user has been deleted successfully.',
+      'No se pudo eliminar el usuario': 'The user could not be deleted',
+      'Ha ocurrido un error al eliminar el usuario.': 'An error occurred while deleting the user.',
+      'Destino eliminado': 'Destination deleted',
+      'El destino se ha eliminado correctamente.': 'The destination has been deleted successfully.',
+      'No se pudo eliminar el destino': 'The destination could not be deleted',
+      'No se pudo eliminar el destino.': 'The destination could not be deleted.',
+      'No se puede borrar un destino con alojamientos asociados':
+        'A destination with associated accommodation cannot be deleted',
+      'No se puede borrar un administrador': 'An administrator cannot be deleted',
+      'Usuario actualizado': 'User updated',
+      'El usuario se ha actualizado correctamente.': 'The user has been updated successfully.',
+      'Destino actualizado': 'Destination updated',
+      'El destino se ha actualizado correctamente.':
+        'The destination has been updated successfully.',
+      'Destino creado': 'Destination created',
+      'El destino se ha creado correctamente.': 'The destination has been created successfully.',
+      'Todos los campos son obligatorios.': 'All fields are required.',
+      'El precio debe ser mayor que 0.': 'The price must be greater than 0.',
+      'No se pudo guardar el destino.': 'The destination could not be saved.',
+      'No se pudo guardar el usuario.': 'The user could not be saved.',
+      'Panel de Administración': 'Administration Panel',
+      Periodo: 'Period',
+      'Mes actual': 'Current month',
+      'Trimestre actual': 'Current quarter',
+      'Semestre actual': 'Current semester',
+      'Año actual': 'Current year',
+      Reservas: 'Bookings',
+      reservas: 'bookings',
+      Ingresos: 'Revenue',
+      'vs periodo anterior': 'vs previous period',
+      'Destino más reservado': 'Most booked destination',
+      'Gestión de usuarios': 'User management',
+      Usuario: 'User',
+      Activas: 'Active',
+      Canceladas: 'Canceled',
+      'Total gastado': 'Total spent',
+      'Sin acciones': 'No actions',
+      'Viajes de': 'Trips by',
+      'reservas totales': 'total bookings',
+      Reserva: 'Booking',
+      Estado: 'Status',
+      Importe: 'Amount',
+      Activa: 'Active',
+      Cancelada: 'Canceled',
+      USER: 'USER',
+      ADMIN: 'ADMIN',
+      user: 'user',
+      admin: 'admin',
+
+      // Extra footer legal text
+      'En ViajesJMJ respetamos la privacidad de los usuarios. Los datos introducidos en la aplicación se usan únicamente para gestionar cuentas, reservas, reseñas y métodos de pago simulados.':
+        'At ViajesJMJ we respect user privacy. Data entered in the application is used only to manage accounts, bookings, reviews, and simulated payment methods.',
+      'Este proyecto forma parte de una aplicación académica, por lo que la información mostrada tiene finalidad demostrativa.':
+        'This project is part of an academic application, so the information shown is for demonstration purposes.',
+      'ViajesJMJ permite explorar destinos, reservar alojamientos, consultar tickets y gestionar reseñas dentro de un entorno de demostración.':
+        'ViajesJMJ lets you explore destinations, book accommodation, view tickets, and manage reviews in a demonstration environment.',
+      'Las reservas, pagos, tickets y recibos generados en la aplicación pertenecen al funcionamiento del proyecto y no representan compras reales.':
+        'Bookings, payments, tickets, and receipts generated in the application belong to the project workflow and do not represent real purchases.',
+      'Para cualquier consulta sobre el proyecto ViajesJMJ, puedes contactar con el equipo de desarrollo.':
+        'For any question about the ViajesJMJ project, you can contact the development team.',
+
+      // Continents
+      Europa: 'Europe',
+      Asia: 'Asia',
+      África: 'Africa',
+      America: 'America',
+      América: 'America',
+      'América del Norte': 'North America',
+      'América del Sur': 'South America',
+      Oceanía: 'Oceania',
+      'Descubre la historia, el arte y una cultura inigualable.':
+        'Discover history, art, and an unmatched culture.',
+      'Explora maravillas ancestrales y ciudades vanguardistas.':
+        'Explore ancient wonders and cutting-edge cities.',
+      'Naturaleza salvaje y paisajes únicos en el mundo.':
+        'Wild nature and unique landscapes in the world.',
+      'Ciudades icónicas y una gran diversidad natural.':
+        'Iconic cities and great natural diversity.',
+      'Cultura vibrante, selvas y maravillas naturales.':
+        'Vibrant culture, jungles, and natural wonders.',
+      'Islas paradisíacas y aventuras increíbles.': 'Paradise islands and incredible adventures.',
+
+      // Countries
+      España: 'Spain',
+      Francia: 'France',
+      Italia: 'Italy',
       'Reino Unido': 'United Kingdom',
-      'Alemania': 'Germany',
-      'Suiza': 'Switzerland',
-      'Jap?n': 'Japan',
-      'Tailandia': 'Thailand',
-      'Emiratos ?rabes': 'United Arab Emirates',
-      'Singapur': 'Singapore',
-      'India': 'India',
+      Alemania: 'Germany',
+      Grecia: 'Greece',
+      Austria: 'Austria',
+      Japón: 'Japan',
+      China: 'China',
+      'Emiratos Árabes Unidos': 'United Arab Emirates',
+      Tailandia: 'Thailand',
+      India: 'India',
+      'Corea del Sur': 'South Korea',
+      Egipto: 'Egypt',
+      Marruecos: 'Morocco',
+      Sudáfrica: 'South Africa',
+      Kenia: 'Kenya',
+      Tanzania: 'Tanzania',
       'Estados Unidos': 'United States',
-      'Brasil': 'Brazil',
-      'Argentina': 'Argentina',
-      'M?xico': 'Mexico',
-      'Canad?': 'Canada',
-      'Marruecos': 'Morocco',
-      'Egipto': 'Egypt',
-      'Sud?frica': 'South Africa',
-      'Australia': 'Australia',
+      México: 'Mexico',
+      Canadá: 'Canada',
+      Argentina: 'Argentina',
+      Brasil: 'Brazil',
+      Colombia: 'Colombia',
+      Perú: 'Peru',
+      Chile: 'Chile',
+      Australia: 'Australia',
       'Nueva Zelanda': 'New Zealand',
-      'Par?s': 'Paris',
-      'Lyon': 'Lyon',
-      'Niza': 'Nice',
-      'Madrid': 'Madrid',
-      'Barcelona': 'Barcelona',
-      'Sevilla': 'Seville',
-      'Roma': 'Rome',
-      'Venecia': 'Venice',
-      'Mil?n': 'Milan',
-      'Londres': 'London',
-      'Edimburgo': 'Edinburgh',
-      'Berl?n': 'Berlin',
-      'M?nich': 'Munich',
-      'Z?rich': 'Zurich',
-      'Ginebra': 'Geneva',
-      'Tokio': 'Tokyo',
-      'Kioto': 'Kyoto',
-      'Osaka': 'Osaka',
-      'Bangkok': 'Bangkok',
-      'Phuket': 'Phuket',
-      'Dub?i': 'Dubai',
+      Fiyi: 'Fiji',
+      Uruguay: 'Uruguay',
+      'Polinesia Francesa': 'French Polynesia',
+      Portugal: 'Portugal',
+      'República Checa': 'Czech Republic',
+      Hungría: 'Hungary',
+      'Países Bajos': 'Netherlands',
+      Croacia: 'Croatia',
+      Dinamarca: 'Denmark',
+      Suecia: 'Sweden',
+      Islandia: 'Iceland',
+      Bélgica: 'Belgium',
+      Taiwán: 'Taiwan',
+      Taiwan: 'Taiwan',
+      Malasia: 'Malaysia',
+      Camboya: 'Cambodia',
+      Nepal: 'Nepal',
+      Catar: 'Qatar',
+      Israel: 'Israel',
+
+      // Cities
+      Madrid: 'Madrid',
+      Barcelona: 'Barcelona',
+      Sevilla: 'Seville',
+      París: 'Paris',
+      Lyon: 'Lyon',
+      Marsella: 'Marseille',
+      Niza: 'Nice',
+      Valencia: 'Valencia',
+      Roma: 'Rome',
+      Venecia: 'Venice',
+      Milán: 'Milan',
+      Milan: 'Milan',
+      Florencia: 'Florence',
+      Londres: 'London',
+      Edimburgo: 'Edinburgh',
+      Manchester: 'Manchester',
+      Oxford: 'Oxford',
+      Berlín: 'Berlin',
+      Múnich: 'Munich',
+      Atenas: 'Athens',
+      Santorini: 'Santorini',
+      Mykonos: 'Mykonos',
+      Tesalonica: 'Thessaloniki',
+      Viena: 'Vienna',
+      Salzburgo: 'Salzburg',
+      Innsbruck: 'Innsbruck',
+      Graz: 'Graz',
+      Ámsterdam: 'Amsterdam',
+      Sintra: 'Sintra',
+      Faro: 'Faro',
+      'Cesky Krumlov': 'Cesky Krumlov',
+      'Karlovy Vary': 'Karlovy Vary',
+      Brno: 'Brno',
+      Eger: 'Eger',
+      Pecs: 'Pecs',
+      Szentendre: 'Szentendre',
+      Rotterdam: 'Rotterdam',
+      'La Haya': 'The Hague',
+      Utrecht: 'Utrecht',
+      Dubrovnik: 'Dubrovnik',
+      Split: 'Split',
+      Zagreb: 'Zagreb',
+      Hvar: 'Hvar',
+      Copenhague: 'Copenhagen',
+      Aarhus: 'Aarhus',
+      Odense: 'Odense',
+      Roskilde: 'Roskilde',
+      Estocolmo: 'Stockholm',
+      Gotemburgo: 'Gothenburg',
+      Malmo: 'Malmo',
+      Uppsala: 'Uppsala',
+      Reykjavik: 'Reykjavik',
+      Akureyri: 'Akureyri',
+      Vik: 'Vik',
+      Hofn: 'Hofn',
+      Brujas: 'Bruges',
+      Bruselas: 'Brussels',
+      Gante: 'Ghent',
+      Amberes: 'Antwerp',
+      Tokio: 'Tokyo',
+      Kioto: 'Kyoto',
+      Osaka: 'Osaka',
+      Bangkok: 'Bangkok',
+      Phuket: 'Phuket',
+      Dubái: 'Dubai',
       'Abu Dhabi': 'Abu Dhabi',
       'Nueva Delhi': 'New Delhi',
-      'Mumbai': 'Mumbai',
+      Mumbai: 'Mumbai',
+      Pekín: 'Beijing',
+      Seúl: 'Seoul',
       'Nueva York': 'New York',
-      'Los ?ngeles': 'Los Angeles',
-      'Miami': 'Miami',
-      'R?o de Janeiro': 'Rio de Janeiro',
+      'Los Ángeles': 'Los Angeles',
+      Miami: 'Miami',
+      'San Francisco': 'San Francisco',
+      Chicago: 'Chicago',
+      Toronto: 'Toronto',
+      Vancouver: 'Vancouver',
+      Cancún: 'Cancun',
+      'Ciudad de México': 'Mexico City',
+      'Río de Janeiro': 'Rio de Janeiro',
       'São Paulo': 'Sao Paulo',
       'Buenos Aires': 'Buenos Aires',
-      'Ciudad de M?xico': 'Mexico City',
-      'Canc?n': 'Cancun',
-      'Toronto': 'Toronto',
-      'Vancouver': 'Vancouver',
-      'Ciudad del Cabo': 'Cape Town',
+      'Machu Picchu': 'Machu Picchu',
+      Cartagena: 'Cartagena',
+      'Santiago de Chile': 'Santiago de Chile',
+      Montevideo: 'Montevideo',
       'El Cairo': 'Cairo',
-      'Marrakech': 'Marrakech',
-      'S?dney': 'Sydney',
-      'Melbourne': 'Melbourne',
-      'Auckland': 'Auckland',
-      'Tokio, Jap?n': 'Tokyo, Japan',
-      'Par?s, Francia': 'Paris, France',
-      'Alpes Suizos': 'Swiss Alps',
-      'Maldivas': 'Maldives',
-      'Explora lo mejor de': 'Explore the best of',
-      'con nosotros.': 'with us.',
-      'Tarjeta guardada': 'Saved card',
-      'Suite Deluxe con vista': 'Deluxe suite with view',
-      'Habitaci?n Boutique': 'Boutique room',
-      'Habitaci?n est?ndar': 'Standard room',
-      'Historia, cultura y arquitectura milenaria': 'History, culture, and millenary architecture',
-      'Tradici?n ancestral y modernidad vibrante': 'Ancient tradition and vibrant modernity',
+      Marrakech: 'Marrakech',
+      Nairobi: 'Nairobi',
+      Zanzibar: 'Zanzibar',
+      Sahara: 'Sahara',
+      'Ciudad del Cabo': 'Cape Town',
+      Sídney: 'Sydney',
+      Sidney: 'Sydney',
+      Melbourne: 'Melbourne',
+      Auckland: 'Auckland',
+      'Bora Bora': 'Bora Bora',
+      Perth: 'Perth',
+
+      // Destination descriptions
+      'Historia, cultura y arquitectura milenaria': 'History, culture, and ancient architecture',
+      'Tradición ancestral y modernidad vibrante': 'Ancient tradition and vibrant modernity',
       'Naturaleza salvaje y ciudades cosmopolitas': 'Wild nature and cosmopolitan cities',
       'Safari, desiertos y culturas ancestrales': 'Safari, deserts, and ancestral cultures',
-      'Playas paradisiacas y naturaleza ?nica': 'Paradisiacal beaches and unique nature',
+      'Playas paradisiacas y naturaleza única': 'Paradise beaches and unique nature',
       'La ciudad de la luz, arte y romance': 'The city of light, art, and romance',
+      'Ciudad del amor, arte y moda': 'City of love, art, and fashion',
       'Perla de la Costa Azul': 'Pearl of the French Riviera',
-      'Capital gastron?mica de Francia': 'Gastronomic capital of France',
-      'Vibrante capital espa?ola': 'Vibrant Spanish capital',
-      'Modernismo y mediterr?neo': 'Modernism and Mediterranean spirit',
-      'Flamenco y tradici?n andaluza': 'Flamenco and Andalusian tradition',
+      'Capital gastronómica de Francia': 'Gastronomic capital of France',
+      'Capital gastronmica de Francia': 'Gastronomic capital of France',
+      'Vibrante capital española': 'Vibrant Spanish capital',
+      'Vibrante capital espaola': 'Vibrant Spanish capital',
+      'Modernismo y mediterráneo': 'Modernism and Mediterranean spirit',
+      'Modernismo y mediterrneo': 'Modernism and Mediterranean spirit',
+      'Flamenco y tradición andaluza': 'Flamenco and Andalusian tradition',
+      'Flamenco y tradicin andaluza': 'Flamenco and Andalusian tradition',
       'La ciudad eterna': 'The eternal city',
+      'Historia romana y cultura italiana': 'Roman history and Italian culture',
+      'Ciudad moderna con historia': 'Modern city with history',
+      'Cuna de la civilización griega': 'Cradle of Greek civilization',
+      'Elegancia, música y cultura imperial': 'Elegance, music, and imperial culture',
+      'Tecnología avanzada, cultura tradicional y vida urbana vibrante':
+        'Advanced technology, traditional culture, and vibrant urban life',
+      'Cultura milenaria, gastronomía y contrastes urbanos':
+        'Ancient culture, gastronomy, and urban contrasts',
+      'Tecnología, cultura moderna y tradición coreana':
+        'Technology, modern culture, and Korean tradition',
+      'Aventura en el desierto y paisajes únicos': 'Desert adventure and unique landscapes',
+      'Naturaleza, montaña y costa espectacular': 'Nature, mountains, and spectacular coast',
+      'Volcanes, naturaleza y aventura': 'Volcanoes, nature, and adventure',
+      'Destino romántico con aguas turquesas y lujo':
+        'Romantic destination with turquoise waters and luxury',
+      'Ciudad moderna con naturaleza salvaje': 'Modern city with wild nature',
+      'Historia, cultura y gastronomía mexicana': 'Mexican history, culture, and gastronomy',
+      'Ciudad moderna con multiculturalidad y rascacielos':
+        'Modern city with multicultural life and skyscrapers',
+      'Puentes icónicos, tecnología y cultura alternativa':
+        'Iconic bridges, technology, and alternative culture',
+      'Historia inca y maravilla del mundo en los Andes':
+        'Inca history and world wonder in the Andes',
+      'Ciudad costera tranquila con cultura y relax':
+        'Quiet coastal city with culture and relaxation',
       'Ciudad de canales y romance': 'City of canals and romance',
       'Capital de la moda': 'Fashion capital',
-      'Cosmopolita y hist?rica': 'Cosmopolitan and historic',
+      'Cosmopolita y histórica': 'Cosmopolitan and historic',
+      'Cosmopolita y histrica': 'Cosmopolitan and historic',
       'Castillos y leyendas escocesas': 'Castles and Scottish legends',
       'Historia y cultura vanguardista': 'History and avant-garde culture',
-      'Tradici?n b?vara': 'Bavarian tradition',
+      'Tradición bávara': 'Bavarian tradition',
+      'Tradicin bvara': 'Bavarian tradition',
       'Alpes suizos y elegancia': 'Swiss Alps and elegance',
       'Lujo y diplomacia internacional': 'Luxury and international diplomacy',
-      'Tecnolog?a y tradici?n': 'Technology and tradition',
+      'Tecnología y tradición': 'Technology and tradition',
+      'Tecnologa y tradicin': 'Technology and tradition',
       'Templos y jardines zen': 'Temples and zen gardens',
-      'Gastronom?a japonesa': 'Japanese gastronomy',
+      'Gastronomía japonesa': 'Japanese gastronomy',
+      'Gastronoma japonesa': 'Japanese gastronomy',
       'Templos dorados y mercados': 'Golden temples and markets',
-      'Playas paradisiacas': 'Paradisiacal beaches',
+      'Playas paradisiacas': 'Paradise beaches',
       'Lujo y arquitectura futurista': 'Luxury and futuristic architecture',
-      'Modernidad ?rabe': 'Arab modernity',
-      'Jard?n urbano del futuro': 'Urban garden of the future',
+      'Modernidad árabe': 'Arab modernity',
+      'Modernidad rabe': 'Arab modernity',
+      'Jardn urbano del futuro': 'Urban garden of the future',
       'Bollywood y diversidad': 'Bollywood and diversity',
-      'Historia milenaria': 'Millenary history',
+      'Historia milenaria': 'Ancient history',
       'La ciudad que nunca duerme': 'The city that never sleeps',
       'Hollywood y playas': 'Hollywood and beaches',
       'Sol, playa y vida nocturna': 'Sun, beach, and nightlife',
-      'Carnaval y playas ic?nicas': 'Carnival and iconic beaches',
-      'Metr?poli cultural': 'Cultural metropolis',
+      'Carnaval y playas icónicas': 'Carnival and iconic beaches',
+      'Carnaval y playas icnicas': 'Carnival and iconic beaches',
+      'Metrópoli cultural': 'Cultural metropolis',
+      'Metrpoli cultural': 'Cultural metropolis',
       'Tango y arquitectura europea': 'Tango and European architecture',
       'Historia azteca y modernidad': 'Aztec history and modernity',
       'Playas del Caribe mexicano': 'Mexican Caribbean beaches',
       'Multicultural y vibrante': 'Multicultural and vibrant',
       'Naturaleza y ciudad': 'Nature and city',
       'Zocos y palacios': 'Souks and palaces',
-      'Puerto mediterr?neo': 'Mediterranean port',
-      'Pir?mides y faraones': 'Pyramids and pharaohs',
-      'Monta?as y oc?ano': 'Mountains and ocean',
-      'Ópera icónica y playas': 'Iconic opera and beaches',
-      'Arte y caf?': 'Art and coffee',
+      'Pirámides y faraones': 'Pyramids and pharaohs',
+      'Pirmides y faraones': 'Pyramids and pharaohs',
+      'Montañas y océano': 'Mountains and ocean',
+      'Montaas y ocano': 'Mountains and ocean',
+      'Ópera icónica y playas': 'Iconic opera house and beaches',
+      'pera icnica y playas': 'Iconic opera house and beaches',
+      'Arte y café': 'Art and coffee',
+      'Arte y caf': 'Art and coffee',
+      'Puerto mediterrneo': 'Mediterranean port',
       'Ciudad de velas': 'City of sails',
-      'Antiguo convento convertido en hotel de lujo con vistas espectaculares de Lyon.': 'Former convent turned into a luxury hotel with spectacular views of Lyon.',
-      'Art d?co y elegancia brit?nica en Mayfair.': 'Art deco and British elegance in Mayfair.',
-      'Boutique hotel bohemio en el Lower East Side.': 'Bohemian boutique hotel in the Lower East Side.',
-      'Boutique hotel moderno en el distrito 11, perfecto para viajeros urbanos.': 'Modern boutique hotel in district 11, perfect for urban travelers.',
-      'Dise?o minimalista de Giorgio Armani en el coraz?n de Mil?n.': "Giorgio Armani's minimalist design in the heart of Milan.",
-      'El hotel m?s ic?nico del mundo en forma de vela.': 'The world\'s most iconic sail-shaped hotel.',
-      'Elegancia Beaux-Arts en la Quinta Avenida.': 'Beaux-Arts elegance on Fifth Avenue.',
+      'Ópera icónica, playas y cultura urbana australiana':
+        'Iconic opera house, beaches, and Australian urban culture',
+      'Rascacielos, cultura urbana y la ciudad que nunca duerme':
+        'Skyscrapers, urban culture, and the city that never sleeps',
+      'Ciudad colonial con playas y encanto caribeño':
+        'Colonial city with beaches and Caribbean charm',
+      'La ciudad del amor, arte, cultura y gastronomía.':
+        'The city of love, art, culture, and gastronomy.',
+      'Historia romana, cultura y gastronomía italiana.':
+        'Roman history, culture, and Italian gastronomy.',
+      'Ciudad moderna con historia, cultura y ocio.':
+        'Modern city with history, culture, and entertainment.',
+      'Cultura, gastronomía y diversidad.': 'Culture, gastronomy, and diversity.',
+      'Ciudad futurista con tecnología, cultura y tradición.':
+        'Futuristic city with technology, culture, and tradition.',
+      'Historia imperial, cultura china y monumentos icónicos.':
+        'Imperial history, Chinese culture, and iconic monuments.',
+      'Templos, mercados y vida nocturna exótica.':
+        'Temples, markets, and exotic nightlife.',
+      'Lujo, rascacielos y experiencias en el desierto.':
+        'Luxury, skyscrapers, and desert experiences.',
+      'Historia antigua, pirámides y cultura egipcia.':
+        'Ancient history, pyramids, and Egyptian culture.',
+      'Playas paradisíacas y aguas cristalinas.':
+        'Paradise beaches and crystal-clear waters.',
+      'Safari africano y naturaleza salvaje.': 'African safari and wild nature.',
+      'Mercados tradicionales, cultura marroquí y arquitectura exótica.':
+        'Traditional markets, Moroccan culture, and exotic architecture.',
+      'Playas paradisíacas y relax total.': 'Paradise beaches and total relaxation.',
+      'Arte, cultura y vida cosmopolita.': 'Art, culture, and cosmopolitan life.',
+      'Playas paradisíacas y relax en el Caribe.':
+        'Paradise beaches and Caribbean relaxation.',
+      'Arquitectura, música y ambiente urbano.':
+        'Architecture, music, and urban atmosphere.',
+      'Playas, carnaval y paisajes icónicos como el Cristo Redentor.':
+        'Beaches, carnival, and iconic landscapes such as Christ the Redeemer.',
+      'Cultura, tango y gastronomía argentina.':
+        'Culture, tango, and Argentine gastronomy.',
+      'Ciudad moderna rodeada de montañas y naturaleza.':
+        'Modern city surrounded by mountains and nature.',
+      'Islas volcánicas, playas tranquilas y cultura polinesia.':
+        'Volcanic islands, quiet beaches, and Polynesian culture.',
+      'Hollywood, playas, cultura urbana y ambiente cinematográfico.':
+        'Hollywood, beaches, urban culture, and a cinematic atmosphere.',
+      'Hoteles destacados en Madrid.': 'Featured hotels in Madrid.',
+      'Hoteles destacados en París.': 'Featured hotels in Paris.',
+      'Hoteles destacados en Londres.': 'Featured hotels in London.',
+      'Hoteles destacados en Roma.': 'Featured hotels in Rome.',
+      'Hoteles destacados en Tokio.': 'Featured hotels in Tokyo.',
+      'Hoteles destacados en Nueva York.': 'Featured hotels in New York.',
+
+      'Arquitectura modernista, playas urbanas y vida mediterranea.':
+        'Modernist architecture, urban beaches, and Mediterranean life.',
+      'Catedral, Alcazar, barrios historicos y cultura andaluza.':
+        'Cathedral, Alcazar, historic neighborhoods, and Andalusian culture.',
+      'Ciudad de las Artes, playas y gastronomia mediterranea.':
+        'City of Arts, beaches, and Mediterranean gastronomy.',
+      'Gastronomia francesa, casco historico y rios Saona y Rodano.':
+        'French gastronomy, old town, and the Saone and Rhone rivers.',
+      'Puerto mediterraneo, calanques y cultura provenzal.':
+        'Mediterranean port, calanques, and Provençal culture.',
+      'Costa Azul, paseo maritimo y ambiente mediterraneo elegante.':
+        'French Riviera, seafront promenade, and elegant Mediterranean atmosphere.',
+      'Arte renacentista, catedral historica y patrimonio italiano.':
+        'Renaissance art, historic cathedral, and Italian heritage.',
+      'Canales, gondolas, palacios y plazas iconicas.':
+        'Canals, gondolas, palaces, and iconic squares.',
+      'Moda, catedral gotica, diseño y vida urbana italiana.':
+        'Fashion, Gothic cathedral, design, and Italian urban life.',
+      'Castillo, calles medievales, cultura escocesa y festivales.':
+        'Castle, medieval streets, Scottish culture, and festivals.',
+      'Musica, futbol, patrimonio industrial y cultura urbana.':
+        'Music, football, industrial heritage, and urban culture.',
+      'Universidad historica, colegios antiguos y arquitectura inglesa.':
+        'Historic university, ancient colleges, and English architecture.',
+      'Casas blancas, caldera volcanica y atardeceres sobre el Egeo.':
+        'White houses, volcanic caldera, and sunsets over the Aegean.',
+      'Playas, molinos, casas cicladicas y vida nocturna.':
+        'Beaches, windmills, Cycladic houses, and nightlife.',
+      'Historia bizantina, paseo maritimo y cultura griega moderna.':
+        'Byzantine history, seafront promenade, and modern Greek culture.',
+      'Musica clasica, fortalezas, palacios y paisaje alpino.':
+        'Classical music, fortresses, palaces, and Alpine scenery.',
+      'Montañas alpinas, casco historico y deportes de invierno.':
+        'Alpine mountains, old town, and winter sports.',
+      'Casco historico, diseño contemporaneo y ambiente universitario.':
+        'Old town, contemporary design, and university atmosphere.',
+      'Palacios de cuento, bosques y miradores cerca de Lisboa.':
+        'Fairytale palaces, forests, and viewpoints near Lisbon.',
+      'Costa del Algarve, casco antiguo y playas del sur portugues.':
+        'Algarve coast, old town, and southern Portuguese beaches.',
+      'Castillo, calles medievales y encanto bohemio junto al rio.':
+        'Castle, medieval streets, and Bohemian charm by the river.',
+      'Balnearios, columnatas y arquitectura elegante.':
+        'Spa resorts, colonnades, and elegant architecture.',
+      'Arquitectura moderna, plazas historicas y ambiente universitario.':
+        'Modern architecture, historic squares, and university atmosphere.',
+      'Castillo, termas, vino y casco historico barroco.':
+        'Castle, thermal baths, wine, and Baroque old town.',
+      'Patrimonio romano, plazas coloridas y ambiente cultural.':
+        'Roman heritage, colorful squares, and cultural atmosphere.',
+      'Calles artisticas, museos y ribera del Danubio.':
+        'Artistic streets, museums, and the Danube riverfront.',
+      'Arquitectura moderna, puerto y skyline neerlandes.':
+        'Modern architecture, port, and Dutch skyline.',
+      'Palacios, costa, museos y centro politico neerlandes.':
+        'Palaces, coast, museums, and Dutch political center.',
+      'Canales historicos, torres y ambiente universitario.':
+        'Historic canals, towers, and university atmosphere.',
+      'Murallas historicas, mar Adriatico y casco antiguo medieval.':
+        'Historic walls, Adriatic Sea, and medieval old town.',
+      'Palacio de Diocleciano, costa dalmata y vida mediterranea.':
+        'Diocletian Palace, Dalmatian coast, and Mediterranean life.',
+      'Capital croata con plazas, museos y arquitectura centroeuropea.':
+        'Croatian capital with squares, museums, and Central European architecture.',
+      'Isla luminosa, puerto historico y playas del Adriatico.':
+        'Bright island, historic harbor, and Adriatic beaches.',
+      'Canales, diseño nordico, puerto historico y ambiente moderno.':
+        'Canals, Nordic design, historic harbor, and modern atmosphere.',
+      'Museos, barrios creativos y costa danesa.':
+        'Museums, creative neighborhoods, and Danish coast.',
+      'Ciudad de Andersen, calles historicas y ambiente familiar.':
+        'Andersen city, historic streets, and family-friendly atmosphere.',
+      'Catedral, barcos vikingos y patrimonio danes.':
+        'Cathedral, Viking ships, and Danish heritage.',
+      'Islas, casco antiguo, museos y arquitectura nordica.':
+        'Islands, old town, museums, and Nordic architecture.',
+      'Canales, costa oeste, gastronomia y ambiente marinero.':
+        'Canals, west coast, gastronomy, and maritime atmosphere.',
+      'Puente de Oresund, diseño urbano y costa escandinava.':
+        'Oresund Bridge, urban design, and Scandinavian coast.',
+      'Universidad historica, catedral y vida cultural sueca.':
+        'Historic university, cathedral, and Swedish cultural life.',
+      'Naturaleza islandesa, auroras, volcanes y aguas termales.':
+        'Icelandic nature, northern lights, volcanoes, and hot springs.',
+      'Fiordos del norte, naturaleza y ambiente islandes tranquilo.':
+        'Northern fjords, nature, and calm Icelandic atmosphere.',
+      'Playas negras, acantilados y paisajes volcanicos.':
+        'Black beaches, cliffs, and volcanic landscapes.',
+      'Glaciares, lagunas y paisajes del sureste islandes.':
+        'Glaciers, lagoons, and southeast Icelandic landscapes.',
+      'Canales, plazas medievales y arquitectura flamenca.':
+        'Canals, medieval squares, and Flemish architecture.',
+      'Grand Place, arte, instituciones europeas y gastronomia belga.':
+        'Grand Place, art, European institutions, and Belgian gastronomy.',
+      'Canales, castillo medieval y ambiente universitario.':
+        'Canals, medieval castle, and university atmosphere.',
+      'Moda, puerto, diamantes y arquitectura flamenca.':
+        'Fashion, port, diamonds, and Flemish architecture.',
+
+      // Common hotel descriptions
+      'Hotel moderno y colorido en pleno centro de Madrid.':
+        'Modern and colorful hotel in downtown Madrid.',
+      'Alojamiento cómodo y bien ubicado para disfrutar de tu viaje.':
+        'Comfortable and well-located accommodation to enjoy your trip.',
+      'Lujo histórico en el corazón de Madrid, cerca del Museo del Prado.':
+        'Historic luxury in the heart of Madrid, near the Prado Museum.',
+      'Elegancia parisina en la Avenue Montaigne, con vistas a la Torre Eiffel y alta cocina francesa.':
+        'Parisian elegance on Avenue Montaigne, with Eiffel Tower views and French haute cuisine.',
+      'Boutique hotel moderno en el distrito 11, perfecto para viajeros urbanos.':
+        'Modern boutique hotel in the 11th district, perfect for urban travelers.',
+      'Hotel moderno en el corazón de Niza, cerca de la playa y el casco antiguo.':
+        'Modern hotel in the heart of Nice, close to the beach and old town.',
       'Elegancia intemporal cerca de Via Veneto.': 'Timeless elegance near Via Veneto.',
-      'Elegancia occidental en el centro comercial de Osaka.': 'Western elegance in Osaka\'s commercial center.',
-      'Elegancia parisina en la Avenue Montaigne, con vistas a la Torre Eiffel y alta cocina francesa.': 'Parisian elegance on Avenue Montaigne, with Eiffel Tower views and French haute cuisine.',
-      'Elegancia y confort en el centro hist?rico de Lyon.': 'Elegance and comfort in the historic center of Lyon.',
-      'Hotel boutique con panader?a artesanal propia.': 'Boutique hotel with its own artisan bakery.',
-      'Hotel familiar de lujo con jard?n privado junto al lago.': 'Luxury family hotel with a private lakeside garden.',
-      'Hotel moderno en el coraz?n de Niza, cerca de la playa y el casco antiguo.': 'Modern hotel in the heart of Nice, close to the beach and old town.',
-      'Hotel moderno en Kabukicho con dise?o art?stico.': 'Modern hotel in Kabukicho with artistic design.',
-      'Hotel moderno y asequible cerca del Burj Khalifa.': 'Modern and affordable hotel near Burj Khalifa.',
-      'Hotel moderno y colorido en pleno centro de Madrid.': 'Modern and colorful hotel in downtown Madrid.',
-      'Hotel urbano moderno en el vibrante East London.': 'Modern urban hotel in vibrant East London.',
-      'Icónico hotel Belle Époque en la Promenade des Anglais con vistas al Mediterráneo.': 'Iconic Belle Époque hotel on Promenade des Anglais with Mediterranean views.',
-      'Icono hist?rico de Nueva York frente a Central Park.': 'Historic New York icon opposite Central Park.',
-      'Icono londinense en el Strand con historia centenaria.': 'London icon in the Strand with a century of history.',
-      'Lujo contempor?neo con vistas al Palacio Imperial.': 'Contemporary luxury with views of the Imperial Palace.',
-      'Lujo contempor?neo en The Rocks con vistas panor?micas.': 'Contemporary luxury in The Rocks with panoramic views.',
-      'Lujo exclusivo con jard?n privado en el centro de Mil?n.': 'Exclusive luxury with a private garden in central Milan.',
-      'Lujo hist?rico en el coraz?n de Madrid, cerca del Museo del Prado.': 'Historic luxury in the heart of Madrid, near the Prado Museum.',
-      'Palacio andalus? con patios ajardinados y azulejos tradicionales.': 'Andalusian palace with garden courtyards and traditional tiles.',
-      'Palacio del siglo XIX restaurado con elegancia contempor?nea.': '19th-century palace restored with contemporary elegance.',
-      'Palacio del siglo XV en el Gran Canal con vistas excepcionales.': '15th-century palace on the Grand Canal with exceptional views.',
-      'Palacio g?tico con vistas a la laguna veneciana.': 'Gothic palace overlooking the Venetian lagoon.',
-      'Rascacielos ic?nico frente al mar con arte contempor?neo.': 'Iconic seafront skyscraper with contemporary art.',
-      'Refugio tradicional en Arashiyama con onsen privado.': 'Traditional retreat in Arashiyama with private onsen.',
-      'Resort tem?tico con parque acu?tico y acuario.': 'Themed resort with water park and aquarium.',
-      'Sofisticaci?n en Paseo de Gracia, con vistas a Gaud?.': 'Sophistication on Passeig de Gracia, with views of Gaudi.',
-      'Un hotel palacio que combina la opulencia del siglo XVIII con el confort moderno, ofreciendo vistas inigualables a los Jardines de las Tuller?as y la Torre Eiffel.': 'A palace hotel blending 18th-century opulence with modern comfort, offering unmatched views of the Tuileries Gardens and the Eiffel Tower.',
-      'Un resort de lujo hist?rico que ofrece impresionantes vistas de Z?rich, el lago y los Alpes, con una impresionante colecci?n de arte.': 'A historic luxury resort with stunning views of Zurich, the lake, and the Alps, plus an impressive art collection.',
-      'Un santuario urbano en lo alto de la torre Otemachi Tower, ofreciendo un dise?o minimalista inspirado en las casas japonesas tradicionales.': 'An urban sanctuary high in Otemachi Tower, offering minimalist design inspired by traditional Japanese homes.',
-      'Vistas directas a la Catedral desde la terraza.': 'Direct Cathedral views from the terrace.',
-      'Vistas incomparables de la Ópera y el Harbour Bridge.': 'Unmatched views of the Opera House and Harbour Bridge.',
-      'Vistas panor?micas de Roma desde el Pincio.': 'Panoramic views of Rome from the Pincio.',
+      'Palacio del siglo XV en el Gran Canal con vistas excepcionales.':
+        '15th-century palace on the Grand Canal with exceptional views.',
+      'Diseño minimalista de Giorgio Armani en el corazón de Milán.':
+        "Giorgio Armani's minimalist design in the heart of Milan.",
+      'Art déco y elegancia británica en Mayfair.': 'Art Deco and British elegance in Mayfair.',
+      'Hotel urbano moderno en el vibrante East London.':
+        'Modern urban hotel in vibrant East London.',
+      'Lujo contemporáneo con vistas al Palacio Imperial.':
+        'Contemporary luxury with views of the Imperial Palace.',
+      'Hotel moderno en Kabukicho con diseño artístico.':
+        'Modern hotel in Kabukicho with artistic design.',
+      'El hotel más icónico del mundo en forma de vela.':
+        'The most iconic sail-shaped hotel in the world.',
+      'Hotel moderno y asequible cerca del Burj Khalifa.':
+        'Modern and affordable hotel near the Burj Khalifa.',
+      'Elegancia Beaux-Arts en la Quinta Avenida.': 'Beaux-Arts elegance on Fifth Avenue.',
+      'Boutique hotel bohemio en el Lower East Side.':
+        'Bohemian boutique hotel in the Lower East Side.',
+      'Lujo contemporáneo en The Rocks con vistas panorámicas.':
+        'Contemporary luxury in The Rocks with panoramic views.',
+      'Vistas incomparables de la Ópera y el Harbour Bridge.':
+        'Unmatched views of the Opera House and Harbour Bridge.',
+      'Iconico hotel Belle époque en la Promenade des Anglais con vistas al Mediterráneo.':
+        'Iconic Belle Epoque hotel on the Promenade des Anglais with Mediterranean views.',
+      'Antiguo convento convertido en hotel de lujo con vistas espectaculares de Lyon.':
+        'Former convent turned luxury hotel with spectacular views of Lyon.',
+      'Elegancia y confort en el centro histórico de Lyon.':
+        'Elegance and comfort in the historic center of Lyon.',
+      'Palacio del siglo XIX restaurado con elegancia contemporánea.':
+        '19th-century palace restored with contemporary elegance.',
+      'Sofisticación en Paseo de Gracia, con vistas a Gaudí.':
+        'Sophistication on Passeig de Gracia, with Gaudi views.',
+      'Rascacielos icónico frente al mar con arte contemporáneo.':
+        'Iconic seaside skyscraper with contemporary art.',
+      'Hotel boutique con panadería artesanal propia.':
+        'Boutique hotel with its own artisan bakery.',
+      'Palacio andalusí con patios ajardinados y azulejos tradicionales.':
+        'Andalusian palace with garden courtyards and traditional tiles.',
+      'Vistas directas a la Catedral desde la terraza.':
+        'Direct cathedral views from the terrace.',
+      'Vistas panorámicas de Roma desde el Pincio.':
+        'Panoramic views of Rome from the Pincio.',
+      'Palacio gótico con vistas a la laguna veneciana.':
+        'Gothic palace with views of the Venetian lagoon.',
+      'Lujo exclusivo con jardín privado en el centro de Milán.':
+        'Exclusive luxury with a private garden in central Milan.',
+      'Icono londinense en el Strand con historia centenaria.':
+        'London icon on the Strand with a century-old history.',
+      'A orillas del río Kamogawa, fusionando tradición y lujo moderno.':
+        'On the banks of the Kamogawa River, blending tradition and modern luxury.',
+      'Refugio tradicional en Arashiyama con onsen privado.':
+        'Traditional retreat in Arashiyama with private onsen.',
+      'Elegancia occidental en el centro comercial de Osaka.':
+        'Western elegance in Osaka shopping district.',
+      'Hotel familiar de lujo con jardín privado junto al lago.':
+        'Luxury family hotel with a private garden by the lake.',
+      'Resort temático con parque acuático y acuario.':
+        'Themed resort with a water park and aquarium.',
+      'Icono histórico de Nueva York frente a Central Park.':
+        'Historic New York icon facing Central Park.',
     },
   };
 
-
-  private readonly mojibakeReplacements: Array<[string, string]> = [
-    [String.fromCharCode(0xc3, 0xa1), '?'],
-    [String.fromCharCode(0xc3, 0xa9), '?'],
-    [String.fromCharCode(0xc3, 0xad), '?'],
-    [String.fromCharCode(0xc3, 0xb3), '?'],
-    [String.fromCharCode(0xc3, 0xba), '?'],
-    [String.fromCharCode(0xc3, 0x81), '?'],
-    [String.fromCharCode(0xc3, 0x89), '?'],
-    [String.fromCharCode(0xc3, 0x8d), '?'],
-    [String.fromCharCode(0xc3, 0x93), '?'],
-    [String.fromCharCode(0xc3, 0x9a), '?'],
-    [String.fromCharCode(0xc3, 0xb1), '?'],
-    [String.fromCharCode(0xc3, 0x91), '?'],
-    [String.fromCharCode(0xc3, 0xbc), '?'],
-    [String.fromCharCode(0xc3, 0x9c), '?'],
-    [String.fromCharCode(0xc2, 0xbf), '?'],
-    [String.fromCharCode(0xc2, 0xa1), '?'],
-    [String.fromCharCode(0xc2, 0xb7), '?'],
-    [String.fromCharCode(0xe2, 0x82, 0xac), '?'],
-    [String.fromCharCode(0xe2, 0x86, 0x92), '?'],
-    [String.fromCharCode(0xe2, 0x80, 0x99), "'"],
-  ];
-
-  private normalizeMojibake(value: string): string {
-    let normalized = value;
-    for (const [source, target] of this.mojibakeReplacements) {
-      normalized = normalized.replaceAll(source, target);
-    }
-    return normalized;
+  constructor() {
+    const savedLang = this.getSavedLanguage();
+    this.currentLang.set(savedLang);
+    this.applyDocumentLanguage(savedLang);
   }
 
   translate(key: string | null | undefined): string {
     if (!key) return '';
 
     const lang = this.currentLang();
-    const trimmedKey = key.trim();
-    const normalizedKey = this.normalizeMojibake(trimmedKey);
     const dictionary = this.dictionary[lang] ?? {};
-    const translated =
-      dictionary[trimmedKey] ??
-      dictionary[normalizedKey] ??
-      Object.entries(dictionary).find(([entryKey]) => this.normalizeMojibake(entryKey) === normalizedKey)?.[1];
-    return translated ?? normalizedKey;
+
+    const cleanKey = this.normalizeText(key);
+    const directTranslation = dictionary[cleanKey];
+
+    if (directTranslation) {
+      return directTranslation;
+    }
+
+    const comparableKey = this.toComparableKey(cleanKey);
+    const foundEntry = Object.entries(dictionary).find(
+      ([entryKey]) => this.toComparableKey(entryKey) === comparableKey,
+    );
+
+    if (foundEntry?.[1]) {
+      return foundEntry[1];
+    }
+
+    const dynamicTranslation = this.translateDynamicText(cleanKey);
+
+    if (dynamicTranslation) {
+      return dynamicTranslation;
+    }
+
+    if (cleanKey.includes(',')) {
+      return cleanKey
+        .split(',')
+        .map((part) => this.translate(part.trim()))
+        .join(', ');
+    }
+
+    return cleanKey;
   }
 
   setLanguage(lang: Language) {
     this.currentLang.set(lang);
+    this.saveLanguage(lang);
     this.applyDocumentLanguage(lang);
   }
 
-  constructor() {
-    this.applyDocumentLanguage(this.currentLang());
+  private getSavedLanguage(): Language {
+    if (typeof localStorage === 'undefined') {
+      return 'es';
+    }
+
+    const savedLang = localStorage.getItem(this.storageKey);
+
+    return savedLang === 'en' || savedLang === 'es' ? savedLang : 'es';
+  }
+
+  private saveLanguage(lang: Language): void {
+    if (typeof localStorage === 'undefined') {
+      return;
+    }
+
+    localStorage.setItem(this.storageKey, lang);
   }
 
   private applyDocumentLanguage(lang: Language): void {
-    if (typeof document === 'undefined') return;
-    document.documentElement.lang = lang === 'en' ? 'en' : 'es';
+    if (typeof document === 'undefined') {
+      return;
+    }
+
+    document.documentElement.lang = lang;
+  }
+
+  private normalizeText(value: string): string {
+    return this.fixMojibake(value).replace(/\s+/g, ' ').trim();
+  }
+
+  private toComparableKey(value: string): string {
+    return this.normalizeText(value)
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[¿?¡!.,:;'"’`´()[\]{}_/\\|-]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  private fixMojibake(value: string): string {
+    return value
+      .replaceAll('Ã¡', 'á')
+      .replaceAll('Ã©', 'é')
+      .replaceAll('Ã­', 'í')
+      .replaceAll('Ã³', 'ó')
+      .replaceAll('Ãº', 'ú')
+      .replaceAll('ÃÁ', 'Á')
+      .replaceAll('Ã‰', 'É')
+      .replaceAll('Ã�', 'Í')
+      .replaceAll('Ã“', 'Ó')
+      .replaceAll('Ãš', 'Ú')
+      .replaceAll('Ã±', 'ñ')
+      .replaceAll('Ã‘', 'Ñ')
+      .replaceAll('Ã¼', 'ü')
+      .replaceAll('Ãœ', 'Ü')
+      .replaceAll('Â¿', '¿')
+      .replaceAll('Â¡', '¡')
+      .replaceAll('â‚¬', '€')
+      .replaceAll('â†’', '→')
+      .replaceAll('â€™', '’')
+      .replaceAll('â€œ', '“')
+      .replaceAll('â€', '”');
+  }
+
+  private translateDynamicText(value: string): string | null {
+    if (this.currentLang() !== 'en') {
+      return null;
+    }
+
+    const featuredHotels = value.match(/^Hoteles destacados en (.+)\.$/i);
+    if (featuredHotels) {
+      return `Featured hotels in ${this.translate(featuredHotels[1])}.`;
+    }
+
+    const featuredDestinations = value.match(/^Destinos destacados en (.+)\.$/i);
+    if (featuredDestinations) {
+      return `Featured destinations in ${this.translate(featuredDestinations[1])}.`;
+    }
+
+    const accommodationIn = value.match(/^Alojamiento cómodo y bien ubicado en (.+)\.$/i);
+    if (accommodationIn) {
+      return `Comfortable and well-located accommodation in ${this.translate(accommodationIn[1])}.`;
+    }
+
+    return null;
   }
 }

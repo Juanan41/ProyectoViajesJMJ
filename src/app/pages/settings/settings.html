@@ -41,8 +41,9 @@
           </div>
           <div>
             <p class="text-white font-bold tracking-widest text-sm">•••• {{ card.numeroTarjeta | slice:-4 }}</p>
-            <p class="text-xs text-gray-500 uppercase font-medium mt-1">{{ card.titular }} • Exp: {{
-              card.fechaExpiracion }}</p>
+            <p class="text-xs text-gray-500 uppercase font-medium mt-1">
+              {{ card.titular }} • Exp: {{ card.fechaExpiracion }}
+            </p>
           </div>
         </div>
         <button (click)="removeCard()" [disabled]="isDeleting()"
@@ -55,3 +56,61 @@
     }
   </div>
 </div>
+
+@if (showDeleteCardConfirm()) {
+<div class="fixed inset-0 z-50 flex items-center justify-center px-4">
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="cancelRemoveCard()"></div>
+
+  <div class="relative w-full max-w-md bg-[rgb(33,36,37)] border border-red-500/20 rounded-3xl shadow-2xl p-8">
+    <div class="w-14 h-14 bg-red-500/10 rounded-2xl flex items-center justify-center mb-5">
+      <lucide-icon [name]="TrashIcon" class="w-7 h-7 text-red-500"></lucide-icon>
+    </div>
+
+    <h2 class="text-2xl font-black text-white mb-3">{{ 'Eliminar tarjeta' | translate }}</h2>
+    <p class="text-gray-400 leading-relaxed mb-8">
+      {{ 'Si eliminas tu tarjeta, tu saldo pasará automáticamente a 0. Esta acción no se puede deshacer.' | translate }}
+    </p>
+
+    <div class="flex flex-col sm:flex-row gap-3">
+      <button type="button" (click)="cancelRemoveCard()" [disabled]="isDeleting()"
+        class="flex-1 bg-white/5 hover:bg-white/10 text-white font-bold py-3 rounded-xl transition-colors disabled:opacity-50">
+        {{ 'Cancelar' | translate }}
+      </button>
+
+      <button type="button" (click)="confirmRemoveCard()" [disabled]="isDeleting()"
+        class="flex-1 bg-red-500 hover:bg-red-400 text-white font-black py-3 rounded-xl transition-colors disabled:opacity-50">
+        @if (isDeleting()) {
+        {{ 'Eliminando...' | translate }}
+        } @else {
+        {{ 'Eliminar' | translate }}
+        }
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+@if (notice()) {
+<div class="fixed inset-0 z-50 flex items-center justify-center px-4">
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="closeNotice()"></div>
+
+  <div class="relative w-full max-w-md bg-[rgb(33,36,37)] border border-white/10 rounded-3xl shadow-2xl p-8">
+    <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-5"
+      [class.bg-emerald-500/10]="notice()?.type === 'success'" [class.bg-red-500/10]="notice()?.type === 'error'">
+      @if (notice()?.type === 'success') {
+      <lucide-icon [name]="CreditCardIcon" class="w-7 h-7 text-emerald-500"></lucide-icon>
+      } @else {
+      <lucide-icon [name]="TrashIcon" class="w-7 h-7 text-red-500"></lucide-icon>
+      }
+    </div>
+
+    <h2 class="text-2xl font-black text-white mb-3">{{ notice()?.title | translate }}</h2>
+    <p class="text-gray-400 leading-relaxed mb-8">{{ notice()?.message | translate }}</p>
+
+    <button type="button" (click)="closeNotice()"
+      class="w-full bg-emerald-500 hover:bg-emerald-400 text-[rgb(23,25,25)] font-black py-3 rounded-xl transition-colors">
+      {{ 'Entendido' | translate }}
+    </button>
+  </div>
+</div>
+}

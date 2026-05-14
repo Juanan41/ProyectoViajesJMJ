@@ -35,6 +35,8 @@ export class Navbar {
   isDialogOpen = false;
   amount = '';
   isUserMenuOpen = false;
+  balanceNotice = '';
+  private noticeTimeout: ReturnType<typeof setTimeout> | null = null;
 
   readonly UserIcon = User;
   readonly LogOutIcon = LogOut;
@@ -82,6 +84,7 @@ export class Navbar {
     const val = parseFloat(this.amount);
     if (val > 0) {
       this.auth.updateCredits(val);
+      this.showBalanceNotice('Saldo ingresado correctamente');
       this.amount = '';
       this.isDialogOpen = false;
     }
@@ -91,8 +94,22 @@ export class Navbar {
     const val = parseFloat(this.amount);
     if (val > 0 && val <= (this.auth.user()?.saldo || 0)) {
       this.auth.updateCredits(-val);
+      this.showBalanceNotice('Saldo retirado correctamente');
       this.amount = '';
       this.isDialogOpen = false;
     }
+  }
+
+  private showBalanceNotice(message: string): void {
+    this.balanceNotice = message;
+
+    if (this.noticeTimeout) {
+      clearTimeout(this.noticeTimeout);
+    }
+
+    this.noticeTimeout = setTimeout(() => {
+      this.balanceNotice = '';
+      this.noticeTimeout = null;
+    }, 3000);
   }
 }

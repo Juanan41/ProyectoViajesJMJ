@@ -3,9 +3,14 @@
     <div class="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center">
       <lucide-icon [name]="PlaneIcon" class="w-6 h-6 text-emerald-500"></lucide-icon>
     </div>
+
     <div>
-      <h1 class="text-3xl font-black text-white tracking-tighter uppercase">{{ 'Mis Viajes' | translate }}</h1>
-      <p class="text-gray-400 text-sm font-medium">{{ 'Gestiona tu historial de reservas y billetes' | translate }}</p>
+      <h1 class="text-3xl font-black text-white tracking-tighter uppercase">
+        {{ 'Mis Viajes' | translate }}
+      </h1>
+      <p class="text-gray-400 text-sm font-medium">
+        {{ 'Gestiona tu historial de reservas y billetes' | translate }}
+      </p>
     </div>
   </div>
 
@@ -13,11 +18,18 @@
   <div class="flex-1 flex items-center justify-center py-20">
     <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
   </div>
-  } @else if (trips().length === 0 && reviews().length === 0) {
+  } @else if (trips().length === 0) {
   <div class="bg-[rgb(23,25,25)] p-12 rounded-3xl border border-white/5 text-center shadow-xl">
     <lucide-icon [name]="HistoryIcon" class="w-16 h-16 mx-auto mb-4 text-gray-600"></lucide-icon>
-    <h2 class="text-2xl font-bold text-white mb-2">{{ 'Aún no tienes viajes' | translate }}</h2>
-    <p class="text-gray-400 mb-6">{{ 'Parece que tu pasaporte está pidiendo algo de acción.' | translate }}</p>
+
+    <h2 class="text-2xl font-bold text-white mb-2">
+      {{ 'Aún no tienes viajes' | translate }}
+    </h2>
+
+    <p class="text-gray-400 mb-6">
+      {{ 'Parece que tu pasaporte está pidiendo algo de acción.' | translate }}
+    </p>
+
     <a routerLink="/continents"
       class="inline-flex items-center gap-2 bg-emerald-500 text-[rgb(23,25,25)] font-bold px-6 py-3 rounded-xl hover:bg-emerald-400 transition-colors uppercase tracking-widest text-sm">
       {{ 'Explorar destinos' | translate }}
@@ -25,32 +37,44 @@
     </a>
   </div>
   } @else {
+
   @if (activeTrips().length > 0) {
   <div class="mb-4">
-    <h2 class="text-2xl font-bold text-white">{{ 'Viajes Activos / Completados' | translate }}</h2>
+    <h2 class="text-2xl font-bold text-white">
+      {{ 'Viajes Próximos' | translate }}
+    </h2>
   </div>
+
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
     @for (trip of activeTrips(); track trip.id) {
     <div
       class="bg-[rgb(23,25,25)] rounded-2xl overflow-hidden border border-white/5 group hover:border-emerald-500/30 transition-colors relative flex flex-col">
 
-      <div class="aspect-video relative overflow-hidden">
+      <a [routerLink]="getHotelRoute(trip)" class="aspect-video relative overflow-hidden block">
         <img [src]="trip.imagenUrl || 'assets/placeholder.jpg'" [alt]="trip.destinoNombre"
           class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+
         <div class="absolute inset-0 bg-gradient-to-t from-[rgb(23,25,25)] to-transparent"></div>
+
         <div
           class="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest border backdrop-blur-md"
           [ngClass]="getStatusClass(trip.estado)">
           {{ trip.estado | translate }}
         </div>
-      </div>
+      </a>
 
       <div class="p-6 flex-1 flex flex-col">
         <div class="mb-4">
-          <h3 class="text-xl font-bold text-white mb-1">{{ trip.destinoNombre }}</h3>
+          <a [routerLink]="getHotelRoute(trip)"
+            class="block text-xl font-bold text-white mb-1 hover:text-emerald-400 transition-colors">
+            {{ trip.destinoNombre | translate }}
+          </a>
+
           <div class="flex items-center gap-2 text-gray-400 text-sm">
             <lucide-icon [name]="MapPinIcon" class="w-4 h-4"></lucide-icon>
-            <span>{{ trip.alojamientoNombre }}</span>
+            <a [routerLink]="getHotelRoute(trip)" class="hover:text-white hover:underline transition-colors">
+              {{ trip.alojamientoNombre | translate }}
+            </a>
           </div>
         </div>
 
@@ -62,6 +86,7 @@
             </div>
             <span class="font-bold text-white">{{ trip.checkIn | date:'dd/MM/yyyy' }}</span>
           </div>
+
           <div class="flex items-center justify-between text-sm">
             <div class="flex items-center gap-2 text-gray-300">
               <lucide-icon [name]="CalendarIcon" class="w-4 h-4 text-emerald-500"></lucide-icon>
@@ -72,17 +97,85 @@
         </div>
 
         <div class="mt-auto flex items-center gap-3">
-          <a [routerLink]="['/receipt', trip.id]"
+          <button (click)="openTicket(trip)"
             class="flex-1 bg-white/5 text-white font-bold text-sm py-3 rounded-xl border border-white/10 hover:border-emerald-500/50 hover:text-emerald-500 transition-colors text-center uppercase tracking-widest">
-            {{ 'Ver Recibo' | translate }}
-          </a>
-          @if (trip.estado !== 'CANCELADA') {
-          <button (click)="cancelTrip(trip.id)"
+            {{ 'Ver Ticket' | translate }}
+          </button>
+
+          <button (click)="askCancelTrip(trip)"
             class="w-12 h-12 flex items-center justify-center bg-red-500/10 text-red-500 rounded-xl border border-red-500/20 hover:bg-red-500 hover:text-white transition-colors cursor-pointer"
             [title]="'Cancelar viaje' | translate">
             <lucide-icon [name]="TrashIcon" class="w-5 h-5"></lucide-icon>
           </button>
-          }
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+  }
+
+  @if (completedTrips().length > 0) {
+  <div class="mb-4">
+    <h2 class="text-2xl font-bold text-white">
+      {{ 'Viajes Completados' | translate }}
+    </h2>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+    @for (trip of completedTrips(); track trip.id) {
+    <div
+      class="bg-[rgb(23,25,25)] rounded-2xl overflow-hidden border border-white/5 group hover:border-emerald-500/30 transition-colors relative flex flex-col opacity-90">
+
+      <a [routerLink]="getHotelRoute(trip)" class="aspect-video relative overflow-hidden block">
+        <img [src]="trip.imagenUrl || 'assets/placeholder.jpg'" [alt]="trip.destinoNombre"
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+
+        <div class="absolute inset-0 bg-gradient-to-t from-[rgb(23,25,25)] to-transparent"></div>
+
+        <div
+          class="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest border bg-emerald-500/10 text-emerald-500 border-emerald-500/20 backdrop-blur-md">
+          {{ 'Completado' | translate }}
+        </div>
+      </a>
+
+      <div class="p-6 flex-1 flex flex-col">
+        <div class="mb-4">
+          <a [routerLink]="getHotelRoute(trip)"
+            class="block text-xl font-bold text-white mb-1 hover:text-emerald-400 transition-colors">
+            {{ trip.destinoNombre | translate }}
+          </a>
+
+          <div class="flex items-center gap-2 text-gray-400 text-sm">
+            <lucide-icon [name]="MapPinIcon" class="w-4 h-4"></lucide-icon>
+            <a [routerLink]="getHotelRoute(trip)" class="hover:text-white hover:underline transition-colors">
+              {{ trip.alojamientoNombre | translate }}
+            </a>
+          </div>
+        </div>
+
+        <div class="bg-white/5 p-4 rounded-xl mb-6 space-y-3">
+          <div class="flex items-center justify-between text-sm">
+            <div class="flex items-center gap-2 text-gray-300">
+              <lucide-icon [name]="CalendarIcon" class="w-4 h-4 text-emerald-500"></lucide-icon>
+              <span>{{ 'Check-in' | translate }}</span>
+            </div>
+            <span class="font-bold text-white">{{ trip.checkIn | date:'dd/MM/yyyy' }}</span>
+          </div>
+
+          <div class="flex items-center justify-between text-sm">
+            <div class="flex items-center gap-2 text-gray-300">
+              <lucide-icon [name]="CalendarIcon" class="w-4 h-4 text-emerald-500"></lucide-icon>
+              <span>{{ 'Check-out' | translate }}</span>
+            </div>
+            <span class="font-bold text-white">{{ trip.checkOut | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+
+        <div class="mt-auto flex items-center gap-3">
+          <button (click)="openTicket(trip)"
+            class="flex-1 bg-white/5 text-white font-bold text-sm py-3 rounded-xl border border-white/10 hover:border-emerald-500/50 hover:text-emerald-500 transition-colors text-center uppercase tracking-widest">
+            {{ 'Ver Ticket' | translate }}
+          </button>
         </div>
       </div>
     </div>
@@ -92,30 +185,42 @@
 
   @if (canceledTrips().length > 0) {
   <div class="mb-4">
-    <h2 class="text-2xl font-bold text-white opacity-70">{{ 'Viajes Cancelados' | translate }}</h2>
+    <h2 class="text-2xl font-bold text-white opacity-70">
+      {{ 'Viajes Cancelados' | translate }}
+    </h2>
   </div>
+
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 opacity-75">
     @for (trip of canceledTrips(); track trip.id) {
     <div
       class="bg-[rgb(23,25,25)] rounded-2xl overflow-hidden border border-white/5 group transition-colors relative flex flex-col grayscale hover:grayscale-0">
 
-      <div class="aspect-video relative overflow-hidden">
+      <a [routerLink]="getHotelRoute(trip)" class="aspect-video relative overflow-hidden block">
         <img [src]="trip.imagenUrl || 'assets/placeholder.jpg'" [alt]="trip.destinoNombre"
           class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+
         <div class="absolute inset-0 bg-gradient-to-t from-[rgb(23,25,25)] to-transparent"></div>
+
         <div
           class="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest border backdrop-blur-md"
           [ngClass]="getStatusClass(trip.estado)">
           {{ trip.estado | translate }}
         </div>
-      </div>
+      </a>
 
       <div class="p-6 flex-1 flex flex-col">
         <div class="mb-4">
-          <h3 class="text-xl font-bold text-white mb-1 line-through">{{ trip.destinoNombre }}</h3>
+          <a [routerLink]="getHotelRoute(trip)"
+            class="block text-xl font-bold text-white mb-1 line-through hover:text-emerald-400 transition-colors">
+            {{ trip.destinoNombre | translate }}
+          </a>
+
           <div class="flex items-center gap-2 text-gray-400 text-sm">
             <lucide-icon [name]="MapPinIcon" class="w-4 h-4"></lucide-icon>
-            <span class="line-through">{{ trip.alojamientoNombre }}</span>
+            <a [routerLink]="getHotelRoute(trip)"
+              class="line-through hover:text-white hover:underline transition-colors">
+              {{ trip.alojamientoNombre | translate }}
+            </a>
           </div>
         </div>
 
@@ -127,6 +232,7 @@
             </div>
             <span class="font-bold text-gray-400">{{ trip.checkIn | date:'dd/MM/yyyy' }}</span>
           </div>
+
           <div class="flex items-center justify-between text-sm">
             <div class="flex items-center gap-2 text-gray-300">
               <lucide-icon [name]="CalendarIcon" class="w-4 h-4 text-gray-500"></lucide-icon>
@@ -137,47 +243,186 @@
         </div>
 
         <div class="mt-auto flex items-center gap-3">
-          <a [routerLink]="['/receipt', trip.id]"
+          <button (click)="openTicket(trip)"
             class="flex-1 bg-white/5 text-gray-300 font-bold text-sm py-3 rounded-xl border border-white/10 hover:border-white/30 hover:text-white transition-colors text-center uppercase tracking-widest">
-            {{ 'Ver Recibo' | translate }}
-          </a>
+            {{ 'Ver Ticket' | translate }}
+          </button>
         </div>
       </div>
     </div>
     }
   </div>
   }
+  }
 
-  <div class="mt-12">
-    <div class="mb-4">
-      <h2 class="text-2xl font-bold text-white">{{ 'Mis Reseñas' | translate }}</h2>
-    </div>
+  @if (selectedTicket()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center px-4">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="closeTicket()"></div>
 
-    @if (reviews().length === 0) {
-    <div class="bg-[rgb(23,25,25)] p-8 rounded-2xl border border-white/5 text-center">
-      <p class="text-gray-400">{{ 'Aún no has escrito ninguna reseña.' | translate }}</p>
-    </div>
-    } @else {
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      @for (review of reviews(); track review.id) {
-      <div class="bg-[rgb(23,25,25)] rounded-2xl border border-white/5 p-6">
-        <div class="flex items-start justify-between gap-4 mb-4">
+    <div class="relative bg-white text-black w-full max-w-sm rounded-[2rem] overflow-hidden shadow-2xl">
+      <button (click)="closeTicket()"
+        class="absolute top-4 right-4 bg-black/10 hover:bg-black/20 p-2 rounded-full transition-colors z-10">
+        <lucide-icon [name]="XIcon" class="w-5 h-5 text-black"></lucide-icon>
+      </button>
+
+      <div class="h-32 bg-gray-100 relative">
+        <img loading="lazy" [src]="selectedTicket()?.imagenUrl || 'assets/placeholder.jpg'" [alt]="'Destino' | translate"
+          class="w-full h-full object-cover opacity-80" />
+
+        <div class="absolute inset-0 bg-gradient-to-t from-white to-transparent"></div>
+
+        <div class="absolute bottom-4 left-6">
+          <p class="text-xs uppercase tracking-widest font-bold text-gray-500 mb-1">
+            {{ 'Boarding Pass' | translate }}
+          </p>
+
+          <h2 class="text-2xl font-black leading-none">
+            {{ selectedTicket()?.destinoNombre | translate }}
+          </h2>
+        </div>
+      </div>
+
+      <div class="px-6 py-6 border-b-2 border-dashed border-gray-300 relative">
+        <div class="absolute -left-3 -bottom-3 w-6 h-6 bg-black rounded-full"></div>
+        <div class="absolute -right-3 -bottom-3 w-6 h-6 bg-black rounded-full"></div>
+
+        <div class="flex justify-between items-center mb-6">
           <div>
-            <h3 class="text-lg font-bold text-white">{{ review.alojamientoNombre || 'Hotel' }}</h3>
-            <p class="text-sm text-gray-400">{{ review.destinoNombre || 'Destino' }}</p>
+            <p class="text-xs text-gray-500 font-medium mb-1">
+              {{ 'Pasajero' | translate }}
+            </p>
+            <p class="font-bold uppercase">{{ userName }}</p>
           </div>
-          <div class="flex items-center gap-1 text-yellow-500">
-            @for (_ of getArray(review.puntuacion || 0); track $index) {
-            <lucide-icon [name]="StarIcon" class="w-4 h-4 fill-yellow-500"></lucide-icon>
-            }
+
+          <div class="text-right">
+            <p class="text-xs text-gray-500 font-medium mb-1">
+              {{ 'Fecha' | translate }}
+            </p>
+            <p class="font-bold">{{ formatTicketDate(selectedTicket()?.checkIn) }}</p>
           </div>
         </div>
-        <p class="text-gray-300 mb-4">{{ review.comentario }}</p>
-        <p class="text-xs text-gray-500 font-mono">{{ review.fechaOpinion | date:'dd/MM/yyyy' }}</p>
+
+        <div class="bg-gray-100 rounded-xl p-4 flex flex-col gap-4">
+          <div class="flex items-center gap-3">
+            <div class="bg-black text-white p-2 rounded-lg">
+              <lucide-icon [name]="getTransportIcon(selectedTicket()?.transporteTipo)" class="w-5 h-5"></lucide-icon>
+            </div>
+
+            <div class="flex-1">
+              <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">
+                {{ getTicketData(selectedTicket()).tipoTransporte | translate }}
+              </p>
+
+              <p class="font-black text-base leading-tight">
+                {{ getTicketData(selectedTicket()).identificadorTransporte }}
+              </p>
+
+              <p class="text-xs text-gray-500 mt-1">
+                {{ getTicketData(selectedTicket()).nombreTransporte | translate }}
+              </p>
+            </div>
+
+            <div class="text-right">
+              <p class="text-xs text-gray-500 font-medium">
+                {{ 'Hora' | translate }}
+              </p>
+              <p class="font-bold">
+                {{ getTicketData(selectedTicket()).hora }}
+              </p>
+            </div>
+          </div>
+
+          <div class="flex justify-between border-t border-gray-200 pt-4 mt-2">
+            <div>
+              <p class="text-xs text-gray-500 font-medium mb-1">
+                {{ 'Puerta' | translate }}
+              </p>
+              <p class="font-bold text-xl">{{ getTicketData(selectedTicket()).puerta }}</p>
+            </div>
+
+            <div>
+              <p class="text-xs text-gray-500 font-medium mb-1">
+                {{ 'Asiento' | translate }}
+              </p>
+              <p class="font-bold text-xl">{{ getTicketData(selectedTicket()).asiento }}</p>
+            </div>
+          </div>
+        </div>
       </div>
-      }
+
+      <div class="bg-gray-50 px-6 py-6 text-center">
+        <div class="w-full h-16 bg-gray-300 rounded mb-2 flex items-center justify-center relative overflow-hidden">
+          <div class="w-[80%] h-full border-x-4 border-black/20 flex divide-x-4 divide-black/20">
+            <div class="flex-1"></div>
+            <div class="flex-1"></div>
+            <div class="flex-1"></div>
+            <div class="flex-1"></div>
+            <div class="flex-1"></div>
+          </div>
+        </div>
+
+        <p class="text-xs text-gray-400 font-mono tracking-widest">
+          {{ getTicketData(selectedTicket()).codigoTicket }}
+        </p>
+      </div>
     </div>
-    }
+  </div>
+  }
+
+  @if (selectedTripToCancel()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center px-4">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="closeCancelModal()"></div>
+
+    <div class="relative w-full max-w-md bg-[rgb(23,25,25)] border border-red-500/20 rounded-3xl shadow-2xl p-6">
+      <button type="button" (click)="closeCancelModal()"
+        class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
+        <lucide-icon [name]="XIcon" class="w-5 h-5 text-gray-300"></lucide-icon>
+      </button>
+
+      <div class="w-14 h-14 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-5">
+        <lucide-icon [name]="TrashIcon" class="w-7 h-7 text-red-500"></lucide-icon>
+      </div>
+
+      <h3 class="text-2xl font-black text-white mb-2">
+        {{ 'Cancelar reserva' | translate }}
+      </h3>
+
+      <p class="text-gray-400 mb-5">
+        {{ '¿Seguro que quieres cancelar este viaje?' | translate }}
+      </p>
+
+      <div class="bg-white/5 rounded-2xl p-4 mb-5 border border-white/10">
+        <p class="text-white font-bold">{{ selectedTripToCancel()?.destinoNombre | translate }}</p>
+        <p class="text-gray-400 text-sm">{{ selectedTripToCancel()?.alojamientoNombre | translate }}</p>
+        <p class="text-gray-500 text-xs mt-2">
+          {{ selectedTripToCancel()?.checkIn | date:'dd/MM/yyyy' }}
+          -
+          {{ selectedTripToCancel()?.checkOut | date:'dd/MM/yyyy' }}
+        </p>
+      </div>
+
+      @if (cancelError()) {
+      <p class="text-red-400 text-sm mb-4">
+        {{ cancelError() | translate }}
+      </p>
+      }
+
+      <div class="flex gap-3">
+        <button type="button" (click)="closeCancelModal()"
+          class="flex-1 py-3 rounded-xl border border-white/10 text-white font-bold hover:bg-white/10 transition-colors">
+          {{ 'No, volver' | translate }}
+        </button>
+
+        <button type="button" (click)="confirmCancelTrip()" [disabled]="isCancelling()"
+          class="flex-1 py-3 rounded-xl bg-red-500 text-white font-bold hover:bg-red-400 disabled:bg-gray-700 disabled:text-gray-400 transition-colors">
+          @if (isCancelling()) {
+          {{ 'Cancelando...' | translate }}
+          } @else {
+          {{ 'Sí, cancelar' | translate }}
+          }
+        </button>
+      </div>
+    </div>
   </div>
   }
 </div>

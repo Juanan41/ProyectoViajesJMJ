@@ -1,47 +1,114 @@
 <div class="min-h-screen bg-[rgb(23,25,25)] flex">
   <aside class="w-64 border-r border-white/5 flex flex-col p-6 gap-2">
     <div class="mb-8">
-      <p class="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-1">{{ 'Panel de Control' | translate }}</p>
-      <h2 class="text-xl font-bold text-white uppercase tracking-tighter">{{ 'Administración' | translate }}</h2>
+      <p class="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-1">
+        {{ 'Panel de Control' | translate }}
+      </p>
+      <h2 class="text-xl font-bold text-white uppercase tracking-tighter">
+        {{ 'Administración' | translate }}
+      </h2>
     </div>
 
     <button (click)="setTab('stats')" [class.bg-white/5]="activeTab() === 'stats'"
       class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all hover:bg-white/5"
       [class.text-emerald-500]="activeTab() === 'stats'" [class.text-gray-400]="activeTab() !== 'stats'">
-      <lucide-icon [name]="DashboardIcon" class="w-4 h-4"></lucide-icon> {{ 'Dashboard' | translate }}
+      <lucide-icon [name]="DashboardIcon" class="w-4 h-4"></lucide-icon>
+      {{ 'Dashboard' | translate }}
     </button>
+
     <button (click)="setTab('users')" [class.bg-white/5]="activeTab() === 'users'"
       class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all hover:bg-white/5"
       [class.text-emerald-500]="activeTab() === 'users'" [class.text-gray-400]="activeTab() !== 'users'">
-      <lucide-icon [name]="UsersIcon" class="w-4 h-4"></lucide-icon> {{ 'Usuarios' | translate }}
+      <lucide-icon [name]="UsersIcon" class="w-4 h-4"></lucide-icon>
+      {{ 'Usuarios' | translate }}
     </button>
+
     <button (click)="setTab('destinos')" [class.bg-white/5]="activeTab() === 'destinos'"
       class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all hover:bg-white/5"
       [class.text-emerald-500]="activeTab() === 'destinos'" [class.text-gray-400]="activeTab() !== 'destinos'">
-      <lucide-icon [name]="MapIcon" class="w-4 h-4"></lucide-icon> {{ 'Destinos' | translate }}
+      <lucide-icon [name]="MapIcon" class="w-4 h-4"></lucide-icon>
+      {{ 'Destinos' | translate }}
+    </button>
+
+    <button (click)="setTab('hoteles')" [class.bg-white/5]="activeTab() === 'hoteles'"
+      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all hover:bg-white/5"
+      [class.text-emerald-500]="activeTab() === 'hoteles'" [class.text-gray-400]="activeTab() !== 'hoteles'">
+      <lucide-icon [name]="HotelIcon" class="w-4 h-4"></lucide-icon>
+      {{ 'Hoteles' | translate }}
+    </button>
+
+    <button (click)="setTab('reservas')" [class.bg-white/5]="activeTab() === 'reservas'"
+      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all hover:bg-white/5"
+      [class.text-emerald-500]="activeTab() === 'reservas'" [class.text-gray-400]="activeTab() !== 'reservas'">
+      <lucide-icon [name]="StatsIcon" class="w-4 h-4"></lucide-icon>
+      {{ 'Reservas' | translate }}
     </button>
   </aside>
 
   <main class="flex-1 p-10">
-
     @if (activeTab() === 'stats') {
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
       <div class="bg-white/5 p-8 rounded-[2rem] border border-white/5">
-        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{{ 'Total Usuarios' | translate }}</p>
+        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">
+          {{ 'Total Usuarios' | translate }}
+        </p>
         <h3 class="text-4xl font-black text-white">{{ usuarios().length }}</h3>
       </div>
+
       <div class="bg-white/5 p-8 rounded-[2rem] border border-white/5">
-        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{{ 'Destinos Activos' | translate }}</p>
+        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">
+          {{ 'Destinos Activos' | translate }}
+        </p>
         <h3 class="text-4xl font-black text-white">{{ destinos().length }}</h3>
       </div>
+
       <div class="bg-emerald-500/10 p-8 rounded-[2rem] border border-emerald-500/10">
-        <p class="text-xs font-bold text-emerald-500 uppercase tracking-widest mb-2">{{ 'Total Reservas' | translate }}</p>
+        <p class="text-xs font-bold text-emerald-500 uppercase tracking-widest mb-2">
+          {{ 'Total Reservas' | translate }}
+        </p>
         <h3 class="text-4xl font-black text-emerald-500">{{ reservas().length }}</h3>
+      </div>
+
+      <div class="bg-white/5 p-8 rounded-[2rem] border border-white/5">
+        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">
+          {{ 'Ingresos totales' | translate }}
+        </p>
+        <h3 class="text-4xl font-black text-white">{{ formatMoney(totalRevenue) }}</h3>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div class="bg-white/5 p-6 rounded-[2rem] border border-white/5">
+        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{{ 'Reservas activas' | translate }}</p>
+        <p class="text-3xl font-black text-amber-300">{{ activeReservationsCount }}</p>
+      </div>
+      <div class="bg-white/5 p-6 rounded-[2rem] border border-white/5">
+        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{{ 'Reservas completadas' | translate }}</p>
+        <p class="text-3xl font-black text-emerald-400">{{ completedReservationsCount }}</p>
+      </div>
+      <div class="bg-white/5 p-6 rounded-[2rem] border border-white/5">
+        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{{ 'Reservas canceladas' | translate }}</p>
+        <p class="text-3xl font-black text-red-400">{{ canceledReservationsCount }}</p>
+      </div>
+      <div class="bg-white/5 p-6 rounded-[2rem] border border-white/5">
+        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{{ 'Usuario con más reservas' | translate }}</p>
+        <p class="text-xl font-black text-white">{{ topBookingUser }}</p>
       </div>
     </div>
     }
 
     @if (activeTab() === 'users') {
+    <div class="flex justify-between items-center mb-8">
+      <h2 class="text-2xl font-black text-white uppercase tracking-tighter">
+        {{ 'Usuarios' | translate }}
+      </h2>
+      <div class="relative">
+        <lucide-icon [name]="SearchIcon" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"></lucide-icon>
+        <input [(ngModel)]="userSearch" [placeholder]="'Buscar usuario' | translate"
+          class="bg-white/5 border border-white/10 text-white rounded-xl py-3 pl-10 pr-4 outline-none focus:border-emerald-500" />
+      </div>
+    </div>
+
     <div class="bg-white/5 rounded-[2rem] border border-white/5 overflow-hidden">
       <table class="w-full text-left">
         <thead class="bg-white/5 text-[10px] font-black text-gray-500 uppercase tracking-widest">
@@ -50,11 +117,13 @@
             <th class="px-8 py-6">{{ 'Nombre' | translate }}</th>
             <th class="px-8 py-6">Email</th>
             <th class="px-8 py-6">{{ 'Rol' | translate }}</th>
+            <th class="px-8 py-6">{{ 'Saldo' | translate }}</th>
             <th class="px-8 py-6 text-right">{{ 'Acciones' | translate }}</th>
           </tr>
         </thead>
+
         <tbody class="divide-y divide-white/5">
-          @for (user of usuarios(); track user.id) {
+          @for (user of filteredUsuarios; track user.id) {
           <tr class="hover:bg-white/[0.02] transition-colors">
             <td class="px-8 py-6 text-sm font-mono text-gray-500">#{{ user.id }}</td>
             <td class="px-8 py-6 text-sm font-bold text-white">{{ user.username }}</td>
@@ -63,10 +132,17 @@
               <span
                 class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/10"
                 [class.text-emerald-500]="user.role === 'ADMIN'" [class.text-gray-400]="user.role !== 'ADMIN'">
-                {{ user.role || 'USER' }}
+                {{ (user.role || 'USER') | translate }}
               </span>
             </td>
+            <td class="px-8 py-6 text-sm font-bold text-emerald-500">
+              {{ user.saldo || 0 }}€
+            </td>
             <td class="px-8 py-6 text-right">
+              <button (click)="openEditUsuario(user)" class="text-gray-400 hover:text-white p-2">
+                <lucide-icon [name]="EditIcon" class="w-4 h-4"></lucide-icon>
+              </button>
+
               <button (click)="deleteUsuario(user.id)" class="text-red-500 hover:text-red-400 p-2">
                 <lucide-icon [name]="TrashIcon" class="w-4 h-4"></lucide-icon>
               </button>
@@ -80,25 +156,39 @@
 
     @if (activeTab() === 'destinos') {
     <div class="flex justify-between items-center mb-8">
-      <h2 class="text-2xl font-black text-white uppercase tracking-tighter">{{ 'Lista de Destinos' | translate }}</h2>
-      <button
+      <h2 class="text-2xl font-black text-white uppercase tracking-tighter">
+        {{ 'Lista de Destinos' | translate }}
+      </h2>
+
+      <button (click)="openCreateDestino()"
         class="bg-emerald-500 text-[rgb(23,25,25)] font-black px-6 py-3 rounded-xl text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-emerald-400 transition-all">
-        <lucide-icon [name]="PlusIcon" class="w-4 h-4"></lucide-icon> Añadir Destino
+        <lucide-icon [name]="PlusIcon" class="w-4 h-4"></lucide-icon>
+        {{ 'Añadir Destino' | translate }}
       </button>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      @for (dest of destinos(); track dest.id) {
+    <div class="relative mb-8 max-w-md">
+      <lucide-icon [name]="SearchIcon" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"></lucide-icon>
+      <input [(ngModel)]="destinoSearch" [placeholder]="'Buscar destino' | translate"
+        class="w-full bg-white/5 border border-white/10 text-white rounded-xl py-3 pl-10 pr-4 outline-none focus:border-emerald-500" />
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-24">
+      @for (dest of filteredDestinos; track dest.id) {
       <div class="bg-white/5 p-6 rounded-[2rem] border border-white/5 flex gap-6 items-center">
-        <img [src]="dest.imagen || '/placeholder.jpg'" class="w-20 h-20 rounded-2xl object-cover" />
+        <img [src]="dest.imagenUrl || dest.imagen || '/placeholder.jpg'" class="w-20 h-20 rounded-2xl object-cover" />
+
         <div class="flex-1">
-          <h4 class="text-lg font-bold text-white">{{ dest.nombre }}</h4>
-          <p class="text-sm text-gray-500">{{ dest.pais }}</p>
+          <h4 class="text-lg font-bold text-white">{{ dest.nombre | translate }}</h4>
+          <p class="text-sm text-gray-500">{{ dest.pais | translate }}</p>
+          <p class="text-sm text-emerald-500 font-bold mt-1">{{ dest.precio }}€</p>
         </div>
+
         <div class="flex gap-2">
-          <button class="text-gray-400 hover:text-white p-2">
+          <button (click)="openEditDestino(dest)" class="text-gray-400 hover:text-white p-2">
             <lucide-icon [name]="EditIcon" class="w-4 h-4"></lucide-icon>
           </button>
+
           <button (click)="deleteDestino(dest.id)" class="text-red-500 hover:text-red-400 p-2">
             <lucide-icon [name]="TrashIcon" class="w-4 h-4"></lucide-icon>
           </button>
@@ -108,5 +198,563 @@
     </div>
     }
 
+    @if (activeTab() === 'hoteles') {
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
+      <h2 class="text-2xl font-black text-white uppercase tracking-tighter">
+        {{ 'Gestion de hoteles' | translate }}
+      </h2>
+
+      <div class="flex flex-col sm:flex-row gap-3">
+        <div class="relative">
+          <lucide-icon [name]="SearchIcon" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"></lucide-icon>
+          <input [(ngModel)]="hotelSearch" [placeholder]="'Buscar hotel' | translate"
+            class="bg-white/5 border border-white/10 text-white rounded-xl py-3 pl-10 pr-4 outline-none focus:border-emerald-500" />
+        </div>
+
+        <select [ngModel]="hotelSort()" (ngModelChange)="hotelSort.set($event)"
+          class="bg-white/5 border border-white/10 text-white rounded-xl px-4 py-3 outline-none focus:border-emerald-500">
+          <option value="nombre">{{ 'Ordenar por nombre' | translate }}</option>
+          <option value="destino">{{ 'Ordenar por destino' | translate }}</option>
+          <option value="precio">{{ 'Ordenar por precio' | translate }}</option>
+          <option value="reservas">{{ 'Ordenar por reservas' | translate }}</option>
+        </select>
+
+        <button (click)="openCreateHotel()"
+          class="bg-emerald-500 text-[rgb(23,25,25)] font-black px-6 py-3 rounded-xl text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-emerald-400 transition-all">
+          <lucide-icon [name]="PlusIcon" class="w-4 h-4"></lucide-icon>
+          {{ 'Anadir hotel' | translate }}
+        </button>
+      </div>
+    </div>
+
+    <div class="bg-white/5 rounded-[2rem] border border-white/5 overflow-hidden mb-24">
+      <table class="w-full text-left">
+        <thead class="bg-white/5 text-[10px] font-black text-gray-500 uppercase tracking-widest">
+          <tr>
+            <th class="px-6 py-5">{{ 'Hotel' | translate }}</th>
+            <th class="px-6 py-5">{{ 'Destino' | translate }}</th>
+            <th class="px-6 py-5">{{ 'Ciudad' | translate }}</th>
+            <th class="px-6 py-5">{{ 'Tipo' | translate }}</th>
+            <th class="px-6 py-5">{{ 'Precio noche' | translate }}</th>
+            <th class="px-6 py-5">{{ 'Reservas' | translate }}</th>
+            <th class="px-6 py-5 text-right">{{ 'Acciones' | translate }}</th>
+          </tr>
+        </thead>
+
+        <tbody class="divide-y divide-white/5">
+          @for (hotel of filteredHoteles; track hotel.id) {
+          <tr class="hover:bg-white/[0.02] transition-colors">
+            <td class="px-6 py-5 text-sm font-bold text-white">{{ hotel.nombre | translate }}</td>
+            <td class="px-6 py-5 text-sm text-gray-300">{{ hotel.destinoNombre | translate }}</td>
+            <td class="px-6 py-5 text-sm text-gray-400">{{ hotel.ciudad | translate }}, {{ hotel.pais | translate }}</td>
+            <td class="px-6 py-5">
+              <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/10 text-emerald-400">
+                {{ hotel.tipo | translate }}
+              </span>
+            </td>
+            <td class="px-6 py-5 text-sm font-bold text-emerald-400">{{ formatMoney(hotel.precioPorNoche) }}</td>
+            <td class="px-6 py-5 text-sm text-gray-300">{{ hotel.reservas || 0 }}</td>
+            <td class="px-6 py-5 text-right">
+              <button (click)="openEditHotel(hotel)" class="text-gray-400 hover:text-white p-2">
+                <lucide-icon [name]="EditIcon" class="w-4 h-4"></lucide-icon>
+              </button>
+
+              <button (click)="deleteHotel(hotel.id)" class="text-red-500 hover:text-red-400 p-2">
+                <lucide-icon [name]="TrashIcon" class="w-4 h-4"></lucide-icon>
+              </button>
+            </td>
+          </tr>
+          } @empty {
+          <tr>
+            <td colspan="7" class="px-6 py-10 text-center text-gray-500">
+              {{ 'No hay hoteles que coincidan con los filtros.' | translate }}
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    }
+
+    @if (activeTab() === 'reservas') {
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
+      <h2 class="text-2xl font-black text-white uppercase tracking-tighter">
+        {{ 'Gestión de reservas' | translate }}
+      </h2>
+
+      <div class="flex flex-col sm:flex-row gap-3">
+        <div class="relative">
+          <lucide-icon [name]="SearchIcon" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"></lucide-icon>
+          <input [(ngModel)]="reservaSearch" [placeholder]="'Buscar reserva' | translate"
+            class="bg-white/5 border border-white/10 text-white rounded-xl py-3 pl-10 pr-4 outline-none focus:border-emerald-500" />
+        </div>
+
+        <select [ngModel]="reservaFilter()" (ngModelChange)="reservaFilter.set($event)"
+          class="bg-white/5 border border-white/10 text-white rounded-xl px-4 py-3 outline-none focus:border-emerald-500">
+          <option value="TODAS">{{ 'Todas' | translate }}</option>
+          <option value="CONFIRMADA">{{ 'Confirmada' | translate }}</option>
+          <option value="CANCELADA">{{ 'Cancelada' | translate }}</option>
+          <option value="COMPLETADA">{{ 'Completada' | translate }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="bg-white/5 rounded-[2rem] border border-white/5 overflow-hidden">
+      <table class="w-full text-left">
+        <thead class="bg-white/5 text-[10px] font-black text-gray-500 uppercase tracking-widest">
+          <tr>
+            <th class="px-6 py-5">{{ 'Reserva' | translate }}</th>
+            <th class="px-6 py-5">{{ 'Usuario' | translate }}</th>
+            <th class="px-6 py-5">{{ 'Destino' | translate }}</th>
+            <th class="px-6 py-5">{{ 'Hotel' | translate }}</th>
+            <th class="px-6 py-5">{{ 'Fechas' | translate }}</th>
+            <th class="px-6 py-5">{{ 'Precio' | translate }}</th>
+            <th class="px-6 py-5">{{ 'Estado' | translate }}</th>
+            <th class="px-6 py-5 text-right">{{ 'Acciones' | translate }}</th>
+          </tr>
+        </thead>
+
+        <tbody class="divide-y divide-white/5">
+          @for (reserva of filteredReservas; track reserva.id) {
+          <tr class="hover:bg-white/[0.02] transition-colors">
+            <td class="px-6 py-5 text-sm font-mono text-gray-400">#{{ reserva.id }}</td>
+            <td class="px-6 py-5">
+              <p class="text-sm font-bold text-white">{{ reserva.usuarioUsername || 'Usuario' }}</p>
+              <p class="text-xs text-gray-500">{{ reserva.usuarioEmail }}</p>
+            </td>
+            <td class="px-6 py-5 text-sm text-gray-300">{{ reserva.destinoNombre | translate }}</td>
+            <td class="px-6 py-5 text-sm text-gray-300">{{ reserva.alojamientoNombre | translate }}</td>
+            <td class="px-6 py-5 text-xs text-gray-400">
+              {{ formatDate(reserva.checkIn) }} - {{ formatDate(reserva.checkOut) }}
+            </td>
+            <td class="px-6 py-5 text-sm font-bold text-emerald-400">{{ formatMoney(reserva.precioTotal) }}</td>
+            <td class="px-6 py-5">
+              <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border"
+                [class]="getReservaStatusClass(reserva)">
+                {{ getReservaStatus(reserva) | translate }}
+              </span>
+            </td>
+            <td class="px-6 py-5 text-right">
+              <button (click)="openReservaDetails(reserva)" class="text-gray-400 hover:text-white p-2">
+                <lucide-icon [name]="EyeIcon" class="w-4 h-4"></lucide-icon>
+              </button>
+            </td>
+          </tr>
+          } @empty {
+          <tr>
+            <td colspan="8" class="px-6 py-10 text-center text-gray-500">
+              {{ 'No hay reservas que coincidan con los filtros.' | translate }}
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    }
   </main>
 </div>
+
+@if (showUserModal()) {
+<div class="fixed inset-0 z-50 flex items-center justify-center px-4">
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="closeUserModal()"></div>
+
+  <div class="relative w-full max-w-xl bg-[rgb(33,36,37)] border border-white/10 rounded-3xl shadow-2xl p-8">
+    <button type="button" (click)="closeUserModal()"
+      class="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center">
+      <lucide-icon [name]="XIcon" class="w-5 h-5 text-gray-300"></lucide-icon>
+    </button>
+
+    <h2 class="text-2xl font-black text-white mb-6">
+      {{ 'Editar usuario' | translate }}
+    </h2>
+
+    <div class="space-y-4">
+      <div>
+        <label class="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">
+          {{ 'Nombre' | translate }}
+        </label>
+        <input [(ngModel)]="editUserForm.username" name="username"
+          class="w-full bg-[rgb(23,25,25)] border border-gray-700 text-white rounded-xl p-3 outline-none focus:border-emerald-500" />
+      </div>
+
+      <div>
+        <label class="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">
+          Email
+        </label>
+        <input [(ngModel)]="editUserForm.email" name="email"
+          class="w-full bg-[rgb(23,25,25)] border border-gray-700 text-white rounded-xl p-3 outline-none focus:border-emerald-500" />
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">
+            {{ 'Rol' | translate }}
+          </label>
+          <select [(ngModel)]="editUserForm.role" name="role"
+            class="w-full bg-[rgb(23,25,25)] border border-gray-700 text-white rounded-xl p-3 outline-none focus:border-emerald-500">
+            <option value="USER">USER</option>
+            <option value="ADMIN">ADMIN</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">
+            {{ 'Saldo' | translate }}
+          </label>
+          <input type="number" [(ngModel)]="editUserForm.saldo" name="saldo"
+            class="w-full bg-[rgb(23,25,25)] border border-gray-700 text-white rounded-xl p-3 outline-none focus:border-emerald-500" />
+        </div>
+      </div>
+
+      @if (userError()) {
+      <p class="text-red-400 text-sm font-medium">
+        {{ userError() | translate }}
+      </p>
+      }
+
+      <div class="flex gap-3 pt-4">
+        <button type="button" (click)="closeUserModal()" [disabled]="isSavingUser()"
+          class="flex-1 bg-white/5 hover:bg-white/10 text-white font-bold py-3 rounded-xl transition-colors disabled:opacity-50">
+          {{ 'Cancelar' | translate }}
+        </button>
+
+        <button type="button" (click)="saveUser()" [disabled]="isSavingUser()"
+          class="flex-1 bg-emerald-500 hover:bg-emerald-400 text-[rgb(23,25,25)] font-black py-3 rounded-xl transition-colors disabled:opacity-50">
+          @if (isSavingUser()) {
+          {{ 'Guardando...' | translate }}
+          } @else {
+          {{ 'Guardar cambios' | translate }}
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+@if (selectedReserva()) {
+<div class="fixed inset-0 z-50 flex items-center justify-center px-4">
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="closeReservaDetails()"></div>
+
+  <div class="relative w-full max-w-2xl bg-[rgb(33,36,37)] border border-white/10 rounded-3xl shadow-2xl p-8">
+    <button type="button" (click)="closeReservaDetails()"
+      class="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center">
+      <lucide-icon [name]="XIcon" class="w-5 h-5 text-gray-300"></lucide-icon>
+    </button>
+
+    <div class="flex items-start gap-5 mb-8">
+      <img [src]="selectedReserva()?.imagenUrl || 'assets/placeholder.jpg'"
+        class="w-24 h-24 rounded-2xl object-cover border border-white/10" />
+
+      <div>
+        <p class="text-xs font-black text-emerald-500 uppercase tracking-[0.2em] mb-2">
+          {{ 'Detalle de reserva' | translate }} #{{ selectedReserva()?.id }}
+        </p>
+        <h2 class="text-2xl font-black text-white">
+          {{ selectedReserva()?.destinoNombre | translate }}
+        </h2>
+        <p class="text-gray-400">{{ selectedReserva()?.alojamientoNombre | translate }}</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+      <div class="bg-white/5 rounded-2xl p-4">
+        <p class="text-gray-500 font-bold uppercase text-xs mb-1">{{ 'Usuario' | translate }}</p>
+        <p class="text-white font-bold">{{ selectedReserva()?.usuarioUsername || '-' }}</p>
+        <p class="text-gray-400">{{ selectedReserva()?.usuarioEmail || '-' }}</p>
+      </div>
+
+      <div class="bg-white/5 rounded-2xl p-4">
+        <p class="text-gray-500 font-bold uppercase text-xs mb-1">{{ 'Estado' | translate }}</p>
+        <span class="inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border"
+          [class]="getReservaStatusClass(selectedReserva())">
+          {{ getReservaStatus(selectedReserva()) | translate }}
+        </span>
+      </div>
+
+      <div class="bg-white/5 rounded-2xl p-4">
+        <p class="text-gray-500 font-bold uppercase text-xs mb-1">{{ 'Fechas' | translate }}</p>
+        <p class="text-white">{{ formatDate(selectedReserva()?.checkIn) }} - {{ formatDate(selectedReserva()?.checkOut) }}</p>
+      </div>
+
+      <div class="bg-white/5 rounded-2xl p-4">
+        <p class="text-gray-500 font-bold uppercase text-xs mb-1">{{ 'Precio' | translate }}</p>
+        <p class="text-emerald-400 font-black text-xl">{{ formatMoney(selectedReserva()?.precioTotal) }}</p>
+      </div>
+
+      <div class="bg-white/5 rounded-2xl p-4">
+        <p class="text-gray-500 font-bold uppercase text-xs mb-1">{{ 'Huéspedes' | translate }}</p>
+        <p class="text-white">{{ selectedReserva()?.huespedes }}</p>
+      </div>
+
+      <div class="bg-white/5 rounded-2xl p-4">
+        <p class="text-gray-500 font-bold uppercase text-xs mb-1">{{ 'Transporte' | translate }}</p>
+        <p class="text-white">{{ selectedReserva()?.transporteNombre | translate }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+@if (showDestinoModal()) {
+<div class="fixed inset-0 z-50 flex items-center justify-center px-4">
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="closeDestinoModal()"></div>
+
+  <div class="relative w-full max-w-2xl bg-[rgb(33,36,37)] border border-white/10 rounded-3xl shadow-2xl p-8">
+    <button type="button" (click)="closeDestinoModal()"
+      class="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center">
+      <lucide-icon [name]="XIcon" class="w-5 h-5 text-gray-300"></lucide-icon>
+    </button>
+
+    <h2 class="text-2xl font-black text-white mb-6">
+      @if (destinoMode() === 'create') {
+      {{ 'Añadir destino' | translate }}
+      } @else {
+      {{ 'Editar destino' | translate }}
+      }
+    </h2>
+
+    <div class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">
+            {{ 'Nombre' | translate }}
+          </label>
+          <input [(ngModel)]="editDestinoForm.nombre" name="destinoNombre"
+            class="w-full bg-[rgb(23,25,25)] border border-gray-700 text-white rounded-xl p-3 outline-none focus:border-emerald-500" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">
+            {{ 'País' | translate }}
+          </label>
+          <input [(ngModel)]="editDestinoForm.pais" name="destinoPais"
+            class="w-full bg-[rgb(23,25,25)] border border-gray-700 text-white rounded-xl p-3 outline-none focus:border-emerald-500" />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">
+            {{ 'Continente' | translate }}
+          </label>
+          <select [(ngModel)]="editDestinoForm.continente" name="destinoContinente"
+            class="w-full bg-[rgb(23,25,25)] border border-gray-700 text-white rounded-xl p-3 outline-none focus:border-emerald-500">
+            @for (continente of continentes; track continente) {
+            <option [value]="continente">{{ continente | translate }}</option>
+            }
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">
+            {{ 'Precio' | translate }}
+          </label>
+          <input type="number" [(ngModel)]="editDestinoForm.precio" name="destinoPrecio"
+            class="w-full bg-[rgb(23,25,25)] border border-gray-700 text-white rounded-xl p-3 outline-none focus:border-emerald-500" />
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">
+          {{ 'Imagen' | translate }}
+        </label>
+        <input [(ngModel)]="editDestinoForm.imagen" name="destinoImagen" placeholder="https://..."
+          class="w-full bg-[rgb(23,25,25)] border border-gray-700 text-white rounded-xl p-3 outline-none focus:border-emerald-500" />
+      </div>
+
+      <div>
+        <label class="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">
+          {{ 'Descripción' | translate }}
+        </label>
+        <textarea [(ngModel)]="editDestinoForm.descripcion" name="destinoDescripcion" rows="4"
+          class="w-full bg-[rgb(23,25,25)] border border-gray-700 text-white rounded-xl p-3 outline-none focus:border-emerald-500 resize-none"></textarea>
+      </div>
+
+      @if (destinoError()) {
+      <p class="text-red-400 text-sm font-medium">
+        {{ destinoError() | translate }}
+      </p>
+      }
+
+      <div class="flex gap-3 pt-4">
+        <button type="button" (click)="closeDestinoModal()" [disabled]="isSavingDestino()"
+          class="flex-1 bg-white/5 hover:bg-white/10 text-white font-bold py-3 rounded-xl transition-colors disabled:opacity-50">
+          {{ 'Cancelar' | translate }}
+        </button>
+
+        <button type="button" (click)="saveDestino()" [disabled]="isSavingDestino()"
+          class="flex-1 bg-emerald-500 hover:bg-emerald-400 text-[rgb(23,25,25)] font-black py-3 rounded-xl transition-colors disabled:opacity-50">
+          @if (isSavingDestino()) {
+          {{ 'Guardando...' | translate }}
+          } @else {
+          {{ 'Guardar cambios' | translate }}
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+@if (showHotelModal()) {
+<div class="fixed inset-0 z-50 flex items-center justify-center px-4">
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="closeHotelModal()"></div>
+
+  <div class="relative w-full max-w-2xl bg-[rgb(33,36,37)] border border-white/10 rounded-3xl shadow-2xl p-8">
+    <button type="button" (click)="closeHotelModal()"
+      class="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center">
+      <lucide-icon [name]="XIcon" class="w-5 h-5 text-gray-300"></lucide-icon>
+    </button>
+
+    <h2 class="text-2xl font-black text-white mb-6">
+      @if (hotelMode() === 'create') {
+      {{ 'Anadir hotel' | translate }}
+      } @else {
+      {{ 'Editar hotel' | translate }}
+      }
+    </h2>
+
+    <div class="space-y-4">
+      <div>
+        <label class="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">
+          {{ 'Destino' | translate }}
+        </label>
+        <select [ngModel]="editHotelForm.destinoId" (ngModelChange)="onHotelDestinoChange($event)" name="hotelDestino"
+          class="w-full bg-[rgb(23,25,25)] border border-gray-700 text-white rounded-xl p-3 outline-none focus:border-emerald-500">
+          @for (destino of destinos(); track destino.id) {
+          <option [value]="destino.id">{{ destino.nombre | translate }} - {{ destino.pais | translate }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">
+            {{ 'Nombre' | translate }}
+          </label>
+          <input [(ngModel)]="editHotelForm.nombre" name="hotelNombre"
+            class="w-full bg-[rgb(23,25,25)] border border-gray-700 text-white rounded-xl p-3 outline-none focus:border-emerald-500" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">
+            {{ 'Tipo' | translate }}
+          </label>
+          <select [(ngModel)]="editHotelForm.tipo" name="hotelTipo"
+            class="w-full bg-[rgb(23,25,25)] border border-gray-700 text-white rounded-xl p-3 outline-none focus:border-emerald-500">
+            @for (type of hotelTypes; track type) {
+            <option [value]="type">{{ type | translate }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">
+            {{ 'Ciudad' | translate }}
+          </label>
+          <input [(ngModel)]="editHotelForm.ciudad" name="hotelCiudad"
+            class="w-full bg-[rgb(23,25,25)] border border-gray-700 text-white rounded-xl p-3 outline-none focus:border-emerald-500" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">
+            {{ 'Pais' | translate }}
+          </label>
+          <input [(ngModel)]="editHotelForm.pais" name="hotelPais"
+            class="w-full bg-[rgb(23,25,25)] border border-gray-700 text-white rounded-xl p-3 outline-none focus:border-emerald-500" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">
+            {{ 'Precio noche' | translate }}
+          </label>
+          <input type="number" [(ngModel)]="editHotelForm.precioPorNoche" name="hotelPrecio"
+            class="w-full bg-[rgb(23,25,25)] border border-gray-700 text-white rounded-xl p-3 outline-none focus:border-emerald-500" />
+        </div>
+      </div>
+
+      @if (hotelError()) {
+      <p class="text-red-400 text-sm font-medium">
+        {{ hotelError() | translate }}
+      </p>
+      }
+
+      <div class="flex gap-3 pt-4">
+        <button type="button" (click)="closeHotelModal()" [disabled]="isSavingHotel()"
+          class="flex-1 bg-white/5 hover:bg-white/10 text-white font-bold py-3 rounded-xl transition-colors disabled:opacity-50">
+          {{ 'Cancelar' | translate }}
+        </button>
+
+        <button type="button" (click)="saveHotel()" [disabled]="isSavingHotel()"
+          class="flex-1 bg-emerald-500 hover:bg-emerald-400 text-[rgb(23,25,25)] font-black py-3 rounded-xl transition-colors disabled:opacity-50">
+          @if (isSavingHotel()) {
+          {{ 'Guardando...' | translate }}
+          } @else {
+          {{ 'Guardar cambios' | translate }}
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+@if (confirmModal()) {
+<div class="fixed inset-0 z-50 flex items-center justify-center px-4">
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="cancelConfirm()"></div>
+
+  <div class="relative w-full max-w-md bg-[rgb(33,36,37)] border border-red-500/20 rounded-3xl shadow-2xl p-8">
+    <div class="w-14 h-14 bg-red-500/10 rounded-2xl flex items-center justify-center mb-5">
+      <lucide-icon [name]="TrashIcon" class="w-7 h-7 text-red-500"></lucide-icon>
+    </div>
+
+    <h2 class="text-2xl font-black text-white mb-3">{{ confirmModal()?.title | translate }}</h2>
+    <p class="text-gray-400 leading-relaxed mb-8">{{ confirmModal()?.message | translate }}</p>
+
+    <div class="flex flex-col sm:flex-row gap-3">
+      <button type="button" (click)="cancelConfirm()" [disabled]="isDeleting()"
+        class="flex-1 bg-white/5 hover:bg-white/10 text-white font-bold py-3 rounded-xl transition-colors disabled:opacity-50">
+        {{ 'Cancelar' | translate }}
+      </button>
+
+      <button type="button" (click)="confirmAction()" [disabled]="isDeleting()"
+        class="flex-1 bg-red-500 hover:bg-red-400 text-white font-black py-3 rounded-xl transition-colors disabled:opacity-50">
+        @if (isDeleting()) {
+        {{ 'Eliminando...' | translate }}
+        } @else {
+        {{ confirmModal()?.confirmText | translate }}
+        }
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+@if (noticeModal()) {
+<div class="fixed inset-0 z-50 flex items-center justify-center px-4">
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="closeNotice()"></div>
+
+  <div class="relative w-full max-w-md bg-[rgb(33,36,37)] border border-white/10 rounded-3xl shadow-2xl p-8">
+    <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-5"
+      [class.bg-emerald-500/10]="noticeModal()?.type === 'success'"
+      [class.bg-red-500/10]="noticeModal()?.type === 'error'">
+      @if (noticeModal()?.type === 'success') {
+      <lucide-icon [name]="DashboardIcon" class="w-7 h-7 text-emerald-500"></lucide-icon>
+      } @else {
+      <lucide-icon [name]="TrashIcon" class="w-7 h-7 text-red-500"></lucide-icon>
+      }
+    </div>
+
+    <h2 class="text-2xl font-black text-white mb-3">{{ noticeModal()?.title | translate }}</h2>
+    <p class="text-gray-400 leading-relaxed mb-8">{{ noticeModal()?.message | translate }}</p>
+
+    <button type="button" (click)="closeNotice()"
+      class="w-full bg-emerald-500 hover:bg-emerald-400 text-[rgb(23,25,25)] font-black py-3 rounded-xl transition-colors">
+      {{ 'Entendido' | translate }}
+    </button>
+  </div>
+</div>
+}

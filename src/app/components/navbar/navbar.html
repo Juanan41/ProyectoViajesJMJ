@@ -80,6 +80,13 @@
   </div>
 </nav>
 
+@if (balanceNotice) {
+<div
+  class="fixed right-4 top-24 z-[9999] rounded-2xl border border-emerald-500/20 bg-[rgb(23,25,25)] px-5 py-4 text-sm font-bold text-emerald-400 shadow-2xl shadow-black/40">
+  {{ balanceNotice | translate }}
+</div>
+}
+
 @if (isDialogOpen) {
 <div class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
   <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" (click)="isDialogOpen = false"></div>

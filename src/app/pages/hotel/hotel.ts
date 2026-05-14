@@ -18,7 +18,7 @@ import {
 } from 'lucide-angular';
 import { Auth } from '../../services/auth';
 import { DestinoService } from '../../services/destino.service';
-import { OpinionService, CreateOpinionDTO, OpinionDTO } from '../../services/opinion.service';
+import { OpinionService, CreateOpinionDTO } from '../../services/opinion.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { TranslationService } from '../../services/translation';
 
@@ -52,7 +52,6 @@ export class HotelComponent implements OnInit {
   hotel = signal<any>(null);
   habitaciones = signal<any[]>([]);
   recommendations = signal<any[]>([]);
-
   reviews = signal<any[]>([]);
 
   checkInDate = '';
@@ -65,6 +64,16 @@ export class HotelComponent implements OnInit {
   newReviewRating = 5;
   newReviewComment = '';
   editingReviewId: number | null = null;
+
+  reviewToDelete = signal<any | null>(null);
+  isDeletingReview = signal(false);
+  deleteReviewError = signal('');
+
+  bookingModal = signal<{
+    title: string;
+    message: string;
+    type: 'warning' | 'error';
+  } | null>(null);
 
   ngOnInit() {
     this.route.paramMap.subscribe((params) => {
@@ -96,6 +105,7 @@ export class HotelComponent implements OnInit {
     }
 
     this.isCheckingCard.set(true);
+
     this.auth.obtenerTarjetas().subscribe({
       next: (cards) => {
         this.hasPaymentCard.set((cards || []).length > 0);
@@ -111,14 +121,16 @@ export class HotelComponent implements OnInit {
   private loadOpiniones(id: number) {
     this.opinionService.getOpinionesByAlojamiento(id).subscribe({
       next: (data) => {
-        // Map backend's 'nombreUsuario' back to 'userName' to avoid breaking the html template immediately
         const mapped = data.map((o) => ({
           ...o,
           userName: o.nombreUsuario,
           rating: o.puntuacion,
           comment: o.comentario,
-          date: o.fechaOpinion.substring(0, 10) || new Date().toISOString().split('T')[0],
+          date: o.fechaOpinion
+            ? o.fechaOpinion.substring(0, 10)
+            : new Date().toISOString().split('T')[0],
         }));
+
         this.reviews.set(mapped);
       },
       error: (e) => console.error('Error cargando opiniones', e),
@@ -141,6 +153,7 @@ export class HotelComponent implements OnInit {
     const today = new Date();
     today.setDate(today.getDate() + 1);
     this.checkInDate = today.toISOString().split('T')[0];
+
     const tomorrow = new Date(today);
     tomorrow.setDate(today.getDate() + 1);
     this.checkOutDate = tomorrow.toISOString().split('T')[0];
@@ -148,6 +161,7 @@ export class HotelComponent implements OnInit {
 
   get nights(): number {
     if (!this.checkInDate || !this.checkOutDate) return 0;
+
     const diff = new Date(this.checkOutDate).getTime() - new Date(this.checkInDate).getTime();
     return diff <= 0 ? 0 : Math.ceil(diff / (1000 * 60 * 60 * 24));
   }
@@ -155,6 +169,7 @@ export class HotelComponent implements OnInit {
   get totalPrice(): number {
     const costs: any = { AVION: 150, TREN: 50, BARCO: 100 };
     const hotelPrice = this.hotel()?.precioPorNoche ?? 0;
+
     return hotelPrice * this.nights * this.guests + (costs[this.selectedTransport] || 0);
   }
 
@@ -167,7 +182,7 @@ export class HotelComponent implements OnInit {
     );
   }
 
-  getArray(length: number): any[] {
+  getArray(length: number | undefined | null): any[] {
     return Array.from({ length: length || 0 });
   }
 
@@ -179,6 +194,7 @@ export class HotelComponent implements OnInit {
       2: 'Regular',
       1: 'Malo',
     };
+
     return labels[rating] || '';
   }
 
@@ -189,20 +205,6 @@ export class HotelComponent implements OnInit {
   isMyReview(review: any): boolean {
     const user = this.auth.user();
     return user ? user.name === review.userName : false;
-  }
-
-  deleteReview(id: number) {
-    const hotelId = this.hotel().id;
-    if (!hotelId) return;
-
-    if (!confirm(this.translationService.translate('Seguro que quieres borrar esta reseña'))) {
-      return;
-    }
-
-    this.opinionService.deleteOpinion(id).subscribe({
-      next: () => this.loadOpiniones(hotelId),
-      error: (err) => console.error('Error deleting review', err),
-    });
   }
 
   startEditReview(review: any) {
@@ -217,8 +219,44 @@ export class HotelComponent implements OnInit {
     this.newReviewComment = '';
   }
 
+  askDeleteReview(review: any) {
+    this.deleteReviewError.set('');
+    this.reviewToDelete.set(review);
+  }
+
+  closeDeleteReviewModal() {
+    if (this.isDeletingReview()) return;
+
+    this.deleteReviewError.set('');
+    this.reviewToDelete.set(null);
+  }
+
+  confirmDeleteReview() {
+    const review = this.reviewToDelete();
+    const hotelId = this.hotel()?.id;
+
+    if (!review || !hotelId || this.isDeletingReview()) return;
+
+    this.isDeletingReview.set(true);
+    this.deleteReviewError.set('');
+
+    this.opinionService.deleteOpinion(review.id).subscribe({
+      next: () => {
+        this.isDeletingReview.set(false);
+        this.reviewToDelete.set(null);
+        this.loadOpiniones(hotelId);
+      },
+      error: (err) => {
+        console.error('Error deleting review', err);
+        this.isDeletingReview.set(false);
+        this.deleteReviewError.set('No se pudo borrar la reseña. Inténtalo de nuevo.');
+      },
+    });
+  }
+
   addReview() {
     if (!this.newReviewComment.trim()) return;
+
     const currentUser = this.auth.user();
     if (!currentUser) return;
 
@@ -243,18 +281,39 @@ export class HotelComponent implements OnInit {
     });
   }
 
+  openBookingModal(title: string, message: string, type: 'warning' | 'error' = 'warning') {
+    this.bookingModal.set({ title, message, type });
+  }
+
+  closeBookingModal() {
+    this.bookingModal.set(null);
+  }
+
   reservar() {
     if (!this.hasPaymentCard()) {
-      alert(
-        this.translationService.translate(
-          'Necesitas tener una tarjeta asociada a tu cuenta para reservar.',
-        ),
+      this.openBookingModal(
+        'Tarjeta necesaria',
+        'Necesitas tener una tarjeta asociada a tu cuenta para reservar.',
+        'warning',
       );
       return;
     }
 
     if (this.habitaciones().length === 0) {
-      alert(this.translationService.translate('No hay habitaciones disponibles en este hotel.'));
+      this.openBookingModal(
+        'Sin habitaciones disponibles',
+        'No hay habitaciones disponibles en este hotel.',
+        'warning',
+      );
+      return;
+    }
+
+    if (this.auth.credits() < this.totalPrice) {
+      this.openBookingModal(
+        'Saldo insuficiente',
+        'No tienes saldo suficiente en tu cartera para completar esta reserva.',
+        'warning',
+      );
       return;
     }
 
@@ -279,10 +338,10 @@ export class HotelComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al realizar la reserva:', err);
-        alert(
-          this.translationService.translate(
-            'Hubo un error al reservar. Revisa tu saldo o disponibilidad.',
-          ),
+        this.openBookingModal(
+          'No se pudo completar la reserva',
+          'Hubo un error al reservar. Revisa tu saldo o disponibilidad.',
+          'error',
         );
       },
     });

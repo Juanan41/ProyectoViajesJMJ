@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Auth } from '../../services/auth';
 import { BookingRecord, getStoredBookings, syncBookingStoreFromRemote } from '../../data/destinations';
 import { fetchRemoteStore, putRemoteStore } from '../../data/persistence-api';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 const AUTH_ACCOUNTS_STORAGE_KEY = 'jmj_auth_accounts_v1';
 const AUTH_ACCOUNTS_API_PATH = '/auth/accounts';
@@ -44,7 +45,7 @@ interface UserAdminRow {
 @Component({
     selector: 'app-admin-dashboard',
     standalone: true,
-    imports: [CommonModule, RouterModule, FormsModule],
+    imports: [CommonModule, RouterModule, FormsModule, TranslatePipe],
     templateUrl: './admin-dashboard.html',
     styleUrl: './admin-dashboard.css',
 })
