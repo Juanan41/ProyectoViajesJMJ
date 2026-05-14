@@ -2,22 +2,19 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import {
-  LucideAngularModule,
-  Star,
-  MapPin,
-  ArrowRight,
-  ArrowLeft,
-  Wifi,
-  Coffee,
-  Wind,
-  BedDouble,
-} from 'lucide-angular';
+import { LucideAngularModule, Star, MapPin, ArrowRight, ArrowLeft } from 'lucide-angular';
 import { DestinoService } from '../../services/destino.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { finalize } from 'rxjs';
-
-type AmenityKey = 'wifi' | 'breakfast' | 'airConditioning' | 'kingBed';
+import {
+  AmenityKey,
+  HOTEL_AMENITIES,
+  HotelFilters,
+  getDefaultHotelFilters,
+  getHotelPriceValue,
+  getVisibleHotelAmenities,
+  hasHotelAmenity,
+} from '../../utils/hotel-amenities';
 
 @Component({
   selector: 'app-hotels',
@@ -33,10 +30,8 @@ export class Hotels implements OnInit {
   readonly MapPinIcon = MapPin;
   readonly ArrowRightIcon = ArrowRight;
   readonly ArrowLeftIcon = ArrowLeft;
-  readonly WifiIcon = Wifi;
-  readonly CoffeeIcon = Coffee;
-  readonly WindIcon = Wind;
-  readonly BedDoubleIcon = BedDouble;
+
+  readonly amenityOptions = HOTEL_AMENITIES;
 
   city = signal<any>(null);
   country = signal<any>(null);
@@ -45,13 +40,7 @@ export class Hotels implements OnInit {
 
   private cityFilter = '';
 
-  filters = {
-    maxPrice: 5000,
-    wifi: false,
-    breakfast: false,
-    airConditioning: false,
-    kingBed: false,
-  };
+  filters: HotelFilters = getDefaultHotelFilters();
 
   ngOnInit() {
     this.route.queryParamMap.subscribe((params) => {
@@ -65,14 +54,6 @@ export class Hotels implements OnInit {
         this.loadData(Number(id));
       }
     });
-  }
-
-  private normalizeText(value: string): string {
-    return value
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .trim();
   }
 
   loadData(id: number) {
@@ -114,31 +95,33 @@ export class Hotels implements OnInit {
         if (city !== this.cityFilter) return false;
       }
 
-      if (this.filters.wifi && !this.hasAmenity(hotel, 'wifi')) return false;
-      if (this.filters.breakfast && !this.hasAmenity(hotel, 'breakfast')) return false;
-      if (this.filters.airConditioning && !this.hasAmenity(hotel, 'airConditioning')) return false;
-      if (this.filters.kingBed && !this.hasAmenity(hotel, 'kingBed')) return false;
+      for (const amenity of this.amenityOptions) {
+        if (this.filters[amenity.key] && !this.hasAmenity(hotel, amenity.key)) {
+          return false;
+        }
+      }
 
       return true;
     });
   }
 
   toggleAmenity(amenity: AmenityKey) {
-    this.filters[amenity] = !this.filters[amenity];
-  }
-
-  clearFilters() {
     this.filters = {
-      maxPrice: 5000,
-      wifi: false,
-      breakfast: false,
-      airConditioning: false,
-      kingBed: false,
+      ...this.filters,
+      [amenity]: !this.filters[amenity],
     };
   }
 
+  isAmenitySelected(amenity: AmenityKey): boolean {
+    return this.filters[amenity];
+  }
+
+  clearFilters() {
+    this.filters = getDefaultHotelFilters();
+  }
+
   getHotelPrice(hotel: any): number {
-    return Number(hotel?.precioPorNoche || hotel?.precio || 0);
+    return getHotelPriceValue(hotel);
   }
 
   getHotelImage(hotel: any): string {
@@ -153,35 +136,27 @@ export class Hotels implements OnInit {
     return (
       hotel?.descripcion ||
       hotel?.description ||
-      `Alojamiento cómodo y bien ubicado en ${hotel?.ciudad || 'tu destino'}.`
+      `Hotel cómodo y bien ubicado en ${hotel?.ciudad || 'tu destino'}.`
     );
   }
 
+  getVisibleAmenities(hotel: any) {
+    return getVisibleHotelAmenities(hotel);
+  }
+
   hasAmenity(hotel: any, amenity: AmenityKey): boolean {
-    const id = Number(hotel?.id || 0);
-    const tipo = String(hotel?.tipo || '').toUpperCase();
-    const price = this.getHotelPrice(hotel);
-
-    if (amenity === 'wifi') {
-      return id % 5 !== 0;
-    }
-
-    if (amenity === 'breakfast') {
-      return tipo === 'HOTEL' || tipo === 'RESORT' || id % 2 === 0;
-    }
-
-    if (amenity === 'airConditioning') {
-      return id % 3 !== 1;
-    }
-
-    if (amenity === 'kingBed') {
-      return tipo === 'RESORT' || price >= 200 || id % 4 === 0;
-    }
-
-    return false;
+    return hasHotelAmenity(hotel, amenity);
   }
 
   getArray(length: number): any[] {
     return Array.from({ length: length || 0 });
+  }
+
+  private normalizeText(value: string): string {
+    return value
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
   }
 }

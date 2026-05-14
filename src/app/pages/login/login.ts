@@ -14,6 +14,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 export class Login {
   email = '';
   password = '';
+
   errorMessage = signal<string>('');
   isLoading = signal<boolean>(false);
 
@@ -22,33 +23,77 @@ export class Login {
     private router: Router,
   ) {}
 
-  async handleSubmit(event: Event) {
+  handleSubmit(event: Event) {
     event.preventDefault();
-    if (!this.email || !this.password) {
-      this.errorMessage.set('Por favor, completa todos los campos.');
+
+    if (this.isLoading()) {
+      return;
+    }
+
+    this.errorMessage.set('');
+
+    const email = this.email.trim().toLowerCase();
+    const password = this.password.trim();
+
+    if (!email || !password) {
+      this.errorMessage.set('Introduce tu correo electrónico y contraseña.');
+      return;
+    }
+
+    if (!this.isValidEmail(email)) {
+      this.errorMessage.set('Introduce un correo electrónico válido.');
       return;
     }
 
     this.isLoading.set(true);
-    this.errorMessage.set('');
 
-    this.authService.login({ email: this.email, password: this.password }).subscribe({
+    this.authService.login({ email, password }).subscribe({
       next: () => {
         this.isLoading.set(false);
         this.router.navigate(['/']);
       },
       error: (err) => {
         this.isLoading.set(false);
-        if (err.error && typeof err.error === 'string') {
-          this.errorMessage.set(err.error);
-        } else if (err.error && err.error.message) {
-          this.errorMessage.set(err.error.message);
-        } else if (err.status === 401 || err.status === 403) {
-          this.errorMessage.set('Credenciales incorrectas. Vuelve a intentarlo.');
-        } else {
-          this.errorMessage.set('Error de conexión con el servidor.');
-        }
+        this.errorMessage.set(this.getLoginErrorMessage(err));
       },
     });
+  }
+
+  private isValidEmail(email: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  private getLoginErrorMessage(err: any): string {
+    const backendMessage = this.extractBackendMessage(err);
+
+    if (backendMessage) {
+      return backendMessage;
+    }
+
+    if (err?.status === 0) {
+      return 'No se pudo conectar con el servidor. Comprueba que el backend esté abierto.';
+    }
+
+    if (err?.status === 401 || err?.status === 403) {
+      return 'Correo electrónico o contraseña incorrectos.';
+    }
+
+    return 'No se pudo iniciar sesión. Inténtalo de nuevo más tarde.';
+  }
+
+  private extractBackendMessage(err: any): string {
+    if (typeof err?.error === 'string') {
+      return err.error;
+    }
+
+    if (err?.error?.message) {
+      return err.error.message;
+    }
+
+    if (err?.error?.detail) {
+      return err.error.detail;
+    }
+
+    return '';
   }
 }

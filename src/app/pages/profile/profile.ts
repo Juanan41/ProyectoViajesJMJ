@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -22,6 +22,11 @@ import { TranslationService } from '../../services/translation';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { ReservaService, ReservaResponse } from '../../services/reserva.service';
 import { OpinionDTO, OpinionService } from '../../services/opinion.service';
+import { TicketService } from '../../services/ticket.service';
+import {
+  getDistanceFromMadridKm,
+  toDestinationCoordinateKey,
+} from '../../data/destination-coordinates';
 import { catchError, forkJoin, of } from 'rxjs';
 
 export interface Trip {
@@ -42,9 +47,11 @@ export interface Trip {
   transport: {
     type: string;
     name: string;
+    identifier: string;
     time: string;
     seat: string;
     gate: string;
+    code: string;
   } | null;
 }
 
@@ -60,6 +67,7 @@ export class Profile implements OnInit {
   private translationService = inject(TranslationService);
   private reservaService = inject(ReservaService);
   private opinionService = inject(OpinionService);
+  private ticketService = inject(TicketService);
   private router = inject(Router);
 
   readonly MapPinIcon = MapPin;
@@ -80,6 +88,20 @@ export class Profile implements OnInit {
   pastTrips = signal<Trip[]>([]);
   reviews = signal<OpinionDTO[]>([]);
   isLoading = signal(true);
+
+  visitedDestinationsCount = computed(() => {
+    const visitedDestinations = this.pastTrips()
+      .map((trip) => toDestinationCoordinateKey(trip.destination))
+      .filter(Boolean);
+
+    return new Set(visitedDestinations).size;
+  });
+
+  traveledKm = computed(() => {
+    return this.pastTrips().reduce((total, trip) => {
+      return total + getDistanceFromMadridKm(trip.destination);
+    }, 0);
+  });
 
   editingReviewId: number | null = null;
   editReviewRating = 5;
@@ -111,17 +133,21 @@ export class Profile implements OnInit {
       ),
       reviews: this.opinionService.getMisOpiniones().pipe(
         catchError((err) => {
-          console.error('Error cargando resenas', err);
+          console.error('Error cargando reseñas', err);
           return of([]);
         }),
       ),
     }).subscribe({
       next: ({ reservas, reviews }) => {
         const trips = reservas.map((res) => this.toTrip(res));
-        const now = new Date().toISOString().split('T')[0];
+        const today = new Date().toISOString().split('T')[0];
 
-        this.activeTrips.set(trips.filter((t) => t.estado !== 'CANCELADA' && t.checkOut >= now));
-        this.pastTrips.set(trips.filter((t) => t.estado !== 'CANCELADA' && t.checkOut < now));
+        this.activeTrips.set(
+          trips.filter((trip) => trip.estado !== 'CANCELADA' && trip.checkOut >= today),
+        );
+        this.pastTrips.set(
+          trips.filter((trip) => trip.estado !== 'CANCELADA' && trip.checkOut < today),
+        );
         this.reviews.set(reviews);
         this.isLoading.set(false);
       },
@@ -251,29 +277,20 @@ export class Profile implements OnInit {
     return this.translationService.currentLang() === 'en' ? 'en-US' : 'es-ES';
   }
 
-  private generateSeat(id: number): string {
-    const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
-    const row = ((id * 3) % 30) + 1;
-    const letter = letters[id % letters.length];
-
-    return `${row}${letter}`;
-  }
-
-  private generateGate(id: number): string {
-    const gateNumber = ((id * 7) % 24) + 1;
-    return `G${String(gateNumber).padStart(2, '0')}`;
-  }
-
   private toTrip(reserva: ReservaResponse): Trip {
     let transportObj = null;
 
     if (reserva.transporteTipo) {
+      const ticket = this.ticketService.getTicketData(reserva);
+
       transportObj = {
-        type: reserva.transporteTipo,
-        name: reserva.transporteNombre || 'Transporte',
-        time: reserva.transporteHora || '12:00',
-        seat: reserva.transporteAsiento || this.generateSeat(reserva.id),
-        gate: reserva.transportePuerta || this.generateGate(reserva.id),
+        type: ticket.tipoTransporte,
+        name: ticket.nombreTransporte,
+        identifier: ticket.identificadorTransporte,
+        time: ticket.hora,
+        seat: ticket.asiento,
+        gate: ticket.puerta,
+        code: ticket.codigoTicket,
       };
     }
 

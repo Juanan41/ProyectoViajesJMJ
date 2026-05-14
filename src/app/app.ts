@@ -7,12 +7,7 @@ import { Footer } from './components/footer/footer';
   selector: 'app-root',
   standalone: true,
   imports: [RouterOutlet, Navbar, Footer],
-  template: `
-    <app-navbar></app-navbar>
-    <main>
-      <router-outlet></router-outlet>
-    </main>
-    <app-footer></app-footer>
-  `,
+  templateUrl: './app.html',
+  styleUrl: './app.css',
 })
 export class App {}

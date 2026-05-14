@@ -66,34 +66,15 @@
                 {{ 'Comodidades principales' | translate }}
               </label>
 
-              <div class="grid grid-cols-1 gap-3">
-                <button type="button" (click)="toggleAmenity('wifi')"
-                  [class]="filters.wifi ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500' : 'border-gray-700 bg-[rgb(23,25,25)] text-gray-400 hover:text-white hover:border-gray-500'"
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
+                @for (amenity of amenityOptions; track amenity.key) {
+                <button type="button" (click)="toggleAmenity(amenity.key)"
+                  [class]="isAmenitySelected(amenity.key) ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500' : 'border-gray-700 bg-[rgb(23,25,25)] text-gray-400 hover:text-white hover:border-gray-500'"
                   class="flex items-center gap-3 w-full p-3 rounded-xl border transition-all text-left">
-                  <lucide-icon [name]="WifiIcon" class="w-5 h-5"></lucide-icon>
-                  <span class="text-sm font-bold">{{ 'Wifi gratuito' | translate }}</span>
+                  <lucide-icon [name]="amenity.icon" class="w-5 h-5"></lucide-icon>
+                  <span class="text-sm font-bold">{{ amenity.label | translate }}</span>
                 </button>
-
-                <button type="button" (click)="toggleAmenity('breakfast')"
-                  [class]="filters.breakfast ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500' : 'border-gray-700 bg-[rgb(23,25,25)] text-gray-400 hover:text-white hover:border-gray-500'"
-                  class="flex items-center gap-3 w-full p-3 rounded-xl border transition-all text-left">
-                  <lucide-icon [name]="CoffeeIcon" class="w-5 h-5"></lucide-icon>
-                  <span class="text-sm font-bold">{{ 'Desayuno incluido' | translate }}</span>
-                </button>
-
-                <button type="button" (click)="toggleAmenity('airConditioning')"
-                  [class]="filters.airConditioning ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500' : 'border-gray-700 bg-[rgb(23,25,25)] text-gray-400 hover:text-white hover:border-gray-500'"
-                  class="flex items-center gap-3 w-full p-3 rounded-xl border transition-all text-left">
-                  <lucide-icon [name]="WindIcon" class="w-5 h-5"></lucide-icon>
-                  <span class="text-sm font-bold">{{ 'Aire acondicionado' | translate }}</span>
-                </button>
-
-                <button type="button" (click)="toggleAmenity('kingBed')"
-                  [class]="filters.kingBed ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500' : 'border-gray-700 bg-[rgb(23,25,25)] text-gray-400 hover:text-white hover:border-gray-500'"
-                  class="flex items-center gap-3 w-full p-3 rounded-xl border transition-all text-left">
-                  <lucide-icon [name]="BedDoubleIcon" class="w-5 h-5"></lucide-icon>
-                  <span class="text-sm font-bold">{{ 'Camas King size' | translate }}</span>
-                </button>
+                }
               </div>
             </div>
           </div>
@@ -144,7 +125,7 @@
                   </h3>
 
                   <div class="flex items-center gap-1">
-                    @for (_ of getArray(getHotelRating(hotel)); track _) {
+                    @for (_ of getArray(getHotelRating(hotel)); track $index) {
                     <lucide-icon [name]="StarIcon" class="w-4 h-4 fill-yellow-500 text-yellow-500"></lucide-icon>
                     }
                   </div>
@@ -165,31 +146,10 @@
               <div
                 class="flex flex-col sm:flex-row sm:items-center justify-between gap-5 pt-6 border-t border-gray-800">
                 <div class="flex flex-wrap gap-3">
-                  @if (hasAmenity(hotel, 'wifi')) {
+                  @for (amenity of getVisibleAmenities(hotel); track amenity.key) {
                   <div class="flex items-center gap-2 text-gray-400 text-xs font-bold uppercase tracking-widest">
-                    <lucide-icon [name]="WifiIcon" class="w-4 h-4 text-emerald-500"></lucide-icon>
-                    {{ 'Wifi' | translate }}
-                  </div>
-                  }
-
-                  @if (hasAmenity(hotel, 'breakfast')) {
-                  <div class="flex items-center gap-2 text-gray-400 text-xs font-bold uppercase tracking-widest">
-                    <lucide-icon [name]="CoffeeIcon" class="w-4 h-4 text-emerald-500"></lucide-icon>
-                    {{ 'Desayuno' | translate }}
-                  </div>
-                  }
-
-                  @if (hasAmenity(hotel, 'airConditioning')) {
-                  <div class="flex items-center gap-2 text-gray-400 text-xs font-bold uppercase tracking-widest">
-                    <lucide-icon [name]="WindIcon" class="w-4 h-4 text-emerald-500"></lucide-icon>
-                    {{ 'A/C' | translate }}
-                  </div>
-                  }
-
-                  @if (hasAmenity(hotel, 'kingBed')) {
-                  <div class="flex items-center gap-2 text-gray-400 text-xs font-bold uppercase tracking-widest">
-                    <lucide-icon [name]="BedDoubleIcon" class="w-4 h-4 text-emerald-500"></lucide-icon>
-                    {{ 'King' | translate }}
+                    <lucide-icon [name]="amenity.icon" class="w-4 h-4 text-emerald-500"></lucide-icon>
+                    {{ amenity.shortLabel | translate }}
                   </div>
                   }
                 </div>

@@ -42,7 +42,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
               <div
                 class="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-6"
               >
-                <div class="text-emerald-500 text-2xl">✈️</div>
+                <div class="text-emerald-500 text-2xl">✈</div>
               </div>
               <h3 class="text-xl font-bold text-white mb-3 uppercase tracking-tight">
                 {{ 'Mejores Vuelos' | translate }}
@@ -60,7 +60,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
               <div
                 class="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-6"
               >
-                <div class="text-emerald-500 text-2xl">🏨</div>
+                <div class="text-emerald-500 text-2xl font-black">H</div>
               </div>
               <h3 class="text-xl font-bold text-white mb-3 uppercase tracking-tight">
                 {{ 'Hoteles Premium' | translate }}
@@ -78,7 +78,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
               <div
                 class="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-6"
               >
-                <div class="text-emerald-500 text-2xl">🛡️</div>
+                <div class="text-emerald-500 text-2xl">✓</div>
               </div>
               <h3 class="text-xl font-bold text-white mb-3 uppercase tracking-tight">
                 {{ 'Seguro Total' | translate }}

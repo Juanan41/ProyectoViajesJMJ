@@ -1,5 +1,5 @@
-<div class="min-h-screen bg-[rgb(23,25,25)] flex">
-  <aside class="w-64 border-r border-white/5 flex flex-col p-6 gap-2">
+<div class="min-h-screen bg-[rgb(23,25,25)] flex flex-col lg:flex-row">
+  <aside class="w-full lg:w-64 border-b lg:border-b-0 lg:border-r border-white/5 flex flex-col p-6 gap-2">
     <div class="mb-8">
       <p class="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-1">
         {{ 'Panel de Control' | translate }}
@@ -45,7 +45,7 @@
     </button>
   </aside>
 
-  <main class="flex-1 p-10">
+  <main class="flex-1 p-4 sm:p-6 lg:p-10 overflow-x-hidden">
     @if (activeTab() === 'stats') {
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
       <div class="bg-white/5 p-8 rounded-[2rem] border border-white/5">
@@ -109,8 +109,8 @@
       </div>
     </div>
 
-    <div class="bg-white/5 rounded-[2rem] border border-white/5 overflow-hidden">
-      <table class="w-full text-left">
+    <div class="bg-white/5 rounded-[2rem] border border-white/5 overflow-x-auto">
+      <table class="w-full min-w-[760px] text-left">
         <thead class="bg-white/5 text-[10px] font-black text-gray-500 uppercase tracking-widest">
           <tr>
             <th class="px-8 py-6">ID</th>
@@ -201,7 +201,7 @@
     @if (activeTab() === 'hoteles') {
     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
       <h2 class="text-2xl font-black text-white uppercase tracking-tighter">
-        {{ 'Gestion de hoteles' | translate }}
+        {{ 'Gestión de hoteles' | translate }}
       </h2>
 
       <div class="flex flex-col sm:flex-row gap-3">
@@ -222,13 +222,13 @@
         <button (click)="openCreateHotel()"
           class="bg-emerald-500 text-[rgb(23,25,25)] font-black px-6 py-3 rounded-xl text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-emerald-400 transition-all">
           <lucide-icon [name]="PlusIcon" class="w-4 h-4"></lucide-icon>
-          {{ 'Anadir hotel' | translate }}
+          {{ 'Añadir hotel' | translate }}
         </button>
       </div>
     </div>
 
-    <div class="bg-white/5 rounded-[2rem] border border-white/5 overflow-hidden mb-24">
-      <table class="w-full text-left">
+    <div class="bg-white/5 rounded-[2rem] border border-white/5 overflow-x-auto mb-24">
+      <table class="w-full min-w-[980px] text-left">
         <thead class="bg-white/5 text-[10px] font-black text-gray-500 uppercase tracking-widest">
           <tr>
             <th class="px-6 py-5">{{ 'Hotel' | translate }}</th>
@@ -299,8 +299,8 @@
       </div>
     </div>
 
-    <div class="bg-white/5 rounded-[2rem] border border-white/5 overflow-hidden">
-      <table class="w-full text-left">
+    <div class="bg-white/5 rounded-[2rem] border border-white/5 overflow-x-auto">
+      <table class="w-full min-w-[1100px] text-left">
         <thead class="bg-white/5 text-[10px] font-black text-gray-500 uppercase tracking-widest">
           <tr>
             <th class="px-6 py-5">{{ 'Reserva' | translate }}</th>
@@ -609,7 +609,7 @@
 
     <h2 class="text-2xl font-black text-white mb-6">
       @if (hotelMode() === 'create') {
-      {{ 'Anadir hotel' | translate }}
+      {{ 'Añadir hotel' | translate }}
       } @else {
       {{ 'Editar hotel' | translate }}
       }
@@ -661,7 +661,7 @@
 
         <div>
           <label class="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">
-            {{ 'Pais' | translate }}
+            {{ 'País' | translate }}
           </label>
           <input [(ngModel)]="editHotelForm.pais" name="hotelPais"
             class="w-full bg-[rgb(23,25,25)] border border-gray-700 text-white rounded-xl p-3 outline-none focus:border-emerald-500" />

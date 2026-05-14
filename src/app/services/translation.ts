@@ -25,6 +25,7 @@ export class TranslationService {
       'Eliminando...': 'Deleting...',
       'Borrando...': 'Deleting...',
       Entendido: 'Got it',
+      Cerrar: 'Close',
       Editar: 'Edit',
       Borrar: 'Delete',
       Eliminar: 'Delete',
@@ -104,8 +105,10 @@ export class TranslationService {
       // Footer
       Privacidad: 'Privacy',
       Términos: 'Terms',
+      Terminos: 'Terms',
       Contacto: 'Contact',
       'Información legal': 'Legal information',
+      'Informacion legal': 'Legal information',
       'Condiciones de uso': 'Terms of use',
       Soporte: 'Support',
       'Usaremos tus datos únicamente para gestionar cuentas, reservas, reseñas y métodos de pago simulados.':
@@ -118,6 +121,14 @@ export class TranslationService {
         'Amounts, cards, and tickets are used only to simulate the project flow and do not represent real purchases.',
       'Puedes contactar con el equipo del proyecto para revisar dudas sobre reservas, usuarios o funcionamiento de la aplicación.':
         'You can contact the project team to ask about bookings, users, or how the application works.',
+      'En ViajesJMJ respetamos la privacidad de los usuarios. Los datos introducidos en la aplicacion se usan unicamente para gestionar cuentas, reservas, resenas y metodos de pago simulados.':
+        'At ViajesJMJ we respect user privacy. The data entered in the application is used only to manage accounts, bookings, reviews, and simulated payment methods.',
+      'Este proyecto forma parte de una aplicacion academica, por lo que la informacion mostrada tiene finalidad demostrativa.':
+        'This project is part of an academic application, so the information shown is for demonstration purposes.',
+      'ViajesJMJ permite explorar destinos, reservar alojamientos, consultar tickets y gestionar resenas dentro de un entorno de demostracion.':
+        'ViajesJMJ lets users explore destinations, book accommodation, check tickets, and manage reviews in a demonstration environment.',
+      'Las reservas, pagos, tickets y recibos generados en la aplicacion pertenecen al funcionamiento del proyecto y no representan compras reales.':
+        'The bookings, payments, tickets, and receipts generated in the application belong to the project flow and do not represent real purchases.',
 
       // Pantalla carga
       Estamos: 'We are',
@@ -200,11 +211,22 @@ export class TranslationService {
       'Cargando alojamientos...': 'Loading accommodation...',
       'Volver a destinos': 'Back to destinations',
       'Precio máximo': 'Maximum price',
+      'Todos los continentes': 'All continents',
+      'Ordenar por': 'Sort by',
+      Relevancia: 'Relevance',
+      'Precio: menor a mayor': 'Price: low to high',
+      'Precio: mayor a menor': 'Price: high to low',
       'Comodidades principales': 'Main amenities',
       'Wifi gratuito': 'Free Wi-Fi',
       'Desayuno incluido': 'Breakfast included',
       'Aire acondicionado': 'Air conditioning',
       'Camas King size': 'King-size beds',
+      Piscina: 'Pool',
+      Spa: 'Spa',
+      Gimnasio: 'Gym',
+      'Parking privado': 'Private parking',
+      Restaurante: 'Restaurant',
+      'Buenas vistas': 'Great views',
       'No hay alojamientos que coincidan con esos filtros.':
         'There are no accommodations matching those filters.',
       Wifi: 'Wi-Fi',
@@ -241,6 +263,64 @@ export class TranslationService {
       'Necesitas tener una tarjeta asociada a tu cuenta para reservar.':
         'You need to have a card linked to your account to book.',
       'Saldo insuficiente en tu cartera.': 'Insufficient balance in your wallet.',
+      'Descripción del hotel': 'Hotel description',
+      'Comodidades del hotel': 'Hotel amenities',
+      'Habitaciones disponibles': 'Available rooms',
+      'Selecciona una habitación compatible con el número de huéspedes.':
+        'Select a room compatible with the number of guests.',
+      'Huéspedes actuales': 'Current guests',
+      'No hay habitaciones disponibles en este hotel.': 'No rooms are available at this hotel.',
+      'No hay habitaciones compatibles': 'No compatible rooms',
+      'Reduce el número de huéspedes o elige una habitación con más capacidad.':
+        'Reduce the number of guests or choose a room with more capacity.',
+      Seleccionada: 'Selected',
+      'Capacidad insuficiente': 'Insufficient capacity',
+      Capacidad: 'Capacity',
+      Individual: 'Single',
+      Doble: 'Double',
+      Suite: 'Suite',
+      SOLO_ALOJAMIENTO: 'Room only',
+      DESAYUNO: 'Breakfast included',
+      MEDIA_PENSION: 'Half board',
+      PENSION_COMPLETA: 'Full board',
+      TODO_INCLUIDO: 'All inclusive',
+      'Solo alojamiento': 'Room only',
+      'Media pensión': 'Half board',
+      'Pensión completa': 'Full board',
+      'Todo incluido': 'All inclusive',
+      'Esta habitación no admite tantos huéspedes.': 'This room does not allow that many guests.',
+      'Suite recomendada para grupos de hasta 4 personas.':
+        'Suite recommended for groups of up to 4 people.',
+      'Elegida': 'Chosen',
+      'Elegir habitación': 'Choose room',
+      'Habitación seleccionada': 'Selected room',
+      'No hay ninguna habitación compatible seleccionada.': 'No compatible room is selected.',
+      'Las suites están pensadas para grupos de hasta 4 personas.':
+        'Suites are designed for groups of up to 4 people.',
+      'Reservar ahora': 'Book now',
+      'Fechas incorrectas': 'Invalid dates',
+      'Sin habitaciones disponibles': 'No rooms available',
+      'Selecciona una habitación': 'Select a room',
+      'Habitación no disponible': 'Room unavailable',
+      'Tarjeta necesaria': 'Card required',
+      'Saldo insuficiente': 'Insufficient balance',
+      'No se pudo completar la reserva': 'The booking could not be completed',
+      'Necesitas iniciar sesión para poder realizar una reserva.':
+        'You need to sign in to make a booking.',
+      'La fecha de salida debe ser posterior a la fecha de entrada.':
+        'The check-out date must be after the check-in date.',
+      'Debes seleccionar una habitación compatible antes de reservar.':
+        'You must select a compatible room before booking.',
+      'La habitación seleccionada no tiene capacidad suficiente para los huéspedes indicados.':
+        'The selected room does not have enough capacity for the guests entered.',
+      'No tienes saldo suficiente en tu cartera para completar esta reserva.':
+        'You do not have enough wallet balance to complete this booking.',
+      'Hubo un error al reservar. Revisa tu saldo, las fechas o la disponibilidad del hotel.':
+        'There was an error booking. Check your balance, dates, or hotel availability.',
+      'No tienes saldo suficiente para completar esta reserva.':
+        'You do not have enough balance to complete this booking.',
+      'Selecciona una habitación compatible para poder reservar.':
+        'Select a compatible room to book.',
       'Hoteles similares': 'Similar hotels',
       'Borrar reseña': 'Delete review',
       '¿Seguro que quieres borrar esta reseña?': 'Are you sure you want to delete this review?',
@@ -400,7 +480,8 @@ export class TranslationService {
       'Hotel creado': 'Hotel created',
       'Hotel actualizado': 'Hotel updated',
       'Hotel eliminado': 'Hotel deleted',
-      'Los cambios del hotel se han guardado correctamente.': 'The hotel changes have been saved successfully.',
+      'Los cambios del hotel se han guardado correctamente.':
+        'The hotel changes have been saved successfully.',
       'El hotel se ha eliminado correctamente.': 'The hotel has been deleted successfully.',
       'Eliminar hotel': 'Delete hotel',
       'No se pudo eliminar el hotel': 'The hotel could not be deleted',
@@ -762,27 +843,22 @@ export class TranslationService {
         'Futuristic city with technology, culture, and tradition.',
       'Historia imperial, cultura china y monumentos icónicos.':
         'Imperial history, Chinese culture, and iconic monuments.',
-      'Templos, mercados y vida nocturna exótica.':
-        'Temples, markets, and exotic nightlife.',
+      'Templos, mercados y vida nocturna exótica.': 'Temples, markets, and exotic nightlife.',
       'Lujo, rascacielos y experiencias en el desierto.':
         'Luxury, skyscrapers, and desert experiences.',
       'Historia antigua, pirámides y cultura egipcia.':
         'Ancient history, pyramids, and Egyptian culture.',
-      'Playas paradisíacas y aguas cristalinas.':
-        'Paradise beaches and crystal-clear waters.',
+      'Playas paradisíacas y aguas cristalinas.': 'Paradise beaches and crystal-clear waters.',
       'Safari africano y naturaleza salvaje.': 'African safari and wild nature.',
       'Mercados tradicionales, cultura marroquí y arquitectura exótica.':
         'Traditional markets, Moroccan culture, and exotic architecture.',
       'Playas paradisíacas y relax total.': 'Paradise beaches and total relaxation.',
       'Arte, cultura y vida cosmopolita.': 'Art, culture, and cosmopolitan life.',
-      'Playas paradisíacas y relax en el Caribe.':
-        'Paradise beaches and Caribbean relaxation.',
-      'Arquitectura, música y ambiente urbano.':
-        'Architecture, music, and urban atmosphere.',
+      'Playas paradisíacas y relax en el Caribe.': 'Paradise beaches and Caribbean relaxation.',
+      'Arquitectura, música y ambiente urbano.': 'Architecture, music, and urban atmosphere.',
       'Playas, carnaval y paisajes icónicos como el Cristo Redentor.':
         'Beaches, carnival, and iconic landscapes such as Christ the Redeemer.',
-      'Cultura, tango y gastronomía argentina.':
-        'Culture, tango, and Argentine gastronomy.',
+      'Cultura, tango y gastronomía argentina.': 'Culture, tango, and Argentine gastronomy.',
       'Ciudad moderna rodeada de montañas y naturaleza.':
         'Modern city surrounded by mountains and nature.',
       'Islas volcánicas, playas tranquilas y cultura polinesia.':
@@ -947,10 +1023,8 @@ export class TranslationService {
         'Boutique hotel with its own artisan bakery.',
       'Palacio andalusí con patios ajardinados y azulejos tradicionales.':
         'Andalusian palace with garden courtyards and traditional tiles.',
-      'Vistas directas a la Catedral desde la terraza.':
-        'Direct cathedral views from the terrace.',
-      'Vistas panorámicas de Roma desde el Pincio.':
-        'Panoramic views of Rome from the Pincio.',
+      'Vistas directas a la Catedral desde la terraza.': 'Direct cathedral views from the terrace.',
+      'Vistas panorámicas de Roma desde el Pincio.': 'Panoramic views of Rome from the Pincio.',
       'Palacio gótico con vistas a la laguna veneciana.':
         'Gothic palace with views of the Venetian lagoon.',
       'Lujo exclusivo con jardín privado en el centro de Milán.':
@@ -969,6 +1043,32 @@ export class TranslationService {
         'Themed resort with a water park and aquarium.',
       'Icono histórico de Nueva York frente a Central Park.':
         'Historic New York icon facing Central Park.',
+      'Completa todos los campos para crear tu cuenta.':
+        'Complete all fields to create your account.',
+      'El nombre debe tener al menos 3 caracteres.': 'The name must be at least 3 characters long.',
+      'Introduce un correo electrónico válido.': 'Enter a valid email address.',
+      'La contraseña debe tener al menos 6 caracteres.':
+        'The password must be at least 6 characters long.',
+      'Las contraseñas no coinciden.': 'Passwords do not match.',
+      'No se pudo conectar con el servidor. Comprueba que el backend esté abierto.':
+        'Could not connect to the server. Check that the backend is running.',
+      'Ya existe una cuenta con ese correo electrónico.':
+        'An account with that email already exists.',
+      'Revisa los datos introducidos e inténtalo de nuevo.':
+        'Review the entered data and try again.',
+      'No se pudo crear la cuenta. Inténtalo de nuevo más tarde.':
+        'The account could not be created. Please try again later.',
+      'Introduce tu correo electrónico y contraseña.': 'Enter your email and password.',
+      'Correo electrónico o contraseña incorrectos.': 'Incorrect email or password.',
+      'No se pudo iniciar sesión. Inténtalo de nuevo más tarde.':
+        'Could not sign in. Please try again later.',
+      'Introduce tu correo electrónico.': 'Enter your email address.',
+      'Introduce tu contraseña.': 'Enter your password.',
+      'Introduce tu nombre completo.': 'Enter your full name.',
+      'Introduce una contraseña.': 'Enter a password.',
+      'Ya existe una cuenta con ese nombre de usuario.':
+        'An account with that username already exists.',
+      'Usuario registrado correctamente.': 'User registered successfully.',
     },
   };
 
@@ -1092,6 +1192,19 @@ export class TranslationService {
       return null;
     }
 
+    const destinationDescription = value.match(
+      /^(.+) destaca por sus (.+), una parada imprescindible para conocer (.+)\.$/i,
+    );
+    if (destinationDescription) {
+      return `${this.translate(destinationDescription[1])} stands out for its ${this.translateDestinationTheme(destinationDescription[2])}, an essential stop to discover ${this.translate(destinationDescription[3])}.`;
+    }
+
+    const hotelName = value.match(/^Hotel (Central|Grand Palace|Boutique|Vista) (.+)$/i);
+    if (hotelName) {
+      const hotelStyle = this.translateHotelStyle(hotelName[1]);
+      return `${hotelStyle} Hotel ${this.translate(hotelName[2])}`;
+    }
+
     const featuredHotels = value.match(/^Hoteles destacados en (.+)\.$/i);
     if (featuredHotels) {
       return `Featured hotels in ${this.translate(featuredHotels[1])}.`;
@@ -1108,5 +1221,52 @@ export class TranslationService {
     }
 
     return null;
+  }
+
+  private translateHotelStyle(value: string): string {
+    const normalized = this.toComparableKey(value);
+
+    if (normalized === 'central') return 'Central';
+    if (normalized === 'grand palace') return 'Grand Palace';
+    if (normalized === 'boutique') return 'Boutique';
+    if (normalized === 'vista') return 'View';
+
+    return value;
+  }
+
+  private translateDestinationTheme(value: string): string {
+    const normalized = this.toComparableKey(value);
+    const themes: Record<string, string> = {
+      'centros historicos plazas animadas y patrimonio europeo':
+        'historic centers, lively squares, and European heritage',
+      'arquitectura museos y vida urbana con mucho caracter':
+        'architecture, museums, and urban life with plenty of character',
+      'barrios antiguos cafes y rutas culturales': 'old neighborhoods, cafes, and cultural routes',
+      'templos mercados y contrastes urbanos': 'temples, markets, and urban contrasts',
+      'tradiciones locales gastronomia y grandes paisajes asiaticos':
+        'local traditions, gastronomy, and great Asian landscapes',
+      'historia tecnologia y vida callejera intensa':
+        'history, technology, and intense street life',
+      'paisajes naturales mercados y cultura local': 'natural landscapes, markets, and local culture',
+      'historia colores urbanos y experiencias africanas':
+        'history, colorful cities, and African experiences',
+      'patrimonio naturaleza y gastronomia regional': 'heritage, nature, and regional gastronomy',
+      'playas grandes avenidas y cultura norteamericana':
+        'beaches, wide avenues, and North American culture',
+      'barrios vivos musica y paisajes reconocibles':
+        'lively neighborhoods, music, and recognizable landscapes',
+      'centros historicos costa y ocio urbano': 'historic centers, coastline, and urban leisure',
+      'paisajes andinos barrios historicos y cultura sudamericana':
+        'Andean landscapes, historic neighborhoods, and South American culture',
+      'naturaleza plazas coloniales y gastronomia local':
+        'nature, colonial squares, and local gastronomy',
+      'color urbano tradicion y rutas panoramicas':
+        'urban color, tradition, and scenic routes',
+      'playas lagunas y naturaleza del pacifico': 'beaches, lagoons, and Pacific nature',
+      'paisajes oceanicos cultura local y relax': 'ocean landscapes, local culture, and relaxation',
+      'islas costas y experiencias al aire libre': 'islands, coastlines, and outdoor experiences',
+    };
+
+    return themes[normalized] || value;
   }
 }

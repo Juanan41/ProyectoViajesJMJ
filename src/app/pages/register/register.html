@@ -2,7 +2,7 @@
   <div class="absolute inset-0 z-0">
     <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent"></div>
     <div
-      class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05q=80&w=2074')] bg-cover bg-center opacity-10 mix-blend-overlay">
+      class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=2074')] bg-cover bg-center opacity-10 mix-blend-overlay">
     </div>
   </div>
 
@@ -13,46 +13,59 @@
           class="inline-flex items-center justify-center w-16 h-16 bg-emerald-500 rounded-2xl mb-6 shadow-lg shadow-emerald-500/20">
           <span class="text-2xl">🌍</span>
         </a>
-        <h1 class="text-3xl font-black text-white uppercase tracking-tighter mb-2">{{ 'Únete a ViajesJMJ' | translate }}
+
+        <h1 class="text-3xl font-black text-white uppercase tracking-tighter mb-2">
+          {{ 'Únete a ViajesJMJ' | translate }}
         </h1>
-        <p class="text-gray-400 font-medium">{{ 'Crea tu cuenta gratis' | translate }}</p>
+
+        <p class="text-gray-400 font-medium">
+          {{ 'Crea tu cuenta gratis' | translate }}
+        </p>
       </div>
 
       @if (errorMessage()) {
       <div
-        class="bg-red-500/10 border border-red-500/20 text-red-500 text-sm font-bold px-4 py-3 rounded-xl mb-6 text-center uppercase tracking-widest">
+        class="bg-red-500/10 border border-red-500/20 text-red-500 text-sm font-bold px-4 py-3 rounded-xl mb-6 text-center">
         {{ errorMessage() | translate }}
       </div>
       }
 
       <form (submit)="handleSubmit($event)" class="space-y-4">
         <div>
-          <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">{{ 'Nombre Completo'
-            | translate }}</label>
+          <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">
+            {{ 'Nombre Completo' | translate }}
+          </label>
+
           <input type="text" [(ngModel)]="name" name="name" required
             class="w-full bg-[rgb(23,25,25)] border border-gray-800 text-white rounded-xl px-4 py-3.5 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all placeholder-gray-600"
             [placeholder]="'Juan Pérez' | translate" />
         </div>
 
         <div>
-          <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">{{ 'Correo
-            electrónico' | translate }}</label>
+          <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">
+            {{ 'Correo electrónico' | translate }}
+          </label>
+
           <input type="email" [(ngModel)]="email" name="email" required
             class="w-full bg-[rgb(23,25,25)] border border-gray-800 text-white rounded-xl px-4 py-3.5 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all placeholder-gray-600"
             [placeholder]="'tu@email.com' | translate" />
         </div>
 
         <div>
-          <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">{{ 'Contraseña' |
-            translate }}</label>
+          <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">
+            {{ 'Contraseña' | translate }}
+          </label>
+
           <input type="password" [(ngModel)]="password" name="password" required
             class="w-full bg-[rgb(23,25,25)] border border-gray-800 text-white rounded-xl px-4 py-3.5 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all placeholder-gray-600"
             placeholder="••••••••" />
         </div>
 
         <div>
-          <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">{{ 'Confirmar
-            Contraseña' | translate }}</label>
+          <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">
+            {{ 'Confirmar Contraseña' | translate }}
+          </label>
+
           <input type="password" [(ngModel)]="confirmPassword" name="confirmPassword" required
             class="w-full bg-[rgb(23,25,25)] border border-gray-800 text-white rounded-xl px-4 py-3.5 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all placeholder-gray-600"
             placeholder="••••••••" />
@@ -70,8 +83,9 @@
 
       <p class="text-center text-gray-400 mt-8 text-sm font-medium">
         {{ '¿Ya tienes cuenta' | translate }}
-        <a routerLink="/login" class="text-emerald-500 hover:text-emerald-400 font-bold ml-1 transition-colors">{{
-          'Inicia sesión' | translate }}</a>
+        <a routerLink="/login" class="text-emerald-500 hover:text-emerald-400 font-bold ml-1 transition-colors">
+          {{ 'Inicia sesión' | translate }}
+        </a>
       </p>
     </div>
   </div>

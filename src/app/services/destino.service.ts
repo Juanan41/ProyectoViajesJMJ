@@ -36,47 +36,131 @@ export class DestinoService {
   private defaultBackendImage = 'photo-1436491865332-7a61a109cc05';
 
   private englishAliases: Record<string, string[]> = {
-    madrid: ['madrid', 'spain'],
-    paris: ['paris', 'france'],
-    roma: ['rome', 'italy'],
-    londres: ['london', 'united kingdom', 'uk', 'england'],
-    atenas: ['athens', 'greece'],
-    viena: ['vienna', 'austria'],
-
-    tokio: ['tokyo', 'japan'],
-    bangkok: ['bangkok', 'thailand'],
-    pekin: ['beijing', 'china'],
-    dubai: ['dubai', 'united arab emirates', 'uae'],
-    'nueva delhi': ['new delhi', 'delhi', 'india'],
-    seul: ['seoul', 'south korea', 'korea'],
-
-    'el cairo': ['cairo', 'egypt'],
-    marrakech: ['marrakesh', 'morocco'],
-    nairobi: ['nairobi', 'kenya'],
-    zanzibar: ['zanzibar', 'tanzania'],
-    sahara: ['sahara', 'desert', 'morocco'],
-    'ciudad del cabo': ['cape town', 'south africa'],
-
-    sidney: ['sydney', 'australia'],
-    melbourne: ['melbourne', 'australia'],
-    auckland: ['auckland', 'new zealand'],
+    paris: ['paris'],
+    roma: ['rome'],
+    londres: ['london'],
+    atenas: ['athens'],
+    viena: ['vienna'],
+    praga: ['prague'],
+    varsovia: ['warsaw'],
+    estocolmo: ['stockholm'],
+    copenhague: ['copenhagen'],
+    pekin: ['beijing'],
+    tokio: ['tokyo'],
+    seul: ['seoul'],
+    'nueva delhi': ['new delhi', 'delhi'],
+    'el cairo': ['cairo'],
+    marrakech: ['marrakesh'],
+    'ciudad del cabo': ['cape town'],
+    sidney: ['sydney'],
     fiyi: ['fiji'],
-    'bora bora': ['bora bora', 'french polynesia'],
-    perth: ['perth', 'australia'],
+    'nueva york': ['new york'],
+    'ciudad de mexico': ['mexico city'],
+    'rio de janeiro': ['rio de janeiro'],
+    'río de janeiro': ['rio de janeiro'],
+    'santiago de chile': ['santiago chile', 'santiago'],
+  };
 
-    'nueva york': ['new york', 'usa', 'united states', 'america'],
-    'ciudad de mexico': ['mexico city', 'mexico'],
-    toronto: ['toronto', 'canada'],
-    'san francisco': ['san francisco', 'usa', 'united states'],
-    cancun: ['cancun', 'mexico'],
-    chicago: ['chicago', 'usa', 'united states'],
+  private countryAliases: Record<string, string[]> = {
+    alemania: ['germany'],
+    argelia: ['algeria'],
+    argentina: ['argentina'],
+    aruba: ['aruba'],
+    australia: ['australia'],
+    austria: ['austria'],
+    bahamas: ['bahamas'],
+    belice: ['belize'],
+    belgica: ['belgium'],
+    bolivia: ['bolivia'],
+    brasil: ['brazil'],
+    canada: ['canada'],
+    catar: ['qatar'],
+    chile: ['chile'],
+    china: ['china'],
+    colombia: ['colombia'],
+    'corea del sur': ['south korea', 'korea'],
+    'costa rica': ['costa rica'],
+    cuba: ['cuba'],
+    curazao: ['curacao', 'curaçao'],
+    ecuador: ['ecuador'],
+    egipto: ['egypt'],
+    'el salvador': ['el salvador'],
+    'emiratos arabes unidos': ['united arab emirates', 'uae'],
+    espana: ['spain'],
+    'estados unidos': ['united states', 'usa', 'us'],
+    etiopia: ['ethiopia'],
+    filipinas: ['philippines'],
+    fiyi: ['fiji'],
+    francia: ['france'],
+    ghana: ['ghana'],
+    grecia: ['greece'],
+    guam: ['guam'],
+    guatemala: ['guatemala'],
+    'guayana francesa': ['french guiana'],
+    guyana: ['guyana'],
+    honduras: ['honduras'],
+    hungria: ['hungary'],
+    india: ['india'],
+    indonesia: ['indonesia'],
+    'islas cook': ['cook islands'],
+    'islas salomon': ['solomon islands'],
+    israel: ['israel'],
+    italia: ['italy'],
+    jamaica: ['jamaica'],
+    japon: ['japan'],
+    kenia: ['kenya'],
+    kiribati: ['kiribati'],
+    malasia: ['malaysia'],
+    marruecos: ['morocco'],
+    mauricio: ['mauritius'],
+    micronesia: ['micronesia'],
+    mexico: ['mexico'],
+    namibia: ['namibia'],
+    nepal: ['nepal'],
+    nicaragua: ['nicaragua'],
+    nigeria: ['nigeria'],
+    'nueva caledonia': ['new caledonia'],
+    'nueva zelanda': ['new zealand'],
+    palaos: ['palau'],
+    panama: ['panama'],
+    'papua nueva guinea': ['papua new guinea'],
+    paraguay: ['paraguay'],
+    'paises bajos': ['netherlands', 'holland'],
+    peru: ['peru'],
+    'polinesia francesa': ['french polynesia'],
+    polonia: ['poland'],
+    portugal: ['portugal'],
+    'puerto rico': ['puerto rico'],
+    'reino unido': ['united kingdom', 'uk', 'england'],
+    'republica checa': ['czech republic', 'czechia'],
+    'republica dominicana': ['dominican republic'],
+    ruanda: ['rwanda'],
+    samoa: ['samoa'],
+    senegal: ['senegal'],
+    seychelles: ['seychelles'],
+    singapur: ['singapore'],
+    sudafrica: ['south africa'],
+    suecia: ['sweden'],
+    suiza: ['switzerland'],
+    surinam: ['suriname'],
+    tailandia: ['thailand'],
+    tanzania: ['tanzania'],
+    tunez: ['tunisia'],
+    tonga: ['tonga'],
+    turquia: ['turkey'],
+    uruguay: ['uruguay'],
+    vanuatu: ['vanuatu'],
+    venezuela: ['venezuela'],
+    vietnam: ['vietnam'],
+  };
 
-    'rio de janeiro': ['rio de janeiro', 'brazil'],
-    'buenos aires': ['buenos aires', 'argentina'],
-    'machu picchu': ['machu picchu', 'peru'],
-    cartagena: ['cartagena', 'colombia'],
-    'santiago de chile': ['santiago', 'santiago chile', 'chile'],
-    montevideo: ['montevideo', 'uruguay'],
+  private continentAliases: Record<number, string[]> = {
+    1: ['europe'],
+    2: ['asia'],
+    3: ['africa'],
+    4: ['north america'],
+    5: ['south america'],
+    6: ['oceania', 'australia pacific'],
   };
 
   public getFullImageUrl(imagePath: string): string {
@@ -104,62 +188,19 @@ export class DestinoService {
     if (!d) return {} as DestinoDTO;
 
     let path = d.imagen || d.imagenUrl;
-    const nameForImage = (d.ciudad || d.nombre || d.pais || '').toString().trim();
     const hasBackendDefault = path && path.includes(this.defaultBackendImage);
 
     if (!path || hasBackendDefault) {
-      if (nameForImage) {
-        path = 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1600';
-      } else {
-        const index = (d.id || 0) % this.fallbackImages.length;
-        path = this.fallbackImages[index];
-      }
+      const index = Number(d.id || 0) % this.fallbackImages.length;
+      path = this.fallbackImages[index];
     }
-
-    const fullUrl = this.getFullImageUrl(path);
 
     let contId = d.continenteId;
     if (d.continente && d.continente.id) contId = d.continente.id;
+    if (!contId && d.continente) contId = this.getContinentIdFromName(d.continente.toString());
+    if (!contId) contId = this.getContinentIdFromCountry(d.pais || '');
 
-    if (!contId && d.continente) {
-      const cont = d.continente.toString().toLowerCase();
-
-      if (cont.includes('europa')) contId = 1;
-      else if (cont.includes('asia')) contId = 2;
-      else if (cont.includes('áfrica') || cont.includes('africa')) contId = 3;
-      else if (cont.includes('américa del norte') || cont.includes('america del norte')) contId = 5;
-      else if (cont.includes('américa del sur') || cont.includes('america del sur')) contId = 6;
-      else if (cont.includes('oceanía') || cont.includes('oceania')) contId = 4;
-    }
-
-    if (!contId) {
-      const pais = this.normalizeText(d.pais || '');
-
-      if (
-        ['espana', 'francia', 'italia', 'alemania', 'reino unido', 'grecia', 'austria'].includes(
-          pais,
-        )
-      )
-        contId = 1;
-      else if (
-        [
-          'japon',
-          'china',
-          'india',
-          'tailandia',
-          'emiratos arabes unidos',
-          'corea del sur',
-        ].includes(pais)
-      )
-        contId = 2;
-      else if (['egipto', 'marruecos', 'kenia', 'sudafrica', 'tanzania'].includes(pais)) contId = 3;
-      else if (['australia', 'nueva zelanda', 'fiyi', 'polinesia francesa'].includes(pais))
-        contId = 4;
-      else if (['estados unidos', 'mexico', 'canada'].includes(pais)) contId = 5;
-      else if (['brasil', 'argentina', 'colombia', 'chile', 'peru', 'uruguay'].includes(pais))
-        contId = 6;
-      else contId = 1;
-    }
+    const fullUrl = this.getFullImageUrl(path);
 
     return {
       ...d,
@@ -168,6 +209,135 @@ export class DestinoService {
       imagen: fullUrl,
       imagenUrl: fullUrl,
     };
+  }
+
+  private getContinentIdFromName(value: string): number {
+    const cont = this.normalizeText(value);
+
+    if (cont.includes('europa')) return 1;
+    if (cont.includes('asia')) return 2;
+    if (cont.includes('africa')) return 3;
+    if (cont.includes('america del norte')) return 4;
+    if (cont.includes('america del sur')) return 5;
+    if (cont.includes('oceania')) return 6;
+
+    return 1;
+  }
+
+  private getContinentIdFromCountry(value: string): number {
+    const pais = this.normalizeText(value);
+
+    const europe = [
+      'alemania',
+      'austria',
+      'belgica',
+      'espana',
+      'francia',
+      'grecia',
+      'hungria',
+      'italia',
+      'paises bajos',
+      'polonia',
+      'portugal',
+      'reino unido',
+      'republica checa',
+      'suecia',
+      'suiza',
+    ];
+    const asia = [
+      'catar',
+      'china',
+      'corea del sur',
+      'emiratos arabes unidos',
+      'filipinas',
+      'india',
+      'indonesia',
+      'israel',
+      'japon',
+      'malasia',
+      'nepal',
+      'singapur',
+      'tailandia',
+      'turquia',
+      'vietnam',
+    ];
+    const africa = [
+      'argelia',
+      'egipto',
+      'etiopia',
+      'ghana',
+      'kenia',
+      'marruecos',
+      'mauricio',
+      'namibia',
+      'nigeria',
+      'ruanda',
+      'senegal',
+      'seychelles',
+      'sudafrica',
+      'tanzania',
+      'tunez',
+    ];
+    const northAmerica = [
+      'bahamas',
+      'belice',
+      'canada',
+      'costa rica',
+      'cuba',
+      'el salvador',
+      'estados unidos',
+      'guatemala',
+      'honduras',
+      'jamaica',
+      'mexico',
+      'nicaragua',
+      'panama',
+      'puerto rico',
+      'republica dominicana',
+    ];
+    const southAmerica = [
+      'argentina',
+      'aruba',
+      'bolivia',
+      'brasil',
+      'chile',
+      'colombia',
+      'curazao',
+      'ecuador',
+      'guayana francesa',
+      'guyana',
+      'paraguay',
+      'peru',
+      'surinam',
+      'uruguay',
+      'venezuela',
+    ];
+    const oceania = [
+      'australia',
+      'fiyi',
+      'guam',
+      'islas cook',
+      'islas salomon',
+      'kiribati',
+      'micronesia',
+      'nueva caledonia',
+      'nueva zelanda',
+      'palaos',
+      'papua nueva guinea',
+      'polinesia francesa',
+      'samoa',
+      'tonga',
+      'vanuatu',
+    ];
+
+    if (europe.includes(pais)) return 1;
+    if (asia.includes(pais)) return 2;
+    if (africa.includes(pais)) return 3;
+    if (northAmerica.includes(pais)) return 4;
+    if (southAmerica.includes(pais)) return 5;
+    if (oceania.includes(pais)) return 6;
+
+    return 1;
   }
 
   getDestinos(): Observable<DestinoDTO[]> {
@@ -255,7 +425,11 @@ export class DestinoService {
           const ciudad = this.normalizeText(d.ciudad || '');
           const pais = this.normalizeText(d.pais || '');
           const descripcion = this.normalizeText(d.descripcion || '');
-          const aliases = this.englishAliases[nombre] || [];
+          const aliases = [
+            ...(this.englishAliases[nombre] || []),
+            ...(this.countryAliases[pais] || []),
+            ...(this.continentAliases[Number(d.continenteId)] || []),
+          ];
 
           const searchableText = [
             nombre,

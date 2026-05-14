@@ -10,10 +10,6 @@ import {
   Train,
   Ship,
   MapPin,
-  Wifi,
-  Coffee,
-  Wind,
-  BedDouble,
   CalendarCheck,
 } from 'lucide-angular';
 import { Auth } from '../../services/auth';
@@ -21,6 +17,7 @@ import { DestinoService } from '../../services/destino.service';
 import { OpinionService, CreateOpinionDTO } from '../../services/opinion.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { TranslationService } from '../../services/translation';
+import { getHotelPriceValue, getVisibleHotelAmenities } from '../../utils/hotel-amenities';
 
 @Component({
   selector: 'app-hotel',
@@ -43,14 +40,13 @@ export class HotelComponent implements OnInit {
   readonly TrainIcon = Train;
   readonly ShipIcon = Ship;
   readonly MapPinIcon = MapPin;
-  readonly WifiIcon = Wifi;
-  readonly CoffeeIcon = Coffee;
-  readonly WindIcon = Wind;
-  readonly BedDoubleIcon = BedDouble;
   readonly CalendarCheckIcon = CalendarCheck;
+
+  readonly maxGuests = 8;
 
   hotel = signal<any>(null);
   habitaciones = signal<any[]>([]);
+  selectedRoomId = signal<number | null>(null);
   recommendations = signal<any[]>([]);
   reviews = signal<any[]>([]);
 
@@ -58,6 +54,7 @@ export class HotelComponent implements OnInit {
   checkOutDate = '';
   guests = 1;
   selectedTransport: 'AVION' | 'TREN' | 'BARCO' = 'AVION';
+
   hasPaymentCard = signal(false);
   isCheckingCard = signal(true);
 
@@ -78,6 +75,7 @@ export class HotelComponent implements OnInit {
   ngOnInit() {
     this.route.paramMap.subscribe((params) => {
       const id = params.get('id');
+
       if (id) {
         this.loadHotelFullData(Number(id));
       }
@@ -94,7 +92,81 @@ export class HotelComponent implements OnInit {
         this.loadOpiniones(id);
         this.loadPaymentCardStatus();
       },
+      error: (err) => {
+        console.error('Error cargando hotel', err);
+        this.hotel.set(null);
+      },
     });
+  }
+
+  private loadRooms(hotelId: number) {
+    this.destinoService.getHabitacionesByHotel(hotelId).subscribe({
+      next: (data) => {
+        this.habitaciones.set(data || []);
+        this.selectFirstAvailableRoom();
+      },
+      error: (err) => {
+        console.error('Error cargando habitaciones', err);
+        this.habitaciones.set([]);
+        this.selectedRoomId.set(null);
+      },
+    });
+  }
+
+  private selectFirstAvailableRoom() {
+    const firstAvailableRoom = this.habitaciones().find((room) => this.isRoomAvailable(room));
+    this.selectedRoomId.set(firstAvailableRoom ? Number(firstAvailableRoom.id) : null);
+  }
+
+  selectedRoom(): any | null {
+    const id = this.selectedRoomId();
+
+    if (id === null) return null;
+
+    return this.habitaciones().find((room) => Number(room.id) === id) || null;
+  }
+
+  selectRoom(room: any) {
+    if (!this.isRoomAvailable(room)) {
+      this.openBookingModal(
+        'Habitación no disponible',
+        'Esta habitación no tiene capacidad suficiente para el número de huéspedes seleccionado.',
+        'warning',
+      );
+      return;
+    }
+
+    this.selectedRoomId.set(Number(room.id));
+  }
+
+  isRoomSelected(room: any): boolean {
+    return this.selectedRoomId() === Number(room?.id);
+  }
+
+  isRoomAvailable(room: any): boolean {
+    return this.getRoomCapacity(room) >= this.guests;
+  }
+
+  get compatibleRoomsCount(): number {
+    return this.habitaciones().filter((room) => this.isRoomAvailable(room)).length;
+  }
+
+  onGuestsChange(value: any) {
+    const parsedGuests = Number(value);
+
+    if (!Number.isFinite(parsedGuests) || parsedGuests < 1) {
+      this.guests = 1;
+    } else if (parsedGuests > this.maxGuests) {
+      this.guests = this.maxGuests;
+    } else {
+      this.guests = Math.floor(parsedGuests);
+    }
+
+    const currentRoom = this.selectedRoom();
+
+    if (!currentRoom || !this.isRoomAvailable(currentRoom)) {
+      this.selectFirstAvailableRoom();
+    }
   }
 
   private loadPaymentCardStatus() {
@@ -137,15 +209,14 @@ export class HotelComponent implements OnInit {
     });
   }
 
-  private loadRooms(hotelId: number) {
-    this.destinoService
-      .getHabitacionesByHotel(hotelId)
-      .subscribe((data) => this.habitaciones.set(data));
-  }
-
   private loadRecommendations() {
-    this.destinoService.getDestinos().subscribe((data) => {
-      this.recommendations.set(data.slice(0, 3));
+    this.destinoService.getDestinos().subscribe({
+      next: (data) => {
+        this.recommendations.set((data || []).slice(0, 3));
+      },
+      error: () => {
+        this.recommendations.set([]);
+      },
     });
   }
 
@@ -163,22 +234,118 @@ export class HotelComponent implements OnInit {
     if (!this.checkInDate || !this.checkOutDate) return 0;
 
     const diff = new Date(this.checkOutDate).getTime() - new Date(this.checkInDate).getTime();
+
     return diff <= 0 ? 0 : Math.ceil(diff / (1000 * 60 * 60 * 24));
   }
 
   get totalPrice(): number {
-    const costs: any = { AVION: 150, TREN: 50, BARCO: 100 };
-    const hotelPrice = this.hotel()?.precioPorNoche ?? 0;
+    const room = this.selectedRoom();
+    const roomPrice = room ? this.getRoomPrice(room) : this.getHotelPrice(this.hotel());
 
-    return hotelPrice * this.nights * this.guests + (costs[this.selectedTransport] || 0);
+    return roomPrice * this.nights * this.guests + this.getTransportPrice(this.selectedTransport);
   }
 
   get canBook(): boolean {
     return (
+      this.auth.isLoggedIn() &&
       this.nights > 0 &&
+      this.selectedRoom() !== null &&
       this.hasPaymentCard() &&
       !this.isCheckingCard() &&
       this.auth.credits() >= this.totalPrice
+    );
+  }
+
+  getHotelPrice(hotel: any): number {
+    return getHotelPriceValue(hotel);
+  }
+
+  getHotelImage(hotel: any): string {
+    return (
+      hotel?.imagenUrl ||
+      hotel?.imagen ||
+      hotel?.image ||
+      'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1600&auto=format&fit=crop'
+    );
+  }
+
+  getHotelRating(hotel: any): number {
+    return Number(hotel?.estrellas || hotel?.rating || 5);
+  }
+
+  getHotelDescription(hotel: any): string {
+    return (
+      hotel?.descripcion ||
+      hotel?.description ||
+      `Hotel cómodo y bien ubicado en ${hotel?.ciudad || 'este destino'}, ideal para descansar después de descubrir la ciudad.`
+    );
+  }
+
+  getHotelLocation(hotel: any): string {
+    const city = hotel?.ciudad || '';
+    const country = hotel?.pais || '';
+
+    if (city && country) return `${city}, ${country}`;
+    if (city) return city;
+    if (country) return country;
+
+    return 'Ubicación no disponible';
+  }
+
+  getVisibleAmenities() {
+    return getVisibleHotelAmenities(this.hotel());
+  }
+
+  getTransportPrice(type: 'AVION' | 'TREN' | 'BARCO'): number {
+    const costs = {
+      AVION: 150,
+      TREN: 50,
+      BARCO: 100,
+    };
+
+    return costs[type];
+  }
+
+  getTransportLabel(type: 'AVION' | 'TREN' | 'BARCO'): string {
+    const labels = {
+      AVION: 'Avión',
+      TREN: 'Tren',
+      BARCO: 'Barco',
+    };
+
+    return labels[type];
+  }
+
+  getRoomPrice(room: any): number {
+    const roomPrice = Number(room?.precioPorNoche || room?.precio_por_noche || room?.precio || 0);
+
+    if (roomPrice > 0) return roomPrice;
+
+    return this.getHotelPrice(this.hotel());
+  }
+
+  getRoomName(room: any): string {
+    return room?.tipo || room?.nombre || 'Habitación estándar';
+  }
+
+  getRoomRegimen(room: any): string {
+    return room?.regimen || 'Solo alojamiento';
+  }
+
+  getRoomCapacity(room: any): number {
+    return Number(room?.capacidad || room?.capacity || 2);
+  }
+
+  getRoomCapacityLabel(room: any): string {
+    return String(this.getRoomCapacity(room));
+  }
+
+  getDestinationImage(destination: any): string {
+    return (
+      destination?.imagenUrl ||
+      destination?.imagen ||
+      destination?.image ||
+      'assets/placeholder.jpg'
     );
   }
 
@@ -204,7 +371,10 @@ export class HotelComponent implements OnInit {
 
   isMyReview(review: any): boolean {
     const user = this.auth.user();
-    return user ? user.name === review.userName : false;
+
+    if (!user) return false;
+
+    return String(user.id) === String(review.usuarioId) || user.name === review.userName;
   }
 
   startEditReview(review: any) {
@@ -255,17 +425,24 @@ export class HotelComponent implements OnInit {
   }
 
   addReview() {
-    if (!this.newReviewComment.trim()) return;
+    if (!this.auth.isLoggedIn()) {
+      this.openBookingModal(
+        'Inicia sesión',
+        'Necesitas iniciar sesión para escribir una reseña.',
+        'warning',
+      );
+      return;
+    }
 
-    const currentUser = this.auth.user();
-    if (!currentUser) return;
+    if (!this.newReviewComment.trim()) return;
 
     const dto: CreateOpinionDTO = {
       puntuacion: this.newReviewRating,
       comentario: this.newReviewComment,
     };
 
-    const hotelId = this.hotel().id;
+    const hotelId = this.hotel()?.id;
+
     if (!hotelId) return;
 
     const request$ = this.editingReviewId
@@ -290,10 +467,19 @@ export class HotelComponent implements OnInit {
   }
 
   reservar() {
-    if (!this.hasPaymentCard()) {
+    if (!this.auth.isLoggedIn()) {
       this.openBookingModal(
-        'Tarjeta necesaria',
-        'Necesitas tener una tarjeta asociada a tu cuenta para reservar.',
+        'Inicia sesión',
+        'Necesitas iniciar sesión para poder realizar una reserva.',
+        'warning',
+      );
+      return;
+    }
+
+    if (this.nights <= 0) {
+      this.openBookingModal(
+        'Fechas incorrectas',
+        'La fecha de salida debe ser posterior a la fecha de entrada.',
         'warning',
       );
       return;
@@ -303,6 +489,35 @@ export class HotelComponent implements OnInit {
       this.openBookingModal(
         'Sin habitaciones disponibles',
         'No hay habitaciones disponibles en este hotel.',
+        'warning',
+      );
+      return;
+    }
+
+    const selectedRoom = this.selectedRoom();
+
+    if (!selectedRoom) {
+      this.openBookingModal(
+        'Selecciona una habitación',
+        'Debes seleccionar una habitación compatible antes de reservar.',
+        'warning',
+      );
+      return;
+    }
+
+    if (!this.isRoomAvailable(selectedRoom)) {
+      this.openBookingModal(
+        'Habitación no disponible',
+        'La habitación seleccionada no tiene capacidad suficiente para los huéspedes indicados.',
+        'warning',
+      );
+      return;
+    }
+
+    if (!this.hasPaymentCard()) {
+      this.openBookingModal(
+        'Tarjeta necesaria',
+        'Necesitas tener una tarjeta asociada a tu cuenta para reservar.',
         'warning',
       );
       return;
@@ -318,7 +533,7 @@ export class HotelComponent implements OnInit {
     }
 
     const bookingRequest = {
-      habitacionId: this.habitaciones()[0].id,
+      habitacionId: selectedRoom.id,
       transporte: this.selectedTransport,
       fechaInicio: this.checkInDate,
       fechaFin: this.checkOutDate,
@@ -340,7 +555,7 @@ export class HotelComponent implements OnInit {
         console.error('Error al realizar la reserva:', err);
         this.openBookingModal(
           'No se pudo completar la reserva',
-          'Hubo un error al reservar. Revisa tu saldo o disponibilidad.',
+          'Hubo un error al reservar. Revisa tu saldo, las fechas o la disponibilidad del hotel.',
           'error',
         );
       },

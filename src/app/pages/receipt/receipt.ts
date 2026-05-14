@@ -49,6 +49,7 @@ export class Receipt implements OnInit {
   reserva = signal<ReservaResponse | null>(null);
   isLoading = signal(true);
   isDownloadingPdf = signal(false);
+  pdfError = signal('');
 
   ticketData = computed<TicketData>(() => this.ticketService.getTicketData(this.reserva()));
 
@@ -151,6 +152,7 @@ export class Receipt implements OnInit {
     }
 
     this.isDownloadingPdf.set(true);
+    this.pdfError.set('');
     const previousScrollX = window.scrollX;
     const previousScrollY = window.scrollY;
 
@@ -192,7 +194,7 @@ export class Receipt implements OnInit {
       pdf.save(`${this.getReceiptCode()} - Recibo ViajesJMJ.pdf`);
     } catch (err) {
       console.error('Error generando PDF:', err);
-      alert('No se ha podido generar el PDF. Abre la consola del navegador y dime el error que aparece.');
+      this.pdfError.set('No se ha podido generar el PDF. Inténtalo de nuevo.');
     } finally {
       window.scrollTo(previousScrollX, previousScrollY);
       this.isDownloadingPdf.set(false);

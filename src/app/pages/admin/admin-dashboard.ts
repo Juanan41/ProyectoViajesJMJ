@@ -155,9 +155,9 @@ export class AdminDashboard implements OnInit {
     destinoId: null,
   };
 
-  hotelTypes = ['HOTEL', 'APARTAMENTO', 'RESORT', 'HOSTAL'];
+  hotelTypes = ['HOTEL'];
 
-  continentes = ['Europa', 'Asia', 'África', 'Oceanía', 'América del Norte', 'América del Sur'];
+  continentes = ['Europa', 'Asia', 'África', 'América del Norte', 'América del Sur', 'Oceanía'];
 
   ngOnInit() {
     if (!this.auth.isCurrentUserAdmin()) {
@@ -765,9 +765,9 @@ export class AdminDashboard implements OnInit {
     if (id === 1) return 'Europa';
     if (id === 2) return 'Asia';
     if (id === 3) return 'África';
-    if (id === 4) return 'Oceanía';
-    if (id === 5) return 'América del Norte';
-    if (id === 6) return 'América del Sur';
+    if (id === 4) return 'América del Norte';
+    if (id === 5) return 'América del Sur';
+    if (id === 6) return 'Oceanía';
     return 'Europa';
   }
 

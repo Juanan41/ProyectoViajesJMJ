@@ -2,7 +2,7 @@ import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Review } from '../data/destinations';
 import { environment } from '../../environments/environment';
-import { Observable, switchMap, tap, map } from 'rxjs';
+import { Observable, switchMap, tap, map, of } from 'rxjs';
 
 export interface Card {
   id: string;
@@ -81,6 +81,10 @@ export class Auth {
   }
 
   obtenerSaldo(): Observable<any> {
+    if (!this.getToken()) {
+      return of({ saldo: 0 });
+    }
+
     return this.http.get<any>(`${this.apiUrl}/saldo`, {
       headers: this.getAuthHeaders(),
     });
@@ -107,6 +111,10 @@ export class Auth {
   }
 
   obtenerTarjetas(): Observable<any[]> {
+    if (!this.getToken()) {
+      return of([]);
+    }
+
     return this.http
       .get<any[]>(`${this.apiUrl}/cuentas/me`, {
         headers: this.getAuthHeaders(),
@@ -134,6 +142,12 @@ export class Auth {
   }
 
   borrarTarjeta(): Observable<any> {
+    if (!this.getToken()) {
+      this.credits.set(0);
+      this.updateUser({ saldo: 0 });
+      return of(null);
+    }
+
     return this.http
       .delete(`${this.apiUrl}/cuentas/me`, {
         headers: this.getAuthHeaders(),
@@ -187,7 +201,8 @@ export class Auth {
   }
 
   private getAuthHeaders(): HttpHeaders {
-    return new HttpHeaders({ Authorization: `Bearer ${this.getToken()}` });
+    const token = this.getToken();
+    return token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : new HttpHeaders();
   }
 
   private restoreSession() {

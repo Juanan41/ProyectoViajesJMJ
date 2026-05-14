@@ -1,5 +1,6 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import {
   LucideAngularModule,
@@ -10,13 +11,15 @@ import {
   Filter,
   Plane,
 } from 'lucide-angular';
-import { DestinoService } from '../../services/destino.service';
+import { DestinoDTO, DestinoService } from '../../services/destino.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+
+type SortOption = 'relevance' | 'priceAsc' | 'priceDesc' | 'nameAsc';
 
 @Component({
   selector: 'app-search-results',
   standalone: true,
-  imports: [CommonModule, RouterModule, LucideAngularModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, RouterModule, LucideAngularModule, TranslatePipe],
   templateUrl: './search-results.html',
 })
 export class SearchResults implements OnInit {
@@ -31,8 +34,43 @@ export class SearchResults implements OnInit {
   readonly PlaneIcon = Plane;
 
   query = signal('');
-  results = signal<any[]>([]);
+  results = signal<DestinoDTO[]>([]);
   isLoading = signal(true);
+  showFilters = signal(false);
+
+  filters = {
+    maxPrice: 5000,
+    continentId: 0,
+    sort: 'relevance' as SortOption,
+  };
+
+  readonly continentes = [
+    { id: 0, name: 'Todos los continentes' },
+    { id: 1, name: 'Europa' },
+    { id: 2, name: 'Asia' },
+    { id: 3, name: 'África' },
+    { id: 4, name: 'América del Norte' },
+    { id: 5, name: 'América del Sur' },
+    { id: 6, name: 'Oceanía' },
+  ];
+
+  filteredResults = computed(() => {
+    const filtered = this.results().filter((item) => {
+      const price = this.getPrice(item);
+      const matchesPrice = price <= this.filters.maxPrice;
+      const matchesContinent =
+        this.filters.continentId === 0 || Number(item.continenteId) === this.filters.continentId;
+
+      return matchesPrice && matchesContinent;
+    });
+
+    return [...filtered].sort((a, b) => {
+      if (this.filters.sort === 'priceAsc') return this.getPrice(a) - this.getPrice(b);
+      if (this.filters.sort === 'priceDesc') return this.getPrice(b) - this.getPrice(a);
+      if (this.filters.sort === 'nameAsc') return (a.nombre || '').localeCompare(b.nombre || '');
+      return 0;
+    });
+  });
 
   ngOnInit() {
     this.route.queryParams.subscribe((params) => {
@@ -56,10 +94,27 @@ export class SearchResults implements OnInit {
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error('Error en la búsqueda:', err);
+        console.error('Error cargando resultados de búsqueda', err);
+        this.results.set([]);
         this.isLoading.set(false);
       },
     });
+  }
+
+  toggleFilters() {
+    this.showFilters.update((value) => !value);
+  }
+
+  clearFilters() {
+    this.filters = {
+      maxPrice: 5000,
+      continentId: 0,
+      sort: 'relevance',
+    };
+  }
+
+  getPrice(item: DestinoDTO): number {
+    return Number(item.precioPorNoche || item.precio || 0);
   }
 
   getArray(length: number): any[] {
