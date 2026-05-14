@@ -411,3 +411,461 @@ INSERT INTO habitacion (tipo, capacidad, precio_por_noche, regimen, alojamiento_
 ('Doble', 2, 160, 'DESAYUNO', 71, ''),
 ('Suite', 2, 260, 'MEDIA_PENSION', 71, ''),
 ('Individual', 1, 120, 'SOLO_ALOJAMIENTO', 72, '');
+
+-- =====================================================
+-- DESTINOS EXTRA UNIFICADOS EN DATA.SQL
+-- =====================================================
+
+-- =====================================================
+-- INSERT DESTINOS EXTRA JMJ VIAJES
+-- No borra datos existentes
+-- Añade destinos, alojamientos y habitaciones
+-- =====================================================
+
+-- =====================
+-- EUROPA
+-- =====================
+INSERT INTO destinos (nombre, descripcion, precio, pais, imagen, continente_id)
+SELECT v.nombre, v.descripcion, v.precio, v.pais, v.imagen,
+       (SELECT id FROM continente WHERE nombre = 'Europa' LIMIT 1)
+FROM (VALUES
+          ('Lisboa', 'Capital portuguesa con tranvías, miradores, historia y gastronomía atlántica.', 1500, 'Portugal', 'https://images.unsplash.com/photo-1548707309-dcebe6120150?q=80&w=2070'),
+          ('Oporto', 'Ciudad del norte de Portugal famosa por el vino, el río Duero y su casco histórico.', 1450, 'Portugal', 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?q=80&w=2070'),
+          ('Praga', 'Ciudad medieval con castillo, puentes históricos y ambiente romántico.', 1600, 'República Checa', 'https://images.unsplash.com/photo-1519677100203-a0e668c92439?q=80&w=2070'),
+          ('Budapest', 'Capital húngara con termas, arquitectura imperial y el río Danubio.', 1550, 'Hungría', 'https://images.unsplash.com/photo-1549877452-9c387954fbc2?q=80&w=2070'),
+          ('Ámsterdam', 'Canales, bicicletas, museos y ambiente cosmopolita europeo.', 1800, 'Países Bajos', 'https://images.unsplash.com/photo-1512470876302-972faa2aa9a4?q=80&w=2070')
+         ) AS v(nombre, descripcion, precio, pais, imagen)
+WHERE NOT EXISTS (
+    SELECT 1 FROM destinos d WHERE d.nombre = v.nombre AND d.pais = v.pais
+);
+
+-- =====================
+-- ASIA
+-- =====================
+INSERT INTO destinos (nombre, descripcion, precio, pais, imagen, continente_id)
+SELECT v.nombre, v.descripcion, v.precio, v.pais, v.imagen,
+       (SELECT id FROM continente WHERE nombre = 'Asia' LIMIT 1)
+FROM (VALUES
+          ('Singapur', 'Ciudad moderna con rascacielos, jardines futuristas y gastronomía internacional.', 2300, 'Singapur', 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?q=80&w=2070'),
+          ('Kioto', 'Templos, jardines zen, tradición japonesa y cultura ancestral.', 2100, 'Japón', 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=2070'),
+          ('Bali', 'Playas, templos, arrozales y ambiente tropical en Indonesia.', 1900, 'Indonesia', 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?q=80&w=2070'),
+          ('Hanoi', 'Capital vietnamita con historia, mercados, lagos y gastronomía callejera.', 1600, 'Vietnam', 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?q=80&w=2070'),
+          ('Maldivas', 'Islas paradisíacas, aguas turquesas y alojamientos sobre el mar.', 3400, 'Maldivas', 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?q=80&w=2070')
+         ) AS v(nombre, descripcion, precio, pais, imagen)
+WHERE NOT EXISTS (
+    SELECT 1 FROM destinos d WHERE d.nombre = v.nombre AND d.pais = v.pais
+);
+
+-- =====================
+-- ÁFRICA
+-- =====================
+INSERT INTO destinos (nombre, descripcion, precio, pais, imagen, continente_id)
+SELECT v.nombre, v.descripcion, v.precio, v.pais, v.imagen,
+       (SELECT id FROM continente WHERE nombre = 'África' LIMIT 1)
+FROM (VALUES
+          ('Túnez', 'Playas mediterráneas, zocos, historia antigua y cultura árabe.', 1200, 'Túnez', 'https://images.unsplash.com/photo-1542108154-15f5cc114b3f?q=80&w=2070'),
+          ('Dakar', 'Capital senegalesa con cultura africana, costa atlántica y música.', 1600, 'Senegal', 'https://images.unsplash.com/photo-1563212871-331201cbdcd3?q=80&w=2070'),
+          ('Victoria Falls', 'Cataratas espectaculares y naturaleza salvaje en el sur de África.', 2400, 'Zimbabue', 'https://images.unsplash.com/photo-1628156170663-8a30595fe1b0?q=80&w=2070'),
+          ('Islas Seychelles', 'Playas paradisíacas, naturaleza protegida y turismo exclusivo.', 3200, 'Seychelles', 'https://images.unsplash.com/photo-1588661623912-70b1cb160cf2?q=80&w=2070'),
+          ('Addis Abeba', 'Capital etíope con historia, cultura y acceso a paisajes únicos.', 1700, 'Etiopía', 'https://images.unsplash.com/photo-1523496922380-91d5afba98a3?q=80&w=2070')
+         ) AS v(nombre, descripcion, precio, pais, imagen)
+WHERE NOT EXISTS (
+    SELECT 1 FROM destinos d WHERE d.nombre = v.nombre AND d.pais = v.pais
+);
+
+-- =====================
+-- OCEANÍA
+-- =====================
+INSERT INTO destinos (nombre, descripcion, precio, pais, imagen, continente_id)
+SELECT v.nombre, v.descripcion, v.precio, v.pais, v.imagen,
+       (SELECT id FROM continente WHERE nombre = 'Oceanía' LIMIT 1)
+FROM (VALUES
+          ('Queenstown', 'Aventura, montañas, lagos y naturaleza extrema en Nueva Zelanda.', 2600, 'Nueva Zelanda', 'https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?q=80&w=2070'),
+          ('Gold Coast', 'Playas, surf, parques temáticos y ambiente costero australiano.', 2400, 'Australia', 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?q=80&w=2070'),
+          ('Hobart', 'Capital de Tasmania con naturaleza, puerto, gastronomía y paisajes salvajes.', 2500, 'Australia', 'https://images.unsplash.com/photo-1559160581-446700c2abdb?q=80&w=2070'),
+          ('Samoa', 'Islas volcánicas, playas tranquilas y cultura polinesia.', 3000, 'Samoa', 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=2070'),
+          ('Tahití', 'Destino tropical con lagunas, montaña, cultura polinesia y relax.', 3400, 'Polinesia Francesa', 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2070')
+         ) AS v(nombre, descripcion, precio, pais, imagen)
+WHERE NOT EXISTS (
+    SELECT 1 FROM destinos d WHERE d.nombre = v.nombre AND d.pais = v.pais
+);
+
+-- =====================
+-- AMÉRICA DEL NORTE
+-- =====================
+INSERT INTO destinos (nombre, descripcion, precio, pais, imagen, continente_id)
+SELECT v.nombre, v.descripcion, v.precio, v.pais, v.imagen,
+       (SELECT id FROM continente WHERE nombre = 'América del Norte' LIMIT 1)
+FROM (VALUES
+          ('Las Vegas', 'Entretenimiento, casinos, espectáculos y excursiones al desierto.', 2500, 'Estados Unidos', 'https://images.unsplash.com/photo-1605810731422-b5e28a50de3f?q=80&w=2070'),
+          ('Los Ángeles', 'Hollywood, playas, cultura urbana y ambiente cinematográfico.', 2700, 'Estados Unidos', 'https://images.unsplash.com/photo-1580659328221-d779fdfa7c78?q=80&w=2070'),
+          ('Vancouver', 'Ciudad moderna entre montañas, mar y naturaleza canadiense.', 2600, 'Canadá', 'https://images.unsplash.com/photo-1559511260-66a654ae982a?q=80&w=2070'),
+          ('La Habana', 'Historia, música, coches clásicos y arquitectura colonial caribeña.', 1800, 'Cuba', 'https://images.unsplash.com/photo-1506501139174-099022df5260?q=80&w=2070'),
+          ('Punta Cana', 'Playas caribeñas, resorts todo incluido y aguas cristalinas.', 2100, 'República Dominicana', 'https://images.unsplash.com/photo-1580210023604-0328b9cc6711?q=80&w=2070')
+         ) AS v(nombre, descripcion, precio, pais, imagen)
+WHERE NOT EXISTS (
+    SELECT 1 FROM destinos d WHERE d.nombre = v.nombre AND d.pais = v.pais
+);
+
+-- =====================
+-- AMÉRICA DEL SUR
+-- =====================
+INSERT INTO destinos (nombre, descripcion, precio, pais, imagen, continente_id)
+SELECT v.nombre, v.descripcion, v.precio, v.pais, v.imagen,
+       (SELECT id FROM continente WHERE nombre = 'América del Sur' LIMIT 1)
+FROM (VALUES
+          ('Lima', 'Capital peruana con gastronomía reconocida, costa e historia colonial.', 1800, 'Perú', 'https://images.unsplash.com/photo-1587595431973-160d0d94add1?q=80&w=2070'),
+          ('La Paz', 'Capital de altura con paisajes andinos, mercados y cultura boliviana.', 1700, 'Bolivia', 'https://images.unsplash.com/photo-1580829891461-8ee3c2356c9a?q=80&w=2070'),
+          ('Ushuaia', 'Fin del mundo, naturaleza patagónica y paisajes de montaña y mar.', 2500, 'Argentina', 'https://images.unsplash.com/photo-1518063319808-1f55819772ee?q=80&w=2070'),
+          ('Medellín', 'Ciudad moderna, clima primaveral, cultura urbana y montaña.', 1800, 'Colombia', 'https://images.unsplash.com/photo-1563200049-74d30c5e3d74?q=80&w=2070')
+         ) AS v(nombre, descripcion, precio, pais, imagen)
+WHERE NOT EXISTS (
+    SELECT 1 FROM destinos d WHERE d.nombre = v.nombre AND d.pais = v.pais
+);
+
+-- =====================================================
+-- ALOJAMIENTOS AUTOMÁTICOS PARA LOS NUEVOS DESTINOS
+-- 2 alojamientos por destino: HOTEL y RESORT
+-- =====================================================
+
+WITH nuevos_destinos AS (
+    SELECT d.id, d.nombre, d.pais, d.precio
+    FROM destinos d
+    WHERE d.nombre IN (
+                       'Lisboa', 'Oporto', 'Praga', 'Budapest', 'Ámsterdam',
+                       'Singapur', 'Kioto', 'Bali', 'Hanoi', 'Maldivas',
+                       'Túnez', 'Dakar', 'Victoria Falls', 'Islas Seychelles', 'Addis Abeba',
+                       'Queenstown', 'Gold Coast', 'Hobart', 'Samoa', 'Tahití',
+                       'Las Vegas', 'Los Ángeles', 'Vancouver', 'La Habana', 'Punta Cana',
+                       'Lima', 'La Paz', 'Ushuaia', 'Medellín'
+        )
+)
+INSERT INTO alojamientos (nombre, ciudad, pais, tipo, precio_por_noche, destino_id, created_at, updated_at)
+SELECT
+    nd.nombre || ' Grand Hotel',
+    nd.nombre,
+    nd.pais,
+    'HOTEL',
+    ROUND(nd.precio / 12.0),
+    nd.id,
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
+FROM nuevos_destinos nd
+WHERE NOT EXISTS (
+    SELECT 1 FROM alojamientos a
+    WHERE a.nombre = nd.nombre || ' Grand Hotel'
+)
+UNION ALL
+SELECT
+    nd.nombre || ' Paradise Resort',
+    nd.nombre,
+    nd.pais,
+    'RESORT',
+    ROUND(nd.precio / 9.0),
+    nd.id,
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
+FROM nuevos_destinos nd
+WHERE NOT EXISTS (
+    SELECT 1 FROM alojamientos a
+    WHERE a.nombre = nd.nombre || ' Paradise Resort'
+);
+
+-- =====================================================
+-- HABITACIONES AUTOMÁTICAS
+-- 3 habitaciones por alojamiento
+-- =====================================================
+
+WITH alojamientos_nuevos AS (
+    SELECT a.id, a.precio_por_noche
+    FROM alojamientos a
+    WHERE a.nombre LIKE '% Grand Hotel'
+       OR a.nombre LIKE '% Paradise Resort'
+)
+INSERT INTO habitacion (tipo, capacidad, precio_por_noche, regimen, alojamiento_id, imagen_url)
+SELECT
+    h.tipo,
+    h.capacidad,
+    ROUND(a.precio_por_noche * h.factor),
+    h.regimen,
+    a.id,
+    ''
+FROM alojamientos_nuevos a
+         CROSS JOIN (VALUES
+                         ('Individual', 1, 0.75, 'SOLO_ALOJAMIENTO'),
+                         ('Doble', 2, 1.00, 'DESAYUNO'),
+                         ('Suite', 2, 1.60, 'MEDIA_PENSION')
+    ) AS h(tipo, capacidad, factor, regimen)
+WHERE NOT EXISTS (
+    SELECT 1 FROM habitacion hab
+    WHERE hab.alojamiento_id = a.id
+);
+
+-- =====================================================
+-- COMPROBACIÓN FINAL
+-- =====================================================
+
+SELECT COUNT(*) AS total_continentes FROM continente;
+SELECT COUNT(*) AS total_destinos FROM destinos;
+SELECT COUNT(*) AS total_alojamientos FROM alojamientos;
+SELECT COUNT(*) AS total_habitaciones FROM habitacion;
+
+-- =====================================================
+-- AMPLIACION FINAL DE CATALOGO
+-- Objetivo: 120 destinos turisticos en data.sql
+-- =====================================================
+
+-- Fotos corregidas para destinos detectados sin imagen
+UPDATE destinos SET imagen = 'https://images.unsplash.com/photo-1597212720419-bd37616e35bc?q=80&w=2000'
+WHERE nombre = 'Marrakech';
+
+UPDATE destinos SET imagen = 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?q=80&w=2000'
+WHERE nombre = 'San Francisco';
+
+UPDATE destinos SET imagen = 'https://images.unsplash.com/photo-1597009049302-6f1d4f27f8f4?q=80&w=2000'
+WHERE nombre = 'Santiago de Chile';
+
+-- EUROPA
+INSERT INTO destinos (nombre, descripcion, precio, pais, imagen, continente_id)
+SELECT v.nombre, v.descripcion, v.precio, v.pais, v.imagen,
+       (SELECT id FROM continente WHERE nombre = 'Europa' LIMIT 1)
+FROM (VALUES
+          ('Barcelona', 'Arquitectura modernista, playas urbanas y vida mediterranea.', 1800, 'España', 'https://images.unsplash.com/photo-1583422409516-2895a77efded?q=80&w=2000'),
+          ('Sevilla', 'Catedral, Alcazar, barrios historicos y cultura andaluza.', 1500, 'España', 'https://images.unsplash.com/photo-1559564484-e48b3e040ff4?q=80&w=2000'),
+          ('Valencia', 'Ciudad de las Artes, playas y gastronomia mediterranea.', 1450, 'España', 'https://images.unsplash.com/photo-1590938847175-55255d8a90a2?q=80&w=2000'),
+
+          ('Lyon', 'Gastronomia francesa, casco historico y rios Saona y Rodano.', 1700, 'Francia', 'https://images.unsplash.com/photo-1524484485831-a92ffc0de03f?q=80&w=2000'),
+          ('Marsella', 'Puerto mediterraneo, calanques y cultura provenzal.', 1750, 'Francia', 'https://images.unsplash.com/photo-1588260695969-1f2ee2327c26?q=80&w=2000'),
+          ('Niza', 'Costa Azul, paseo maritimo y ambiente mediterraneo elegante.', 1900, 'Francia', 'https://images.unsplash.com/photo-1533614767277-8780f17ffbb0?q=80&w=2000'),
+
+          ('Florencia', 'Arte renacentista, catedral historica y patrimonio italiano.', 1800, 'Italia', 'https://images.unsplash.com/photo-1541370976299-4d24ebbc9077?q=80&w=2000'),
+          ('Venecia', 'Canales, gondolas, palacios y plazas iconicas.', 2100, 'Italia', 'https://images.unsplash.com/photo-1514890547357-a9ee288728e0?q=80&w=2000'),
+          ('Milan', 'Moda, catedral gotica, diseño y vida urbana italiana.', 1900, 'Italia', 'https://images.unsplash.com/photo-1610016302534-6f67f1c968d8?q=80&w=2000'),
+
+          ('Edimburgo', 'Castillo, calles medievales, cultura escocesa y festivales.', 1700, 'Reino Unido', 'https://images.unsplash.com/photo-1506377585622-bedcbb027afc?q=80&w=2000'),
+          ('Manchester', 'Musica, futbol, patrimonio industrial y cultura urbana.', 1650, 'Reino Unido', 'https://images.unsplash.com/photo-1571857114908-67e6d657e1bb?q=80&w=2000'),
+          ('Oxford', 'Universidad historica, colegios antiguos y arquitectura inglesa.', 1600, 'Reino Unido', 'https://images.unsplash.com/photo-1587920277771-52d2b9f4f7b6?q=80&w=2000'),
+
+          ('Santorini', 'Casas blancas, caldera volcanica y atardeceres sobre el Egeo.', 1900, 'Grecia', 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?q=80&w=2000'),
+          ('Mykonos', 'Playas, molinos, casas cicladicas y vida nocturna.', 1950, 'Grecia', 'https://images.unsplash.com/photo-1601581875309-fafbf2d3ed3a?q=80&w=2000'),
+          ('Tesalonica', 'Historia bizantina, paseo maritimo y cultura griega moderna.', 1500, 'Grecia', 'https://images.unsplash.com/photo-1598620617137-2ab990aadd88?q=80&w=2000'),
+
+          ('Salzburgo', 'Musica clasica, fortalezas, palacios y paisaje alpino.', 1700, 'Austria', 'https://images.unsplash.com/photo-1605649487212-47bdab064df7?q=80&w=2000'),
+          ('Innsbruck', 'Montañas alpinas, casco historico y deportes de invierno.', 1750, 'Austria', 'https://images.unsplash.com/photo-1516550893923-42d28e5677af?q=80&w=2000'),
+          ('Graz', 'Casco historico, diseño contemporaneo y ambiente universitario.', 1500, 'Austria', 'https://images.unsplash.com/photo-1599900703137-f0e9295212bc?q=80&w=2000'),
+
+          ('Sintra', 'Palacios de cuento, bosques y miradores cerca de Lisboa.', 1450, 'Portugal', 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?q=80&w=2000'),
+          ('Faro', 'Costa del Algarve, casco antiguo y playas del sur portugues.', 1500, 'Portugal', 'https://images.unsplash.com/photo-1513735492246-483525079686?q=80&w=2000'),
+
+          ('Cesky Krumlov', 'Castillo, calles medievales y encanto bohemio junto al rio.', 1450, 'República Checa', 'https://images.unsplash.com/photo-1562602833-0f4ab2fc46e3?q=80&w=2000'),
+          ('Karlovy Vary', 'Balnearios, columnatas y arquitectura elegante.', 1450, 'República Checa', 'https://images.unsplash.com/photo-1596202339028-6f47a2e1696a?q=80&w=2000'),
+          ('Brno', 'Arquitectura moderna, plazas historicas y ambiente universitario.', 1400, 'República Checa', 'https://images.unsplash.com/photo-1600670564764-0b8657b5d99f?q=80&w=2000'),
+
+          ('Eger', 'Castillo, termas, vino y casco historico barroco.', 1400, 'Hungría', 'https://images.unsplash.com/photo-1551867633-194f125bddfa?q=80&w=2000'),
+          ('Pecs', 'Patrimonio romano, plazas coloridas y ambiente cultural.', 1400, 'Hungría', 'https://images.unsplash.com/photo-1624811539255-63489b3c9561?q=80&w=2000'),
+          ('Szentendre', 'Calles artisticas, museos y ribera del Danubio.', 1350, 'Hungría', 'https://images.unsplash.com/photo-1549877452-9c387954fbc2?q=80&w=2000'),
+
+          ('Rotterdam', 'Arquitectura moderna, puerto y skyline neerlandes.', 1750, 'Países Bajos', 'https://images.unsplash.com/photo-1513622470522-26c3c8a854bc?q=80&w=2000'),
+          ('La Haya', 'Palacios, costa, museos y centro politico neerlandes.', 1700, 'Países Bajos', 'https://images.unsplash.com/photo-1558449028-b53a39d100fc?q=80&w=2000'),
+          ('Utrecht', 'Canales historicos, torres y ambiente universitario.', 1650, 'Países Bajos', 'https://images.unsplash.com/photo-1512470876302-972faa2aa9a4?q=80&w=2000'),
+
+          ('Dubrovnik', 'Murallas historicas, mar Adriatico y casco antiguo medieval.', 1750, 'Croacia', 'https://images.unsplash.com/photo-1555990538-c48dbe0d6f4b?q=80&w=2000'),
+          ('Split', 'Palacio de Diocleciano, costa dalmata y vida mediterranea.', 1650, 'Croacia', 'https://images.unsplash.com/photo-1555990538-c48dbe0d6f4b?q=80&w=2000'),
+          ('Zagreb', 'Capital croata con plazas, museos y arquitectura centroeuropea.', 1500, 'Croacia', 'https://images.unsplash.com/photo-1598369412158-1726f2ff644a?q=80&w=2000'),
+          ('Hvar', 'Isla luminosa, puerto historico y playas del Adriatico.', 1800, 'Croacia', 'https://images.unsplash.com/photo-1555990538-c48dbe0d6f4b?q=80&w=2000'),
+
+          ('Copenhague', 'Canales, diseño nordico, puerto historico y ambiente moderno.', 1900, 'Dinamarca', 'https://images.unsplash.com/photo-1513622470522-26c3c8a854bc?q=80&w=2000'),
+          ('Aarhus', 'Museos, barrios creativos y costa danesa.', 1700, 'Dinamarca', 'https://images.unsplash.com/photo-1513622470522-26c3c8a854bc?q=80&w=2000'),
+          ('Odense', 'Ciudad de Andersen, calles historicas y ambiente familiar.', 1600, 'Dinamarca', 'https://images.unsplash.com/photo-1513622470522-26c3c8a854bc?q=80&w=2000'),
+          ('Roskilde', 'Catedral, barcos vikingos y patrimonio danes.', 1600, 'Dinamarca', 'https://images.unsplash.com/photo-1513622470522-26c3c8a854bc?q=80&w=2000'),
+
+          ('Estocolmo', 'Islas, casco antiguo, museos y arquitectura nordica.', 1950, 'Suecia', 'https://images.unsplash.com/photo-1509356843151-3e7d96241e11?q=80&w=2000'),
+          ('Gotemburgo', 'Canales, costa oeste, gastronomia y ambiente marinero.', 1750, 'Suecia', 'https://images.unsplash.com/photo-1509356843151-3e7d96241e11?q=80&w=2000'),
+          ('Malmo', 'Puente de Oresund, diseño urbano y costa escandinava.', 1700, 'Suecia', 'https://images.unsplash.com/photo-1509356843151-3e7d96241e11?q=80&w=2000'),
+          ('Uppsala', 'Universidad historica, catedral y vida cultural sueca.', 1650, 'Suecia', 'https://images.unsplash.com/photo-1509356843151-3e7d96241e11?q=80&w=2000'),
+
+          ('Reykjavik', 'Naturaleza islandesa, auroras, volcanes y aguas termales.', 2400, 'Islandia', 'https://images.unsplash.com/photo-1504893524553-b855bce32c67?q=80&w=2000'),
+          ('Akureyri', 'Fiordos del norte, naturaleza y ambiente islandes tranquilo.', 2300, 'Islandia', 'https://images.unsplash.com/photo-1504893524553-b855bce32c67?q=80&w=2000'),
+          ('Vik', 'Playas negras, acantilados y paisajes volcanicos.', 2350, 'Islandia', 'https://images.unsplash.com/photo-1504893524553-b855bce32c67?q=80&w=2000'),
+          ('Hofn', 'Glaciares, lagunas y paisajes del sureste islandes.', 2350, 'Islandia', 'https://images.unsplash.com/photo-1504893524553-b855bce32c67?q=80&w=2000'),
+
+          ('Brujas', 'Canales, plazas medievales y arquitectura flamenca.', 1500, 'Bélgica', 'https://images.unsplash.com/photo-1491557345352-5929e343eb89?q=80&w=2000'),
+          ('Bruselas', 'Grand Place, arte, instituciones europeas y gastronomia belga.', 1600, 'Bélgica', 'https://images.unsplash.com/photo-1491557345352-5929e343eb89?q=80&w=2000'),
+          ('Gante', 'Canales, castillo medieval y ambiente universitario.', 1500, 'Bélgica', 'https://images.unsplash.com/photo-1491557345352-5929e343eb89?q=80&w=2000'),
+          ('Amberes', 'Moda, puerto, diamantes y arquitectura flamenca.', 1550, 'Bélgica', 'https://images.unsplash.com/photo-1491557345352-5929e343eb89?q=80&w=2000')
+     ) AS v(nombre, descripcion, precio, pais, imagen)
+WHERE NOT EXISTS (
+    SELECT 1 FROM destinos d WHERE d.nombre = v.nombre AND d.pais = v.pais
+);
+
+-- ASIA
+INSERT INTO destinos (nombre, descripcion, precio, pais, imagen, continente_id)
+SELECT v.nombre, v.descripcion, v.precio, v.pais, v.imagen,
+       (SELECT id FROM continente WHERE nombre = 'Asia' LIMIT 1)
+FROM (VALUES
+          ('Osaka', 'Gastronomia japonesa, castillo historico y vida urbana vibrante.', 2050, 'Japón', 'https://source.unsplash.com/1600x900/?osaka,castle'),
+          ('Hong Kong', 'Skyline, bahia Victoria, mercados y energia cosmopolita.', 2400, 'China', 'https://source.unsplash.com/1600x900/?hong-kong,skyline'),
+          ('Taipei', 'Templos, rascacielos, mercados nocturnos y montanas cercanas.', 2100, 'Taiwan', 'https://source.unsplash.com/1600x900/?taipei,101'),
+          ('Kuala Lumpur', 'Torres Petronas, cultura multicultural y gastronomia.', 1800, 'Malasia', 'https://source.unsplash.com/1600x900/?kuala-lumpur,petronas'),
+          ('Phuket', 'Playas tropicales, islas, templos y vida costera.', 1700, 'Tailandia', 'https://source.unsplash.com/1600x900/?phuket,beach'),
+          ('Siem Reap', 'Templos de Angkor, historia jemer y paisajes culturales.', 1650, 'Camboya', 'https://source.unsplash.com/1600x900/?angkor-wat'),
+          ('Katmandu', 'Templos, Himalaya, plazas historicas y cultura nepali.', 1800, 'Nepal', 'https://source.unsplash.com/1600x900/?kathmandu,temple'),
+          ('Doha', 'Arquitectura moderna, zocos, museos y costa del Golfo.', 2200, 'Catar', 'https://source.unsplash.com/1600x900/?doha,skyline'),
+          ('Jerusalen', 'Historia, lugares sagrados y patrimonio cultural unico.', 1900, 'Israel', 'https://source.unsplash.com/1600x900/?jerusalem,old-city')
+     ) AS v(nombre, descripcion, precio, pais, imagen)
+WHERE NOT EXISTS (
+    SELECT 1 FROM destinos d WHERE d.nombre = v.nombre AND d.pais = v.pais
+);
+
+-- AFRICA
+INSERT INTO destinos (nombre, descripcion, precio, pais, imagen, continente_id)
+SELECT v.nombre, v.descripcion, v.precio, v.pais, v.imagen,
+       (SELECT id FROM continente WHERE nombre = 'África' LIMIT 1)
+FROM (VALUES
+          ('Luxor', 'Templos faraonicos, valle de los Reyes y ribera del Nilo.', 1500, 'Egipto', 'https://source.unsplash.com/1600x900/?luxor,temple'),
+          ('Aswan', 'Nilo, templos nubios, islas y paisajes deserticos.', 1450, 'Egipto', 'https://source.unsplash.com/1600x900/?aswan,nile'),
+          ('Fez', 'Medina historica, artesania, puertas monumentales y cultura marroqui.', 1250, 'Marruecos', 'https://source.unsplash.com/1600x900/?fez,morocco'),
+          ('Chefchaouen', 'Calles azules, montanas del Rif y ambiente tradicional.', 1200, 'Marruecos', 'https://source.unsplash.com/1600x900/?chefchaouen,blue-city'),
+          ('Mombasa', 'Costa keniana, playas, fuerte Jesus y cultura swahili.', 1900, 'Kenia', 'https://source.unsplash.com/1600x900/?mombasa,beach')
+     ) AS v(nombre, descripcion, precio, pais, imagen)
+WHERE NOT EXISTS (
+    SELECT 1 FROM destinos d WHERE d.nombre = v.nombre AND d.pais = v.pais
+);
+
+-- OCEANIA
+INSERT INTO destinos (nombre, descripcion, precio, pais, imagen, continente_id)
+SELECT v.nombre, v.descripcion, v.precio, v.pais, v.imagen,
+       (SELECT id FROM continente WHERE nombre = 'Oceanía' LIMIT 1)
+FROM (VALUES
+          ('Brisbane', 'Rio, clima subtropical, cultura urbana y costa australiana.', 2350, 'Australia', 'https://source.unsplash.com/1600x900/?brisbane,skyline'),
+          ('Cairns', 'Gran Barrera de Coral, selva tropical y aventura marina.', 2600, 'Australia', 'https://source.unsplash.com/1600x900/?cairns,great-barrier-reef'),
+          ('Darwin', 'Naturaleza tropical, parques nacionales y cultura del norte.', 2450, 'Australia', 'https://source.unsplash.com/1600x900/?darwin,australia'),
+          ('Adelaida', 'Vinedos, costa, cultura y ambiente tranquilo australiano.', 2300, 'Australia', 'https://source.unsplash.com/1600x900/?adelaide,australia'),
+          ('Wellington', 'Capital neozelandesa con bahia, cultura y montanas cercanas.', 2450, 'Nueva Zelanda', 'https://source.unsplash.com/1600x900/?wellington,new-zealand'),
+          ('Christchurch', 'Jardines, arquitectura renovada y puerta a los Alpes del Sur.', 2400, 'Nueva Zelanda', 'https://source.unsplash.com/1600x900/?christchurch,new-zealand'),
+          ('Rotorua', 'Geiseres, cultura maori, lagos y actividad geotermal.', 2500, 'Nueva Zelanda', 'https://source.unsplash.com/1600x900/?rotorua,geothermal'),
+          ('Nadi', 'Puerta de Fiyi, playas, resorts y cultura isleña.', 3000, 'Fiyi', 'https://source.unsplash.com/1600x900/?fiji,beach')
+     ) AS v(nombre, descripcion, precio, pais, imagen)
+WHERE NOT EXISTS (
+    SELECT 1 FROM destinos d WHERE d.nombre = v.nombre AND d.pais = v.pais
+);
+
+-- AMERICA DEL NORTE
+INSERT INTO destinos (nombre, descripcion, precio, pais, imagen, continente_id)
+SELECT v.nombre, v.descripcion, v.precio, v.pais, v.imagen,
+       (SELECT id FROM continente WHERE nombre = 'América del Norte' LIMIT 1)
+FROM (VALUES
+          ('Miami', 'Playas, art deco, vida latina y ambiente costero.', 2300, 'Estados Unidos', 'https://source.unsplash.com/1600x900/?miami,beach'),
+          ('Boston', 'Historia, universidades, barrios clasicos y costa atlantica.', 2250, 'Estados Unidos', 'https://source.unsplash.com/1600x900/?boston,skyline'),
+          ('Washington DC', 'Monumentos nacionales, museos y arquitectura institucional.', 2200, 'Estados Unidos', 'https://source.unsplash.com/1600x900/?washington-dc,monument'),
+          ('Seattle', 'Skyline, bahia, cafe, musica y naturaleza cercana.', 2400, 'Estados Unidos', 'https://source.unsplash.com/1600x900/?seattle,space-needle'),
+          ('Montreal', 'Cultura francofona, casco antiguo y festivales urbanos.', 2100, 'Canada', 'https://source.unsplash.com/1600x900/?montreal,old-town'),
+          ('Quebec', 'Murallas, encanto europeo y patrimonio historico canadiense.', 2050, 'Canada', 'https://source.unsplash.com/1600x900/?quebec-city'),
+          ('Orlando', 'Parques tematicos, entretenimiento familiar y resorts.', 2150, 'Estados Unidos', 'https://source.unsplash.com/1600x900/?orlando,theme-park'),
+          ('Tulum', 'Ruinas mayas, playas caribeñas y cenotes.', 1850, 'México', 'https://source.unsplash.com/1600x900/?tulum,mexico')
+     ) AS v(nombre, descripcion, precio, pais, imagen)
+WHERE NOT EXISTS (
+    SELECT 1 FROM destinos d WHERE d.nombre = v.nombre AND d.pais = v.pais
+);
+
+-- AMERICA DEL SUR
+INSERT INTO destinos (nombre, descripcion, precio, pais, imagen, continente_id)
+SELECT v.nombre, v.descripcion, v.precio, v.pais, v.imagen,
+       (SELECT id FROM continente WHERE nombre = 'América del Sur' LIMIT 1)
+FROM (VALUES
+          ('Cusco', 'Ciudad andina, patrimonio inca y acceso al Valle Sagrado.', 1750, 'Perú', 'https://source.unsplash.com/1600x900/?cusco,peru'),
+          ('Valparaiso', 'Cerros coloridos, arte urbano, puerto y miradores.', 1650, 'Chile', 'https://source.unsplash.com/1600x900/?valparaiso,chile'),
+          ('Salvador de Bahia', 'Cultura afrobrasileña, playas, musica y casco historico.', 1850, 'Brasil', 'https://source.unsplash.com/1600x900/?salvador-bahia'),
+          ('Brasilia', 'Arquitectura moderna, urbanismo singular y edificios iconicos.', 1750, 'Brasil', 'https://source.unsplash.com/1600x900/?brasilia,architecture'),
+          ('Punta del Este', 'Playas, puerto, lujo costero y ambiente veraniego.', 1900, 'Uruguay', 'https://source.unsplash.com/1600x900/?punta-del-este'),
+          ('Bariloche', 'Lagos, montañas, chocolate y naturaleza patagonica.', 2200, 'Argentina', 'https://source.unsplash.com/1600x900/?bariloche,argentina'),
+          ('Mendoza', 'Vinedos, Andes, gastronomia y rutas del vino.', 1850, 'Argentina', 'https://source.unsplash.com/1600x900/?mendoza,vineyard')
+     ) AS v(nombre, descripcion, precio, pais, imagen)
+WHERE NOT EXISTS (
+    SELECT 1 FROM destinos d WHERE d.nombre = v.nombre AND d.pais = v.pais
+);
+
+-- =====================================================
+-- HOTELES AUTOMATICOS PARA LOS 54 DESTINOS NUEVOS
+-- 4 alojamientos por ciudad
+-- =====================================================
+
+WITH destinos_nuevos AS (
+    SELECT d.id, d.nombre, d.pais, d.precio
+    FROM destinos d
+    WHERE d.nombre IN (
+        'Barcelona','Sevilla','Valencia','Lyon','Marsella','Niza','Florencia','Venecia','Milan',
+        'Edimburgo','Manchester','Oxford','Santorini','Mykonos','Tesalonica','Salzburgo','Innsbruck','Graz',
+        'Sintra','Faro','Cesky Krumlov','Karlovy Vary','Brno','Eger','Pecs','Szentendre',
+        'Rotterdam','La Haya','Utrecht','Dubrovnik','Split','Zagreb','Hvar','Copenhague','Aarhus','Odense','Roskilde',
+        'Estocolmo','Gotemburgo','Malmo','Uppsala','Reykjavik','Akureyri','Vik','Hofn','Brujas','Bruselas','Gante','Amberes',
+        'Osaka','Hong Kong','Taipei','Kuala Lumpur','Phuket','Siem Reap','Katmandu','Doha','Jerusalen',
+        'Luxor','Aswan','Fez','Chefchaouen','Mombasa',
+        'Brisbane','Cairns','Darwin','Adelaida','Wellington','Christchurch','Rotorua','Nadi',
+        'Miami','Boston','Washington DC','Seattle','Montreal','Quebec','Orlando','Tulum',
+        'Cusco','Valparaiso','Salvador de Bahia','Brasilia','Punta del Este','Bariloche','Mendoza'
+    )
+)
+INSERT INTO alojamientos (nombre, ciudad, pais, tipo, precio_por_noche, destino_id, created_at, updated_at)
+SELECT nd.nombre || ' Grand Hotel', nd.nombre, nd.pais, 'HOTEL', ROUND(nd.precio / 12.0), nd.id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+FROM destinos_nuevos nd
+WHERE NOT EXISTS (SELECT 1 FROM alojamientos a WHERE a.nombre = nd.nombre || ' Grand Hotel')
+UNION ALL
+SELECT nd.nombre || ' Boutique Suites', nd.nombre, nd.pais, 'HOTEL', ROUND(nd.precio / 10.0), nd.id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+FROM destinos_nuevos nd
+WHERE NOT EXISTS (SELECT 1 FROM alojamientos a WHERE a.nombre = nd.nombre || ' Boutique Suites')
+UNION ALL
+SELECT nd.nombre || ' Central Palace', nd.nombre, nd.pais, 'HOTEL', ROUND(nd.precio / 11.0), nd.id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+FROM destinos_nuevos nd
+WHERE NOT EXISTS (SELECT 1 FROM alojamientos a WHERE a.nombre = nd.nombre || ' Central Palace')
+UNION ALL
+SELECT nd.nombre || ' Vista Resort', nd.nombre, nd.pais, 'HOTEL', ROUND(nd.precio / 9.0), nd.id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+FROM destinos_nuevos nd
+WHERE NOT EXISTS (SELECT 1 FROM alojamientos a WHERE a.nombre = nd.nombre || ' Vista Resort');
+
+-- Dos hoteles extra para destinos ya existentes, hasta dejar el catalogo mas variado
+WITH destinos_existentes AS (
+    SELECT d.id, d.nombre, d.pais, d.precio
+    FROM destinos d
+    WHERE d.nombre NOT IN (
+        'Barcelona','Sevilla','Valencia','Lyon','Marsella','Niza','Florencia','Venecia','Milan',
+        'Edimburgo','Manchester','Oxford','Santorini','Mykonos','Tesalonica','Salzburgo','Innsbruck','Graz',
+        'Sintra','Faro','Cesky Krumlov','Karlovy Vary','Brno','Eger','Pecs','Szentendre',
+        'Rotterdam','La Haya','Utrecht','Dubrovnik','Split','Zagreb','Hvar','Copenhague','Aarhus','Odense','Roskilde',
+        'Estocolmo','Gotemburgo','Malmo','Uppsala','Reykjavik','Akureyri','Vik','Hofn','Brujas','Bruselas','Gante','Amberes',
+        'Osaka','Hong Kong','Taipei','Kuala Lumpur','Phuket','Siem Reap','Katmandu','Doha','Jerusalen',
+        'Luxor','Aswan','Fez','Chefchaouen','Mombasa',
+        'Brisbane','Cairns','Darwin','Adelaida','Wellington','Christchurch','Rotorua','Nadi',
+        'Miami','Boston','Washington DC','Seattle','Montreal','Quebec','Orlando','Tulum',
+        'Cusco','Valparaiso','Salvador de Bahia','Brasilia','Punta del Este','Bariloche','Mendoza'
+    )
+)
+INSERT INTO alojamientos (nombre, ciudad, pais, tipo, precio_por_noche, destino_id, created_at, updated_at)
+SELECT de.nombre || ' Boutique Suites', de.nombre, de.pais, 'HOTEL', ROUND(de.precio / 10.0), de.id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+FROM destinos_existentes de
+WHERE NOT EXISTS (SELECT 1 FROM alojamientos a WHERE a.nombre = de.nombre || ' Boutique Suites')
+UNION ALL
+SELECT de.nombre || ' Central Palace', de.nombre, de.pais, 'HOTEL', ROUND(de.precio / 11.0), de.id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+FROM destinos_existentes de
+WHERE NOT EXISTS (SELECT 1 FROM alojamientos a WHERE a.nombre = de.nombre || ' Central Palace');
+
+-- Habitaciones para cualquier hotel que todavia no tenga habitaciones
+WITH hoteles_sin_habitaciones AS (
+    SELECT a.id, a.precio_por_noche
+    FROM alojamientos a
+    WHERE NOT EXISTS (
+        SELECT 1 FROM habitacion h WHERE h.alojamiento_id = a.id
+    )
+)
+INSERT INTO habitacion (tipo, capacidad, precio_por_noche, regimen, alojamiento_id, imagen_url)
+SELECT h.tipo, h.capacidad, ROUND(a.precio_por_noche * h.factor), h.regimen, a.id, ''
+FROM hoteles_sin_habitaciones a
+         CROSS JOIN (VALUES
+             ('Individual', 1, 0.75, 'SOLO_ALOJAMIENTO'),
+             ('Doble', 2, 1.00, 'DESAYUNO'),
+             ('Suite', 2, 1.60, 'MEDIA_PENSION')
+         ) AS h(tipo, capacidad, factor, regimen);
+
+SELECT COUNT(*) AS total_destinos_final FROM destinos;
+SELECT COUNT(*) AS total_alojamientos_final FROM alojamientos;
+SELECT COUNT(*) AS total_habitaciones_final FROM habitacion;

@@ -2,10 +2,10 @@ package com.viajes.app.destinos;
 
 import com.viajes.app.api.UnsplashService;
 import com.viajes.app.destinos.dto.DestinoDTO;
-
-import org.springframework.stereotype.Service;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
 import java.util.List;
 
 @Service
@@ -29,7 +29,7 @@ public class DestinoService {
         return destinoRepository.findAll()
                 .stream()
                 .map(this::mapToDto)
-                .collect(java.util.stream.Collectors.toList());
+                .toList();
     }
 
     public DestinoDTO obtenerDestino(Long id) {
@@ -42,43 +42,88 @@ public class DestinoService {
         if (pais == null || pais.isBlank()) {
             return List.of();
         }
+
         return destinoRepository.findByPaisIgnoreCase(pais.trim())
                 .stream()
                 .map(this::mapToDto)
                 .toList();
     }
 
-    // ✅ GUARDAR (DTO → ENTITY → DTO)
-    public DestinoDTO guardarDesdeDTO(DestinoDTO dto){
+    public DestinoDTO guardarDesdeDTO(DestinoDTO dto) {
+        validarDestino(dto);
 
-        Destino d = new Destino();
-        d.setNombre(dto.getNombre());
-        d.setDescripcion(dto.getDescripcion());
-        d.setPrecio(dto.getPrecio());
-        d.setPais(dto.getPais());
+        Destino destino = new Destino();
+        destino.setNombre(dto.getNombre().trim());
+        destino.setDescripcion(dto.getDescripcion() != null ? dto.getDescripcion().trim() : "");
+        destino.setPrecio(dto.getPrecio());
+        destino.setPais(dto.getPais().trim());
+        destino.setImagen(resolverImagen(dto.getImagen(), dto.getNombre()));
 
-        // 🔥 IMAGEN DESDE UNSPLASH
-        String imagen = unsplashService.obtenerImagen(dto.getNombre());
-        d.setImagen(imagen);
+        Continente continente = buscarContinente(dto.getContinente());
+        destino.setContinente(continente);
 
-        // 🔥 CONTINENTE REAL
-        Continente continente = continenteRepository
-                .findByNombre(dto.getContinente())
-                .orElseThrow(() -> new RuntimeException("Continente no encontrado"));
+        Destino guardado = destinoRepository.save(destino);
+        return mapToDto(guardado);
+    }
 
-        d.setContinente(continente);
+    public DestinoDTO actualizarDesdeDTO(Long id, DestinoDTO dto) {
+        validarDestino(dto);
 
-        Destino guardado = destinoRepository.save(d);
+        Destino destino = destinoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Destino no encontrado"));
 
-        return new DestinoDTO(
-                guardado.getId(),
-                guardado.getNombre(),
-                guardado.getDescripcion(),
-                guardado.getPrecio(),
-                guardado.getPais(),
-                guardado.getContinente().getNombre(),
-                guardado.getImagen()
-        );
+        destino.setNombre(dto.getNombre().trim());
+        destino.setDescripcion(dto.getDescripcion() != null ? dto.getDescripcion().trim() : "");
+        destino.setPrecio(dto.getPrecio());
+        destino.setPais(dto.getPais().trim());
+
+        if (dto.getImagen() != null && !dto.getImagen().isBlank()) {
+            destino.setImagen(dto.getImagen().trim());
+        } else if (destino.getImagen() == null || destino.getImagen().isBlank()) {
+            destino.setImagen(unsplashService.obtenerImagen(dto.getNombre()));
+        }
+
+        Continente continente = buscarContinente(dto.getContinente());
+        destino.setContinente(continente);
+
+        Destino actualizado = destinoRepository.save(destino);
+        return mapToDto(actualizado);
+    }
+
+    private void validarDestino(DestinoDTO dto) {
+        if (dto == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Datos del destino inválidos");
+        }
+
+        if (dto.getNombre() == null || dto.getNombre().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre es obligatorio");
+        }
+
+        if (dto.getPais() == null || dto.getPais().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El país es obligatorio");
+        }
+
+        if (dto.getContinente() == null || dto.getContinente().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El continente es obligatorio");
+        }
+
+        if (dto.getPrecio() == null || dto.getPrecio() <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El precio debe ser mayor que 0");
+        }
+    }
+
+    private Continente buscarContinente(String nombreContinente) {
+        return continenteRepository
+                .findByNombre(nombreContinente.trim())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Continente no encontrado"));
+    }
+
+    private String resolverImagen(String imagen, String nombreDestino) {
+        if (imagen != null && !imagen.isBlank()) {
+            return imagen.trim();
+        }
+
+        return unsplashService.obtenerImagen(nombreDestino);
     }
 
     private DestinoDTO mapToDto(Destino destino) {
@@ -94,7 +139,7 @@ public class DestinoService {
                 destino.getDescripcion(),
                 destino.getPrecio(),
                 destino.getPais(),
-                destino.getContinente().getNombre(),
+                destino.getContinente() != null ? destino.getContinente().getNombre() : "",
                 imagen
         );
     }

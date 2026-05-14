@@ -68,6 +68,30 @@ public class AlojamientoController {
 
         dto.put("imagen", "https://picsum.photos/seed/hotel-" + alojamiento.getId() + "/900/600");
 
+        agregarComodidades(dto, alojamiento);
+
         return dto;
+    }
+
+    private void agregarComodidades(Map<String, Object> dto, Alojamiento alojamiento) {
+        TipoAlojamiento tipo = alojamiento.getTipo();
+        Long id = alojamiento.getId() == null ? 0L : alojamiento.getId();
+
+        boolean esHotel = tipo == TipoAlojamiento.HOTEL;
+        boolean esResort = tipo == TipoAlojamiento.RESORT;
+        boolean esApartamento = tipo == TipoAlojamiento.APARTAMENTO;
+        boolean esHostal = tipo == TipoAlojamiento.HOSTAL;
+
+        boolean wifi = true;
+        boolean desayuno = esHotel || esResort || esHostal;
+        boolean aireAcondicionado = esHotel || esResort || esApartamento;
+        boolean camasKing = esHotel || esResort;
+        boolean parking = esResort || esApartamento || id % 2 == 0;
+
+        dto.put("wifi", wifi);
+        dto.put("desayuno", desayuno);
+        dto.put("aireAcondicionado", aireAcondicionado);
+        dto.put("camasKing", camasKing);
+        dto.put("parking", parking);
     }
 }

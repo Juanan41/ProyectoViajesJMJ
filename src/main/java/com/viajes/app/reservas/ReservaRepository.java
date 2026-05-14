@@ -14,4 +14,6 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     List<Reserva> findByUsuarioEmailOrderByFechaReservaDesc(String email);
 
     Optional<Reserva> findByIdAndUsuarioEmail(Long id, String email);
+
+    long countByHabitacionAlojamientoId(Long alojamientoId);
 }

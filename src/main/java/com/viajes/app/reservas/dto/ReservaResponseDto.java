@@ -9,6 +9,9 @@ public class ReservaResponseDto {
     private Long destinoId;
     private Long alojamientoId;
     private Long habitacionId;
+    private Long usuarioId;
+    private String usuarioUsername;
+    private String usuarioEmail;
     private String destinoNombre;
     private String alojamientoNombre;
     private String imagenUrl;
@@ -29,6 +32,9 @@ public class ReservaResponseDto {
                               Long destinoId,
                               Long alojamientoId,
                               Long habitacionId,
+                              Long usuarioId,
+                              String usuarioUsername,
+                              String usuarioEmail,
                               String destinoNombre,
                               String alojamientoNombre,
                               String imagenUrl,
@@ -48,6 +54,9 @@ public class ReservaResponseDto {
         this.destinoId = destinoId;
         this.alojamientoId = alojamientoId;
         this.habitacionId = habitacionId;
+        this.usuarioId = usuarioId;
+        this.usuarioUsername = usuarioUsername;
+        this.usuarioEmail = usuarioEmail;
         this.destinoNombre = destinoNombre;
         this.alojamientoNombre = alojamientoNombre;
         this.imagenUrl = imagenUrl;
@@ -79,6 +88,18 @@ public class ReservaResponseDto {
 
     public Long getHabitacionId() {
         return habitacionId;
+    }
+
+    public Long getUsuarioId() {
+        return usuarioId;
+    }
+
+    public String getUsuarioUsername() {
+        return usuarioUsername;
+    }
+
+    public String getUsuarioEmail() {
+        return usuarioEmail;
     }
 
     public String getDestinoNombre() {
