@@ -65,6 +65,11 @@ public class ReservaService {
         }
 
         int huespedes = dto.getHuespedes() != null && dto.getHuespedes() > 0 ? dto.getHuespedes() : 1;
+
+        if (habitacion.getCapacidad() < huespedes) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La habitación no tiene capacidad suficiente");
+        }
+
         double transporteCoste = getTransporteCoste(transporte);
         double precioTotal = (habitacion.getPrecioPorNoche() * noches * huespedes) + transporteCoste;
         BigDecimal precioTotalSaldo = BigDecimal.valueOf(precioTotal);
@@ -173,9 +178,9 @@ public class ReservaService {
                 reserva.getFechaReserva(),
                 transporteTipo,
                 getTransporteNombre(transporte),
-                null,
-                null,
-                null
+                getTransporteHora(reserva.getId()),
+                getTransporteAsiento(reserva.getId()),
+                getTransportePuerta(reserva.getId(), transporte)
         );
     }
 
@@ -191,9 +196,37 @@ public class ReservaService {
     private String getTransporteNombre(TransporteTipo transporte) {
         if (transporte == null) return null;
         return switch (transporte) {
-            case AVION -> "Vuelo";
-            case TREN -> "Tren";
-            case BARCO -> "Barco";
+            case AVION -> "JMJ Airlines";
+            case TREN -> "JMJ Rail";
+            case BARCO -> "JMJ Cruises";
         };
+    }
+
+    private String getTransporteHora(Long id) {
+        String[] horas = {"08:30", "10:15", "12:00", "16:45", "20:30", "22:10"};
+        return horas[Math.floorMod(id != null ? id.intValue() : 0, horas.length)];
+    }
+
+    private String getTransporteAsiento(Long id) {
+        String[] letras = {"A", "B", "C", "D", "E", "F"};
+        int safeId = id != null ? id.intValue() : 0;
+        int fila = Math.floorMod(safeId, 28) + 1;
+        return fila + letras[Math.floorMod(safeId, letras.length)];
+    }
+
+    private String getTransportePuerta(Long id, TransporteTipo transporte) {
+        int safeId = id != null ? id.intValue() : 0;
+        int numero = Math.floorMod(safeId, 18) + 1;
+
+        if (transporte == TransporteTipo.TREN) {
+            return "Vía " + numero;
+        }
+
+        if (transporte == TransporteTipo.BARCO) {
+            return "Muelle " + numero;
+        }
+
+        String[] letras = {"A", "B", "C", "D", "E", "F", "G"};
+        return letras[Math.floorMod(safeId, letras.length)] + numero;
     }
 }

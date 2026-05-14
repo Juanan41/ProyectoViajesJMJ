@@ -7,8 +7,10 @@ import com.viajes.app.auth.dto.RegisterResponse;
 import com.viajes.app.users.Rol;
 import com.viajes.app.users.Usuario;
 import com.viajes.app.users.UsuarioRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 
@@ -29,13 +31,35 @@ public class AuthService {
 
     public LoginResponse login(LoginRequest request) {
 
-        Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Introduce tu correo electrónico."
+            );
+        }
 
-        boolean matches = passwordEncoder.matches(request.getPassword(), usuario.getPassword());
+        if (request.getPassword() == null || request.getPassword().trim().isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Introduce tu contraseña."
+            );
+        }
 
-        if (!matches) {
-            throw new RuntimeException("Contraseña incorrecta");
+        String email = request.getEmail().trim().toLowerCase();
+
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED,
+                        "Correo electrónico o contraseña incorrectos."
+                ));
+
+        boolean passwordMatches = passwordEncoder.matches(request.getPassword(), usuario.getPassword());
+
+        if (!passwordMatches) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Correo electrónico o contraseña incorrectos."
+            );
         }
 
         String token = jwtService.generateToken(usuario.getEmail());
@@ -51,25 +75,67 @@ public class AuthService {
     public RegisterResponse register(RegisterRequest request) {
 
         if (request.getUsername() == null || request.getUsername().trim().isEmpty()) {
-            throw new RuntimeException("El nombre de usuario es obligatorio");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Introduce tu nombre completo."
+            );
+        }
+
+        if (request.getUsername().trim().length() < 3) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "El nombre debe tener al menos 3 caracteres."
+            );
+        }
+
+        if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Introduce tu correo electrónico."
+            );
+        }
+
+        String email = request.getEmail().trim().toLowerCase();
+
+        if (!email.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Introduce un correo electrónico válido."
+            );
         }
 
         if (request.getPassword() == null || request.getPassword().trim().isEmpty()) {
-            throw new RuntimeException("La contraseña es obligatoria");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Introduce una contraseña."
+            );
         }
 
-        if (usuarioRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException("Ya existe un usuario con ese email");
+        if (request.getPassword().trim().length() < 6) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "La contraseña debe tener al menos 6 caracteres."
+            );
         }
 
-        if (usuarioRepository.findByUsername(request.getUsername()).isPresent()) {
-            throw new RuntimeException("Ya existe un usuario con ese nombre");
+        if (usuarioRepository.findByEmail(email).isPresent()) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Ya existe una cuenta con ese correo electrónico."
+            );
+        }
+
+        if (usuarioRepository.findByUsername(request.getUsername().trim()).isPresent()) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Ya existe una cuenta con ese nombre de usuario."
+            );
         }
 
         Usuario usuario = new Usuario();
-        usuario.setUsername(request.getUsername());
-        usuario.setEmail(request.getEmail());
-        usuario.setPassword(passwordEncoder.encode(request.getPassword()));
+        usuario.setUsername(request.getUsername().trim());
+        usuario.setEmail(email);
+        usuario.setPassword(passwordEncoder.encode(request.getPassword().trim()));
         usuario.setRole(Rol.USER);
         usuario.setSaldo(BigDecimal.ZERO);
 
@@ -80,7 +146,7 @@ public class AuthService {
                 guardado.getUsername(),
                 guardado.getEmail(),
                 guardado.getRole().name(),
-                "Usuario registrado correctamente"
+                "Usuario registrado correctamente."
         );
     }
 }

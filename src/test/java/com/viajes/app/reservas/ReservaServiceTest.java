@@ -348,6 +348,7 @@ class ReservaServiceTest {
         Habitacion habitacion = new Habitacion();
         ReflectionTestUtils.setField(habitacion, "id", id);
         habitacion.setTipo(tipoHabitacion);
+        habitacion.setCapacidad(tipoHabitacion != null && tipoHabitacion.toLowerCase().contains("suite") ? 4 : 2);
         habitacion.setPrecioPorNoche(precioPorNoche);
         habitacion.setAlojamiento(alojamiento);
 

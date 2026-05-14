@@ -82,7 +82,7 @@ class AuthServiceTest {
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> authService.login(request));
 
-        assertEquals("Usuario no encontrado", exception.getMessage());
+        assertEquals("401 UNAUTHORIZED \"Correo electrónico o contraseña incorrectos.\"", exception.getMessage());
 
         verify(usuarioRepository).findByEmail("noexiste@viajes.com");
         verify(passwordEncoder, never()).matches(any(), any());
@@ -110,7 +110,7 @@ class AuthServiceTest {
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> authService.login(request));
 
-        assertEquals("Contraseña incorrecta", exception.getMessage());
+        assertEquals("401 UNAUTHORIZED \"Correo electrónico o contraseña incorrectos.\"", exception.getMessage());
 
         verify(usuarioRepository).findByEmail("cliente1@viajes.com");
         verify(passwordEncoder).matches("mal123", "hash123");
@@ -122,13 +122,13 @@ class AuthServiceTest {
         RegisterRequest request = new RegisterRequest();
         request.setUsername("clienteNuevo");
         request.setEmail("nuevo@viajes.com");
-        request.setPassword("1234");
+        request.setPassword("123456");
 
         when(usuarioRepository.findByEmail("nuevo@viajes.com"))
                 .thenReturn(Optional.empty());
         when(usuarioRepository.findByUsername("clienteNuevo"))
                 .thenReturn(Optional.empty());
-        when(passwordEncoder.encode("1234"))
+        when(passwordEncoder.encode("123456"))
                 .thenReturn("hashRegistrado");
 
         when(usuarioRepository.save(any(Usuario.class))).thenAnswer(invocation -> {
@@ -144,7 +144,7 @@ class AuthServiceTest {
         assertEquals("clienteNuevo", response.getUsername());
         assertEquals("nuevo@viajes.com", response.getEmail());
         assertEquals("USER", response.getRole());
-        assertEquals("Usuario registrado correctamente", response.getMessage());
+        assertEquals("Usuario registrado correctamente.", response.getMessage());
 
         ArgumentCaptor<Usuario> captor = ArgumentCaptor.forClass(Usuario.class);
         verify(usuarioRepository).save(captor.capture());
@@ -161,7 +161,7 @@ class AuthServiceTest {
         RegisterRequest request = new RegisterRequest();
         request.setUsername("clienteNuevo");
         request.setEmail("repetido@viajes.com");
-        request.setPassword("1234");
+        request.setPassword("123456");
 
         Usuario existente = new Usuario();
         ReflectionTestUtils.setField(existente, "id", 2L);
@@ -176,7 +176,7 @@ class AuthServiceTest {
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> authService.register(request));
 
-        assertEquals("Ya existe un usuario con ese email", exception.getMessage());
+        assertEquals("409 CONFLICT \"Ya existe una cuenta con ese correo electrónico.\"", exception.getMessage());
 
         verify(usuarioRepository).findByEmail("repetido@viajes.com");
         verify(usuarioRepository, never()).findByUsername(any());
@@ -188,7 +188,7 @@ class AuthServiceTest {
         RegisterRequest request = new RegisterRequest();
         request.setUsername("clienteExistente");
         request.setEmail("nuevo@viajes.com");
-        request.setPassword("1234");
+        request.setPassword("123456");
 
         Usuario existente = new Usuario();
         ReflectionTestUtils.setField(existente, "id", 3L);
@@ -205,7 +205,7 @@ class AuthServiceTest {
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> authService.register(request));
 
-        assertEquals("Ya existe un usuario con ese nombre", exception.getMessage());
+        assertEquals("409 CONFLICT \"Ya existe una cuenta con ese nombre de usuario.\"", exception.getMessage());
 
         verify(usuarioRepository).findByEmail("nuevo@viajes.com");
         verify(usuarioRepository).findByUsername("clienteExistente");
@@ -217,12 +217,12 @@ class AuthServiceTest {
         RegisterRequest request = new RegisterRequest();
         request.setUsername("   ");
         request.setEmail("nuevo@viajes.com");
-        request.setPassword("1234");
+        request.setPassword("123456");
 
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> authService.register(request));
 
-        assertEquals("El nombre de usuario es obligatorio", exception.getMessage());
+        assertEquals("400 BAD_REQUEST \"Introduce tu nombre completo.\"", exception.getMessage());
 
         verify(usuarioRepository, never()).findByEmail(any());
         verify(usuarioRepository, never()).save(any());
@@ -238,7 +238,7 @@ class AuthServiceTest {
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> authService.register(request));
 
-        assertEquals("La contraseña es obligatoria", exception.getMessage());
+        assertEquals("400 BAD_REQUEST \"Introduce una contraseña.\"", exception.getMessage());
 
         verify(usuarioRepository, never()).findByEmail(any());
         verify(usuarioRepository, never()).save(any());

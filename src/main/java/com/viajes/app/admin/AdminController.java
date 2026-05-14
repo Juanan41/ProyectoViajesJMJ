@@ -283,7 +283,6 @@ public class AdminController {
         String nombre = getString(request, "nombre");
         String ciudad = getString(request, "ciudad");
         String pais = getString(request, "pais");
-        String tipo = getString(request, "tipo");
         BigDecimal precioPorNoche = getBigDecimal(request, "precioPorNoche");
         Long destinoId = getLong(request, "destinoId");
 
@@ -296,11 +295,11 @@ public class AdminController {
         }
 
         if (pais == null || pais.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El pais es obligatorio");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El país es obligatorio");
         }
 
         if (precioPorNoche == null || precioPorNoche.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El precio por noche no es valido");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El precio por noche no es válido");
         }
 
         if (destinoId == null) {
@@ -316,11 +315,7 @@ public class AdminController {
         alojamiento.setPrecioPorNoche(precioPorNoche);
         alojamiento.setDestino(destino);
 
-        try {
-            alojamiento.setTipo(TipoAlojamiento.valueOf((tipo == null || tipo.isBlank() ? "HOTEL" : tipo).trim().toUpperCase()));
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tipo de alojamiento no valido");
-        }
+        alojamiento.setTipo(TipoAlojamiento.HOTEL);
     }
 
     private Map<String, Object> toUsuarioResponse(Usuario usuario) {
