@@ -2,8 +2,8 @@ package com.viajes.app.destinos;
 
 import com.viajes.app.api.UnsplashService;
 import com.viajes.app.destinos.dto.DestinoDTO;
-
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -26,29 +26,32 @@ public class DestinoService {
 
         return destinoRepository.findAll()
                 .stream()
-                .map(destino -> {
-
-                    String imagen = destino.getImagen();
-
-                    if (imagen == null || imagen.isEmpty()) {
-                        imagen = unsplashService.obtenerImagen(destino.getNombre());
-                    }
-
-                    return new DestinoDTO(
-                            destino.getId(),
-                            destino.getNombre(),
-                            destino.getDescripcion(),
-                            destino.getPrecio(),
-                            destino.getPais(),
-                            destino.getContinente().getNombre(),
-                            imagen
-                    );
-                })
+                .map(this::convertirADTO)
                 .collect(java.util.stream.Collectors.toList());
     }
 
-    // ✅ GUARDAR (DTO → ENTITY → DTO)
-    public DestinoDTO guardarDesdeDTO(DestinoDTO dto){
+    public DestinoDTO obtenerPorId(Long id) {
+        Destino destino = destinoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Destino no encontrado con id: " + id));
+
+        return convertirADTO(destino);
+    }
+
+    public List<DestinoDTO> listarPorContinente(Long continenteId) {
+        return destinoRepository.findByContinenteId(continenteId)
+                .stream()
+                .map(this::convertirADTO)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    public List<DestinoDTO> listarPorPais(String pais) {
+        return destinoRepository.findByPaisIgnoreCase(pais)
+                .stream()
+                .map(this::convertirADTO)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    public DestinoDTO guardarDesdeDTO(DestinoDTO dto) {
 
         Destino d = new Destino();
         d.setNombre(dto.getNombre());
@@ -56,11 +59,9 @@ public class DestinoService {
         d.setPrecio(dto.getPrecio());
         d.setPais(dto.getPais());
 
-        // 🔥 IMAGEN DESDE UNSPLASH
         String imagen = unsplashService.obtenerImagen(dto.getNombre());
         d.setImagen(imagen);
 
-        // 🔥 CONTINENTE REAL
         Continente continente = continenteRepository
                 .findByNombre(dto.getContinente())
                 .orElseThrow(() -> new RuntimeException("Continente no encontrado"));
@@ -69,14 +70,28 @@ public class DestinoService {
 
         Destino guardado = destinoRepository.save(d);
 
+        return convertirADTO(guardado);
+    }
+
+    private DestinoDTO convertirADTO(Destino destino) {
+        String imagen = destino.getImagen();
+
+        if (imagen == null || imagen.isEmpty()) {
+            imagen = unsplashService.obtenerImagen(destino.getNombre());
+        }
+
+        String continente = destino.getContinente() != null
+                ? destino.getContinente().getNombre()
+                : null;
+
         return new DestinoDTO(
-                guardado.getId(),
-                guardado.getNombre(),
-                guardado.getDescripcion(),
-                guardado.getPrecio(),
-                guardado.getPais(),
-                guardado.getContinente().getNombre(),
-                guardado.getImagen()
+                destino.getId(),
+                destino.getNombre(),
+                destino.getDescripcion(),
+                destino.getPrecio(),
+                destino.getPais(),
+                continente,
+                imagen
         );
     }
 }

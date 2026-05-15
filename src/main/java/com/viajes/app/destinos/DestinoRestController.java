@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
 @RestController
 @RequestMapping("/api/destinos")
 public class DestinoRestController {
@@ -17,6 +16,21 @@ public class DestinoRestController {
     @GetMapping
     public List<DestinoDTO> getDestinos() {
         return destinoService.listarDestinos();
+    }
+
+    @GetMapping("/{id}")
+    public DestinoDTO obtenerPorId(@PathVariable Long id) {
+        return destinoService.obtenerPorId(id);
+    }
+
+    @GetMapping("/continente/{continenteId}")
+    public List<DestinoDTO> listarPorContinente(@PathVariable Long continenteId) {
+        return destinoService.listarPorContinente(continenteId);
+    }
+
+    @GetMapping("/pais/{pais}")
+    public List<DestinoDTO> listarPorPais(@PathVariable String pais) {
+        return destinoService.listarPorPais(pais);
     }
 
     @PostMapping

@@ -30,6 +30,12 @@ public class ReservaRestController {
         return reservaService.obtenerReservasDeUsuario(emailUsuario);
     }
 
+    @GetMapping("/usuario/{usuarioId}")
+    public List<ReservaResponseDto> obtenerReservasPorUsuarioCompatibilidad(@PathVariable Long usuarioId) {
+        String emailUsuario = getEmailAutenticado();
+        return reservaService.obtenerReservasDeUsuario(emailUsuario);
+    }
+
     @GetMapping("/{id}")
     public ReservaResponseDto obtenerReservaPorId(@PathVariable Long id) {
         String emailUsuario = getEmailAutenticado();
