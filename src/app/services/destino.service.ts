@@ -57,7 +57,6 @@ export class DestinoService {
     'nueva york': ['new york'],
     'ciudad de mexico': ['mexico city'],
     'rio de janeiro': ['rio de janeiro'],
-    'río de janeiro': ['rio de janeiro'],
     'santiago de chile': ['santiago chile', 'santiago'],
   };
 
@@ -155,12 +154,12 @@ export class DestinoService {
   };
 
   private continentAliases: Record<number, string[]> = {
-    1: ['europe'],
+    1: ['europe', 'europa'],
     2: ['asia'],
-    3: ['africa'],
-    4: ['north america'],
-    5: ['south america'],
-    6: ['oceania', 'australia pacific'],
+    3: ['africa', 'áfrica'],
+    4: ['north america', 'america del norte', 'américa del norte'],
+    5: ['south america', 'america del sur', 'américa del sur'],
+    6: ['oceania', 'oceanía', 'australia pacific'],
   };
 
   public getFullImageUrl(imagePath: string): string {
@@ -176,8 +175,24 @@ export class DestinoService {
     return `${this.serverUrl}/${cleanPath}`;
   }
 
+  private fixBrokenText(value: any): string {
+    return String(value || '')
+      .replaceAll('B?lgica', 'Bélgica')
+      .replaceAll('Espa?a', 'España')
+      .replaceAll('M?xico', 'México')
+      .replaceAll('Per?', 'Perú')
+      .replaceAll('Turqu?a', 'Turquía')
+      .replaceAll('Sud?frica', 'Sudáfrica')
+      .replaceAll('Pa?ses Bajos', 'Países Bajos')
+      .replaceAll('Rep?blica Checa', 'República Checa')
+      .replaceAll('Rep?blica Dominicana', 'República Dominicana')
+      .replaceAll('Emiratos ?rabes Unidos', 'Emiratos Árabes Unidos')
+      .replaceAll('Polinesia Francesa', 'Polinesia Francesa')
+      .trim();
+  }
+
   private normalizeText(value: string): string {
-    return (value || '')
+    return this.fixBrokenText(value)
       .toLowerCase()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
@@ -187,6 +202,11 @@ export class DestinoService {
   private mapDestino(d: any): DestinoDTO {
     if (!d) return {} as DestinoDTO;
 
+    const nombre = this.fixBrokenText(d.nombre);
+    const ciudad = this.fixBrokenText(d.ciudad || d.nombre);
+    const pais = this.fixBrokenText(d.pais);
+    const descripcion = this.fixBrokenText(d.descripcion);
+
     let path = d.imagen || d.imagenUrl;
     const hasBackendDefault = path && path.includes(this.defaultBackendImage);
 
@@ -195,17 +215,28 @@ export class DestinoService {
       path = this.fallbackImages[index];
     }
 
-    let contId = d.continenteId;
-    if (d.continente && d.continente.id) contId = d.continente.id;
-    if (!contId && d.continente) contId = this.getContinentIdFromName(d.continente.toString());
-    if (!contId) contId = this.getContinentIdFromCountry(d.pais || '');
+    let backendContinentId = d.continenteId;
 
+    if (d.continente && typeof d.continente === 'object' && d.continente.id) {
+      backendContinentId = d.continente.id;
+    }
+
+    if (!backendContinentId && d.continente) {
+      backendContinentId = this.getContinentIdFromName(String(d.continente));
+    }
+
+    const continentFromCountry = this.getKnownContinentIdFromCountry(pais);
+
+    const finalContinentId = continentFromCountry || Number(backendContinentId) || 1;
     const fullUrl = this.getFullImageUrl(path);
 
     return {
       ...d,
-      ciudad: d.ciudad || d.nombre,
-      continenteId: Number(contId),
+      nombre,
+      ciudad: ciudad || nombre,
+      pais,
+      descripcion,
+      continenteId: finalContinentId,
       imagen: fullUrl,
       imagenUrl: fullUrl,
     };
@@ -224,7 +255,7 @@ export class DestinoService {
     return 1;
   }
 
-  private getContinentIdFromCountry(value: string): number {
+  private getKnownContinentIdFromCountry(value: string): number | null {
     const pais = this.normalizeText(value);
 
     const europe = [
@@ -244,6 +275,7 @@ export class DestinoService {
       'suecia',
       'suiza',
     ];
+
     const asia = [
       'catar',
       'china',
@@ -261,6 +293,7 @@ export class DestinoService {
       'turquia',
       'vietnam',
     ];
+
     const africa = [
       'argelia',
       'egipto',
@@ -278,6 +311,7 @@ export class DestinoService {
       'tanzania',
       'tunez',
     ];
+
     const northAmerica = [
       'bahamas',
       'belice',
@@ -295,6 +329,7 @@ export class DestinoService {
       'puerto rico',
       'republica dominicana',
     ];
+
     const southAmerica = [
       'argentina',
       'aruba',
@@ -312,6 +347,7 @@ export class DestinoService {
       'uruguay',
       'venezuela',
     ];
+
     const oceania = [
       'australia',
       'fiyi',
@@ -337,7 +373,11 @@ export class DestinoService {
     if (southAmerica.includes(pais)) return 5;
     if (oceania.includes(pais)) return 6;
 
-    return 1;
+    return null;
+  }
+
+  private getContinentIdFromCountry(value: string): number {
+    return this.getKnownContinentIdFromCountry(value) || 1;
   }
 
   getDestinos(): Observable<DestinoDTO[]> {
@@ -353,9 +393,25 @@ export class DestinoService {
   }
 
   getDestinosByPais(pais: string): Observable<DestinoDTO[]> {
-    return this.http
-      .get<any[]>(`${this.apiUrl}/pais/${encodeURIComponent(pais)}`)
-      .pipe(map((destinos) => (destinos || []).map((d) => this.mapDestino(d))));
+    const query = this.normalizeText(pais);
+
+    return this.getDestinos().pipe(
+      map((destinos) =>
+        (destinos || []).filter((d) => {
+          const country = this.normalizeText(d.pais || '');
+          const aliases = (this.countryAliases[country] || []).map((a) => this.normalizeText(a));
+
+          return (
+            country === query ||
+            country.includes(query) ||
+            query.includes(country) ||
+            aliases.some(
+              (alias) => alias === query || alias.includes(query) || query.includes(alias),
+            )
+          );
+        }),
+      ),
+    );
   }
 
   getHotelDetails(id: number): Observable<any> {
@@ -364,11 +420,14 @@ export class DestinoService {
         h
           ? {
               ...h,
-              nombre: h.nombre || h.name,
+              nombre: this.fixBrokenText(h.nombre || h.name),
+              descripcion: this.fixBrokenText(h.descripcion),
+              ciudad: this.fixBrokenText(h.ciudad),
+              pais: this.fixBrokenText(h.pais),
               imagen: this.getFullImageUrl(h.imagen || h.imagenUrl),
               imagenUrl: this.getFullImageUrl(h.imagen || h.imagenUrl),
               image: this.getFullImageUrl(h.imagen || h.imagenUrl),
-              name: h.nombre || h.name,
+              name: this.fixBrokenText(h.nombre || h.name),
             }
           : (null as any),
       ),
@@ -380,10 +439,14 @@ export class DestinoService {
       map((alojamientos) =>
         (alojamientos || []).map((a) => ({
           ...a,
+          nombre: this.fixBrokenText(a.nombre || a.name),
+          descripcion: this.fixBrokenText(a.descripcion),
+          ciudad: this.fixBrokenText(a.ciudad),
+          pais: this.fixBrokenText(a.pais),
           imagen: this.getFullImageUrl(a.imagen || a.imagenUrl),
           imagenUrl: this.getFullImageUrl(a.imagen || a.imagenUrl),
           image: this.getFullImageUrl(a.imagen || a.imagenUrl),
-          name: a.nombre,
+          name: this.fixBrokenText(a.nombre || a.name),
         })),
       ),
     );
@@ -394,10 +457,14 @@ export class DestinoService {
       map((alojamientos) =>
         (alojamientos || []).map((a) => ({
           ...a,
+          nombre: this.fixBrokenText(a.nombre || a.name),
+          descripcion: this.fixBrokenText(a.descripcion),
+          ciudad: this.fixBrokenText(a.ciudad),
+          pais: this.fixBrokenText(a.pais),
           imagen: this.getFullImageUrl(a.imagen || a.imagenUrl),
           imagenUrl: this.getFullImageUrl(a.imagen || a.imagenUrl),
           image: this.getFullImageUrl(a.imagen || a.imagenUrl),
-          name: a.nombre,
+          name: this.fixBrokenText(a.nombre || a.name),
         })),
       ),
     );
@@ -408,9 +475,10 @@ export class DestinoService {
   }
 
   crearReserva(reserva: any): Observable<any> {
-    return this.http.post(`${environment.apiUrl}/reservas`, reserva, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-    });
+    const token = localStorage.getItem('token');
+    const options = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+
+    return this.http.post(`${environment.apiUrl}/reservas`, reserva, options);
   }
 
   searchDestinos(query: string): Observable<DestinoDTO[]> {
@@ -425,6 +493,7 @@ export class DestinoService {
           const ciudad = this.normalizeText(d.ciudad || '');
           const pais = this.normalizeText(d.pais || '');
           const descripcion = this.normalizeText(d.descripcion || '');
+
           const aliases = [
             ...(this.englishAliases[nombre] || []),
             ...(this.countryAliases[pais] || []),

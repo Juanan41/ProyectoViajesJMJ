@@ -2,9 +2,9 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { DestinoService, DestinoDTO } from '../../services/destino.service';
 import { Auth } from '../../services/auth';
-import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import {
@@ -94,11 +94,20 @@ export class AdminDashboard implements OnInit {
   readonly HotelIcon = Building2;
 
   activeTab = signal<AdminTab>('stats');
+
   destinos = signal<DestinoDTO[]>([]);
   usuarios = signal<any[]>([]);
   reservas = signal<any[]>([]);
+
   hoteles = signal<any[]>([]);
+  hotelesLoaded = signal(false);
+  isLoadingHoteles = signal(false);
+  hotelesLoadError = signal('');
+  hotelPage = signal(1);
+  hotelPageSize = 50;
+
   selectedReserva = signal<any | null>(null);
+
   reservaFilter = signal<ReservaFilter>('TODAS');
   reservaSearch = '';
   userSearch = '';
@@ -168,11 +177,18 @@ export class AdminDashboard implements OnInit {
     this.loadDestinos();
     this.loadUsuarios();
     this.loadReservas();
-    this.loadHoteles();
   }
 
   loadDestinos() {
-    this.destinoService.getDestinos().subscribe((data) => this.destinos.set(data));
+    this.destinoService.getDestinos().subscribe({
+      next: (data) => {
+        this.destinos.set(data || []);
+      },
+      error: (err) => {
+        console.error('Error cargando destinos', err);
+        this.destinos.set([]);
+      },
+    });
   }
 
   loadUsuarios() {
@@ -180,7 +196,15 @@ export class AdminDashboard implements OnInit {
       .get<any[]>(`${environment.apiUrl}/admin/usuarios`, {
         headers: this.getAuthHeaders(),
       })
-      .subscribe((data) => this.usuarios.set(data));
+      .subscribe({
+        next: (data) => {
+          this.usuarios.set(data || []);
+        },
+        error: (err) => {
+          console.error('Error cargando usuarios', err);
+          this.usuarios.set([]);
+        },
+      });
   }
 
   loadReservas() {
@@ -188,19 +212,48 @@ export class AdminDashboard implements OnInit {
       .get<any[]>(`${environment.apiUrl}/admin/reservas`, {
         headers: this.getAuthHeaders(),
       })
-      .subscribe((data) => this.reservas.set(data));
+      .subscribe({
+        next: (data) => {
+          this.reservas.set(data || []);
+        },
+        error: (err) => {
+          console.error('Error cargando reservas', err);
+          this.reservas.set([]);
+        },
+      });
   }
 
   loadHoteles() {
+    this.isLoadingHoteles.set(true);
+    this.hotelesLoadError.set('');
+
     this.http
       .get<any[]>(`${environment.apiUrl}/admin/alojamientos`, {
         headers: this.getAuthHeaders(),
       })
-      .subscribe((data) => this.hoteles.set(data));
+      .subscribe({
+        next: (data) => {
+          this.hoteles.set(data || []);
+          this.hotelesLoaded.set(true);
+          this.hotelPage.set(1);
+          this.isLoadingHoteles.set(false);
+        },
+        error: (err) => {
+          console.error('Error cargando hoteles', err);
+          this.hoteles.set([]);
+          this.hotelesLoaded.set(false);
+          this.isLoadingHoteles.set(false);
+          this.hotelesLoadError.set('No se pudieron cargar los hoteles.');
+        },
+      });
   }
 
   setTab(tab: AdminTab) {
     this.activeTab.set(tab);
+
+    if (tab === 'hoteles' && !this.hotelesLoaded()) {
+      this.loadHoteles();
+    }
   }
 
   get filteredReservas() {
@@ -228,6 +281,7 @@ export class AdminDashboard implements OnInit {
 
   get filteredUsuarios() {
     const query = this.normalize(this.userSearch);
+
     return this.usuarios().filter((user) =>
       this.normalize([user.username, user.email, user.role].join(' ')).includes(query),
     );
@@ -235,23 +289,76 @@ export class AdminDashboard implements OnInit {
 
   get filteredDestinos() {
     const query = this.normalize(this.destinoSearch);
+
     return this.destinos().filter((destino) =>
-      this.normalize([destino.nombre, destino.pais, (destino as any).continente].join(' ')).includes(query),
+      this.normalize(
+        [destino.nombre, destino.pais, (destino as any).continente].join(' '),
+      ).includes(query),
     );
   }
 
   get filteredHoteles() {
     const query = this.normalize(this.hotelSearch);
+
     const hoteles = this.hoteles().filter((hotel) =>
-      this.normalize([hotel.nombre, hotel.ciudad, hotel.pais, hotel.destinoNombre, hotel.tipo].join(' ')).includes(query),
+      this.normalize(
+        [hotel.nombre, hotel.ciudad, hotel.pais, hotel.destinoNombre, hotel.tipo].join(' '),
+      ).includes(query),
     );
 
     return [...hoteles].sort((a, b) => {
-      if (this.hotelSort() === 'precio') return Number(a.precioPorNoche || 0) - Number(b.precioPorNoche || 0);
-      if (this.hotelSort() === 'reservas') return Number(b.reservas || 0) - Number(a.reservas || 0);
-      if (this.hotelSort() === 'destino') return String(a.destinoNombre || '').localeCompare(String(b.destinoNombre || ''));
+      if (this.hotelSort() === 'precio') {
+        return Number(a.precioPorNoche || 0) - Number(b.precioPorNoche || 0);
+      }
+
+      if (this.hotelSort() === 'reservas') {
+        return Number(b.reservas || 0) - Number(a.reservas || 0);
+      }
+
+      if (this.hotelSort() === 'destino') {
+        return String(a.destinoNombre || '').localeCompare(String(b.destinoNombre || ''));
+      }
+
       return String(a.nombre || '').localeCompare(String(b.nombre || ''));
     });
+  }
+
+  get totalHotelPages(): number {
+    return Math.max(1, Math.ceil(this.filteredHoteles.length / this.hotelPageSize));
+  }
+
+  get paginatedHoteles() {
+    const page = Math.min(this.hotelPage(), this.totalHotelPages);
+    const start = (page - 1) * this.hotelPageSize;
+    const end = start + this.hotelPageSize;
+
+    return this.filteredHoteles.slice(start, end);
+  }
+
+  get hotelPageStart(): number {
+    if (this.filteredHoteles.length === 0) return 0;
+
+    return (this.hotelPage() - 1) * this.hotelPageSize + 1;
+  }
+
+  get hotelPageEnd(): number {
+    return Math.min(this.hotelPage() * this.hotelPageSize, this.filteredHoteles.length);
+  }
+
+  resetHotelPagination() {
+    this.hotelPage.set(1);
+  }
+
+  previousHotelPage() {
+    if (this.hotelPage() > 1) {
+      this.hotelPage.update((page) => page - 1);
+    }
+  }
+
+  nextHotelPage() {
+    if (this.hotelPage() < this.totalHotelPages) {
+      this.hotelPage.update((page) => page + 1);
+    }
   }
 
   get totalRevenue(): number {
@@ -259,15 +366,18 @@ export class AdminDashboard implements OnInit {
   }
 
   get activeReservationsCount(): number {
-    return this.reservas().filter((reserva) => this.getReservaStatus(reserva) === 'CONFIRMADA').length;
+    return this.reservas().filter((reserva) => this.getReservaStatus(reserva) === 'CONFIRMADA')
+      .length;
   }
 
   get canceledReservationsCount(): number {
-    return this.reservas().filter((reserva) => this.getReservaStatus(reserva) === 'CANCELADA').length;
+    return this.reservas().filter((reserva) => this.getReservaStatus(reserva) === 'CANCELADA')
+      .length;
   }
 
   get completedReservationsCount(): number {
-    return this.reservas().filter((reserva) => this.getReservaStatus(reserva) === 'COMPLETADA').length;
+    return this.reservas().filter((reserva) => this.getReservaStatus(reserva) === 'COMPLETADA')
+      .length;
   }
 
   get topBookingUser(): string {
@@ -295,8 +405,10 @@ export class AdminDashboard implements OnInit {
     if (estado === 'CANCELADA') return 'CANCELADA';
     if (estado === 'COMPLETADA') return 'COMPLETADA';
 
-    const checkOut = reserva?.checkOut ? new Date(reserva.checkOut) : null;
-    if (checkOut && !Number.isNaN(checkOut.getTime()) && checkOut < new Date()) {
+    const checkOut = reserva?.checkOut || reserva?.fechaFin;
+    const checkOutDate = checkOut ? new Date(checkOut) : null;
+
+    if (checkOutDate && !Number.isNaN(checkOutDate.getTime()) && checkOutDate < new Date()) {
       return 'COMPLETADA';
     }
 
@@ -327,8 +439,8 @@ export class AdminDashboard implements OnInit {
     return `${Number(value || 0).toFixed(2)}€`;
   }
 
-  private normalize(value: string): string {
-    return value
+  private normalize(value: string | number | null | undefined): string {
+    return String(value || '')
       .toLowerCase()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
@@ -455,6 +567,8 @@ export class AdminDashboard implements OnInit {
     this.isSavingDestino.set(true);
     this.destinoError.set('');
 
+    const mode = this.destinoMode();
+
     const request = {
       nombre: this.editDestinoForm.nombre,
       pais: this.editDestinoForm.pais,
@@ -467,7 +581,7 @@ export class AdminDashboard implements OnInit {
     const destino = this.destinoToEdit();
 
     const request$ =
-      this.destinoMode() === 'edit' && destino
+      mode === 'edit' && destino
         ? this.http.put<DestinoDTO>(`${environment.apiUrl}/admin/destinos/${destino.id}`, request, {
             headers: this.getAuthHeaders(),
           })
@@ -483,7 +597,7 @@ export class AdminDashboard implements OnInit {
 
         this.noticeModal.set({
           type: 'success',
-          title: this.destinoMode() === 'edit' ? 'Destino actualizado' : 'Destino creado',
+          title: mode === 'edit' ? 'Destino actualizado' : 'Destino creado',
           message: 'Los cambios del destino se han guardado correctamente.',
         });
       },
@@ -521,6 +635,7 @@ export class AdminDashboard implements OnInit {
     this.showHotelModal.set(true);
 
     const firstDestino = this.destinos()[0];
+
     this.editHotelForm = {
       id: 0,
       nombre: '',
@@ -551,6 +666,7 @@ export class AdminDashboard implements OnInit {
 
   closeHotelModal() {
     if (this.isSavingHotel()) return;
+
     this.showHotelModal.set(false);
     this.hotelToEdit.set(null);
     this.hotelError.set('');
@@ -574,6 +690,8 @@ export class AdminDashboard implements OnInit {
     this.isSavingHotel.set(true);
     this.hotelError.set('');
 
+    const mode = this.hotelMode();
+
     const request = {
       nombre: this.editHotelForm.nombre,
       ciudad: this.editHotelForm.ciudad,
@@ -584,8 +702,9 @@ export class AdminDashboard implements OnInit {
     };
 
     const hotel = this.hotelToEdit();
+
     const request$ =
-      this.hotelMode() === 'edit' && hotel
+      mode === 'edit' && hotel
         ? this.http.put<any>(`${environment.apiUrl}/admin/alojamientos/${hotel.id}`, request, {
             headers: this.getAuthHeaders(),
           })
@@ -601,14 +720,19 @@ export class AdminDashboard implements OnInit {
 
         this.noticeModal.set({
           type: 'success',
-          title: this.hotelMode() === 'edit' ? 'Hotel actualizado' : 'Hotel creado',
+          title: mode === 'edit' ? 'Hotel actualizado' : 'Hotel creado',
           message: 'Los cambios del hotel se han guardado correctamente.',
         });
       },
       error: (err) => {
         console.error('Error guardando hotel', err);
         this.isSavingHotel.set(false);
-        this.hotelError.set(typeof err?.error === 'string' ? err.error : err?.error?.message || 'No se pudo guardar el hotel.');
+
+        this.hotelError.set(
+          typeof err?.error === 'string'
+            ? err.error
+            : err?.error?.message || 'No se pudo guardar el hotel.',
+        );
       },
     });
   }
@@ -618,13 +742,15 @@ export class AdminDashboard implements OnInit {
       action: 'delete-hotel',
       id,
       title: 'Eliminar hotel',
-      message: 'Seguro que quieres eliminar este hotel? Si tiene reservas asociadas, no se podra borrar.',
+      message:
+        '¿Seguro que quieres eliminar este hotel? Si tiene reservas asociadas, no se podrá borrar.',
       confirmText: 'Eliminar hotel',
     });
   }
 
   cancelConfirm() {
     if (this.isDeleting()) return;
+
     this.confirmModal.set(null);
   }
 
@@ -751,7 +877,10 @@ export class AdminDashboard implements OnInit {
           this.noticeModal.set({
             type: 'error',
             title: 'No se pudo eliminar el hotel',
-            message: typeof err?.error === 'string' ? err.error : err?.error?.message || 'No se pudo eliminar el hotel.',
+            message:
+              typeof err?.error === 'string'
+                ? err.error
+                : err?.error?.message || 'No se pudo eliminar el hotel.',
           });
         },
       });
@@ -768,12 +897,19 @@ export class AdminDashboard implements OnInit {
     if (id === 4) return 'América del Norte';
     if (id === 5) return 'América del Sur';
     if (id === 6) return 'Oceanía';
+
     return 'Europa';
   }
 
-  private getAuthHeaders() {
-    return {
-      Authorization: `Bearer ${this.auth.getToken()}`,
-    };
+  private getAuthHeaders(): HttpHeaders {
+    const token = this.auth.getToken() || localStorage.getItem('token');
+
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    return headers;
   }
 }
