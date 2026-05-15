@@ -29,6 +29,9 @@ public class Usuario {
     @Column(unique = true, nullable = false)
     private String email;
 
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Rol role;
@@ -69,6 +72,14 @@ public class Usuario {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+    
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+    
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 
     public Rol getRole() {

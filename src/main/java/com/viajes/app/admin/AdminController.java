@@ -9,6 +9,7 @@ import com.viajes.app.destinos.ContinenteRepository;
 import com.viajes.app.destinos.Destino;
 import com.viajes.app.destinos.DestinoRepository;
 import com.viajes.app.destinos.dto.DestinoDTO;
+import com.viajes.app.reservas.Opinion;
 import com.viajes.app.reservas.OpinionRepository;
 import com.viajes.app.reservas.ReservaRepository;
 import com.viajes.app.reservas.ReservaService;
@@ -22,10 +23,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -65,6 +68,85 @@ public class AdminController {
                 .sorted(Comparator.comparing(Usuario::getId))
                 .map(this::toUsuarioResponse)
                 .toList();
+    }
+
+    @GetMapping("/usuarios/{id}/detalle")
+    public Map<String, Object> obtenerDetalleUsuario(@PathVariable Long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+
+        List<ReservaResponseDto> reservasUsuario = reservaService.obtenerTodasReservas()
+                .stream()
+                .filter(reserva -> Objects.equals(reserva.getUsuarioId(), usuario.getId()))
+                .sorted((a, b) -> {
+                    if (a.getFechaReserva() == null && b.getFechaReserva() == null) return 0;
+                    if (a.getFechaReserva() == null) return 1;
+                    if (b.getFechaReserva() == null) return -1;
+                    return b.getFechaReserva().compareTo(a.getFechaReserva());
+                })
+                .toList();
+
+        List<Opinion> opinionesUsuario = opinionRepository.findByUsuarioId(id);
+
+        long viajesPendientes = reservasUsuario.stream()
+                .filter(reserva -> getReservaStatus(reserva).equals("CONFIRMADA"))
+                .count();
+
+        long viajesRealizados = reservasUsuario.stream()
+                .filter(reserva -> getReservaStatus(reserva).equals("COMPLETADA"))
+                .count();
+
+        long viajesCancelados = reservasUsuario.stream()
+                .filter(reserva -> getReservaStatus(reserva).equals("CANCELADA"))
+                .count();
+
+        long destinosUnicos = reservasUsuario.stream()
+                .filter(reserva -> getReservaStatus(reserva).equals("COMPLETADA"))
+                .map(ReservaResponseDto::getDestinoNombre)
+                .filter(nombre -> nombre != null && !nombre.isBlank())
+                .distinct()
+                .count();
+
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("usuario", toUsuarioResponse(usuario));
+
+        cuentaBancariaRepository.findByUsuarioEmail(usuario.getEmail()).ifPresentOrElse(cuenta -> {
+            Map<String, Object> cuentaResponse = new LinkedHashMap<>();
+            cuentaResponse.put("id", cuenta.getId());
+            cuentaResponse.put("iban", cuenta.getIban());
+            cuentaResponse.put("titular", cuenta.getTitular());
+            cuentaResponse.put("entidad", cuenta.getEntidad());
+            cuentaResponse.put("last4", cuenta.getIban() != null && cuenta.getIban().length() >= 4
+                    ? cuenta.getIban().substring(cuenta.getIban().length() - 4)
+                    : "");
+            response.put("cuenta", cuentaResponse);
+        }, () -> response.put("cuenta", null));
+
+        Map<String, Object> resumen = new LinkedHashMap<>();
+        resumen.put("viajesPendientes", viajesPendientes);
+        resumen.put("viajesRealizados", viajesRealizados);
+        resumen.put("viajesCancelados", viajesCancelados);
+        resumen.put("destinosUnicos", destinosUnicos);
+        resumen.put("resenas", opinionesUsuario.size());
+        resumen.put("saldo", usuario.getSaldo());
+
+        response.put("resumen", resumen);
+
+        response.put("reservas", reservasUsuario.stream()
+                .map(this::toReservaDetalleResponse)
+                .toList());
+
+        response.put("opiniones", opinionesUsuario.stream()
+                .sorted((a, b) -> {
+                    if (a.getFechaOpinion() == null && b.getFechaOpinion() == null) return 0;
+                    if (a.getFechaOpinion() == null) return 1;
+                    if (b.getFechaOpinion() == null) return -1;
+                    return b.getFechaOpinion().compareTo(a.getFechaOpinion());
+                })
+                .map(this::toOpinionDetalleResponse)
+                .toList());
+
+        return response;
     }
 
     @GetMapping("/reservas")
@@ -326,6 +408,84 @@ public class AdminController {
         response.put("role", usuario.getRole().name());
         response.put("saldo", usuario.getSaldo());
         return response;
+    }
+
+    private Map<String, Object> toReservaDetalleResponse(ReservaResponseDto reserva) {
+        Map<String, Object> response = new LinkedHashMap<>();
+
+        response.put("id", reserva.getId());
+        response.put("destinoId", reserva.getDestinoId());
+        response.put("alojamientoId", reserva.getAlojamientoId());
+        response.put("habitacionId", reserva.getHabitacionId());
+        response.put("destinoNombre", reserva.getDestinoNombre());
+        response.put("alojamientoNombre", reserva.getAlojamientoNombre());
+        response.put("imagenUrl", reserva.getImagenUrl());
+        response.put("checkIn", reserva.getCheckIn());
+        response.put("checkOut", reserva.getCheckOut());
+        response.put("noches", reserva.getNoches());
+        response.put("huespedes", reserva.getHuespedes());
+        response.put("precioTotal", reserva.getPrecioTotal());
+        response.put("estado", getReservaStatus(reserva));
+        response.put("estadoOriginal", reserva.getEstado());
+        response.put("fechaReserva", reserva.getFechaReserva());
+        response.put("transporteTipo", reserva.getTransporteTipo());
+        response.put("transporteNombre", reserva.getTransporteNombre());
+        response.put("transporteHora", reserva.getTransporteHora());
+        response.put("transporteAsiento", reserva.getTransporteAsiento());
+        response.put("transportePuerta", reserva.getTransportePuerta());
+
+        return response;
+    }
+
+    private Map<String, Object> toOpinionDetalleResponse(Opinion opinion) {
+        Map<String, Object> response = new LinkedHashMap<>();
+
+        response.put("id", opinion.getId());
+        response.put("puntuacion", opinion.getPuntuacion());
+        response.put("comentario", opinion.getComentario());
+        response.put("fechaOpinion", opinion.getFechaOpinion());
+
+        if (opinion.getAlojamiento() != null) {
+            Alojamiento alojamiento = opinion.getAlojamiento();
+
+            response.put("alojamientoId", alojamiento.getId());
+            response.put("alojamientoNombre", alojamiento.getNombre());
+
+            if (alojamiento.getDestino() != null) {
+                response.put("destinoId", alojamiento.getDestino().getId());
+                response.put("destinoNombre", alojamiento.getDestino().getNombre());
+            } else {
+                response.put("destinoId", null);
+                response.put("destinoNombre", "");
+            }
+        } else {
+            response.put("alojamientoId", null);
+            response.put("alojamientoNombre", "");
+            response.put("destinoId", null);
+            response.put("destinoNombre", "");
+        }
+
+        return response;
+    }
+
+    private String getReservaStatus(ReservaResponseDto reserva) {
+        String estado = reserva.getEstado() != null ? reserva.getEstado().toUpperCase() : "";
+
+        if (estado.equals("CANCELADA")) {
+            return "CANCELADA";
+        }
+
+        if (estado.equals("COMPLETADA")) {
+            return "COMPLETADA";
+        }
+
+        LocalDate checkOut = reserva.getCheckOut();
+
+        if (checkOut != null && checkOut.isBefore(LocalDate.now())) {
+            return "COMPLETADA";
+        }
+
+        return "CONFIRMADA";
     }
 
     private DestinoDTO toDestinoResponse(Destino destino) {
