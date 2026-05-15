@@ -1,6 +1,10 @@
 package com.viajes.app.alojamientos;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -15,4 +19,18 @@ public interface AlojamientoRepository extends JpaRepository<Alojamiento, Long> 
     List<Alojamiento> findByDestinoNombre(String nombre);
 
     List<Alojamiento> findByDestinoId(Long destinoId);
+
+    @Query("""
+            SELECT a
+            FROM Alojamiento a
+            LEFT JOIN a.destino d
+            WHERE :search IS NULL
+               OR :search = ''
+               OR LOWER(a.nombre) LIKE LOWER(CONCAT('%', :search, '%'))
+               OR LOWER(a.ciudad) LIKE LOWER(CONCAT('%', :search, '%'))
+               OR LOWER(a.pais) LIKE LOWER(CONCAT('%', :search, '%'))
+               OR LOWER(d.nombre) LIKE LOWER(CONCAT('%', :search, '%'))
+               OR LOWER(d.pais) LIKE LOWER(CONCAT('%', :search, '%'))
+            """)
+    Page<Alojamiento> buscarPaginado(@Param("search") String search, Pageable pageable);
 }

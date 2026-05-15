@@ -1,5 +1,6 @@
 package com.viajes.app.alojamientos;
 
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedHashMap;
@@ -26,6 +27,27 @@ public class AlojamientoController {
                 .toList();
     }
 
+    @GetMapping("/paginado")
+    public Map<String, Object> listarAlojamientosPaginados(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "") String search,
+            @RequestParam(defaultValue = "nombre") String sort
+    ) {
+        Page<Alojamiento> resultado = alojamientoService.obtenerPaginado(page, size, search, sort);
+
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("content", resultado.getContent().stream().map(this::convertirADto).toList());
+        response.put("page", resultado.getNumber());
+        response.put("size", resultado.getSize());
+        response.put("totalElements", resultado.getTotalElements());
+        response.put("totalPages", resultado.getTotalPages());
+        response.put("first", resultado.isFirst());
+        response.put("last", resultado.isLast());
+
+        return response;
+    }
+
     @GetMapping("/destino/{destinoId}")
     public List<Map<String, Object>> listarPorDestino(@PathVariable Long destinoId) {
         return alojamientoService.getAlojamientosPorDestino(destinoId)
@@ -36,13 +58,7 @@ public class AlojamientoController {
 
     @GetMapping("/{id}")
     public Map<String, Object> obtenerPorId(@PathVariable Long id) {
-        Alojamiento alojamiento = alojamientoService.obtenerTodos()
-                .stream()
-                .filter(a -> a.getId().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Alojamiento no encontrado"));
-
-        return convertirADto(alojamiento);
+        return convertirADto(alojamientoService.obtenerPorId(id));
     }
 
     @GetMapping("/{id}/habitaciones")
@@ -60,6 +76,7 @@ public class AlojamientoController {
         dto.put("tipo", alojamiento.getTipo().name());
         dto.put("precioPorNoche", alojamiento.getPrecioPorNoche());
         dto.put("precio", alojamiento.getPrecioPorNoche());
+        dto.put("reservas", 0);
 
         if (alojamiento.getDestino() != null) {
             dto.put("destinoId", alojamiento.getDestino().getId());
@@ -82,16 +99,10 @@ public class AlojamientoController {
         boolean esApartamento = tipo == TipoAlojamiento.APARTAMENTO;
         boolean esHostal = tipo == TipoAlojamiento.HOSTAL;
 
-        boolean wifi = true;
-        boolean desayuno = esHotel || esResort || esHostal;
-        boolean aireAcondicionado = esHotel || esResort || esApartamento;
-        boolean camasKing = esHotel || esResort;
-        boolean parking = esResort || esApartamento || id % 2 == 0;
-
-        dto.put("wifi", wifi);
-        dto.put("desayuno", desayuno);
-        dto.put("aireAcondicionado", aireAcondicionado);
-        dto.put("camasKing", camasKing);
-        dto.put("parking", parking);
+        dto.put("wifi", true);
+        dto.put("desayuno", esHotel || esResort || esHostal);
+        dto.put("aireAcondicionado", esHotel || esResort || esApartamento);
+        dto.put("camasKing", esHotel || esResort);
+        dto.put("parking", esResort || esApartamento || id % 2 == 0);
     }
 }
