@@ -18,10 +18,13 @@ import {
   TrendingUp,
   Search,
   X,
-  Save,
   Eye,
   Building2,
 } from 'lucide-angular';
+import {
+  getDistanceFromMadridKm,
+  toDestinationCoordinateKey,
+} from '../../data/destination-coordinates';
 
 type AdminTab = 'stats' | 'users' | 'destinos' | 'hoteles' | 'reservas';
 type ReservaFilter = 'TODAS' | 'CONFIRMADA' | 'CANCELADA' | 'COMPLETADA';
@@ -68,6 +71,16 @@ interface EditHotelForm {
   destinoId: number | null;
 }
 
+interface AdminUserDetail {
+  usuario: any;
+  tarjeta: any | null;
+  resumen: any;
+  reservasPendientes: any[];
+  reservasRealizadas: any[];
+  reservasCanceladas: any[];
+  resenias: any[];
+}
+
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
@@ -89,7 +102,6 @@ export class AdminDashboard implements OnInit {
   readonly StatsIcon = TrendingUp;
   readonly SearchIcon = Search;
   readonly XIcon = X;
-  readonly SaveIcon = Save;
   readonly EyeIcon = Eye;
   readonly HotelIcon = Building2;
 
@@ -108,6 +120,10 @@ export class AdminDashboard implements OnInit {
 
   selectedReserva = signal<any | null>(null);
 
+  selectedUserDetail = signal<AdminUserDetail | null>(null);
+  isLoadingUserDetail = signal(false);
+  userDetailError = signal('');
+
   reservaFilter = signal<ReservaFilter>('TODAS');
   reservaSearch = '';
   userSearch = '';
@@ -115,7 +131,6 @@ export class AdminDashboard implements OnInit {
   hotelSearch = '';
   hotelSort = signal<HotelSort>('nombre');
 
-  isLoading = signal(false);
   isDeleting = signal(false);
 
   confirmModal = signal<AdminConfirmModal | null>(null);
@@ -181,9 +196,7 @@ export class AdminDashboard implements OnInit {
 
   loadDestinos() {
     this.destinoService.getDestinos().subscribe({
-      next: (data) => {
-        this.destinos.set(data || []);
-      },
+      next: (data) => this.destinos.set(data || []),
       error: (err) => {
         console.error('Error cargando destinos', err);
         this.destinos.set([]);
@@ -197,9 +210,7 @@ export class AdminDashboard implements OnInit {
         headers: this.getAuthHeaders(),
       })
       .subscribe({
-        next: (data) => {
-          this.usuarios.set(data || []);
-        },
+        next: (data) => this.usuarios.set(data || []),
         error: (err) => {
           console.error('Error cargando usuarios', err);
           this.usuarios.set([]);
@@ -213,9 +224,7 @@ export class AdminDashboard implements OnInit {
         headers: this.getAuthHeaders(),
       })
       .subscribe({
-        next: (data) => {
-          this.reservas.set(data || []);
-        },
+        next: (data) => this.reservas.set(data || []),
         error: (err) => {
           console.error('Error cargando reservas', err);
           this.reservas.set([]);
@@ -399,6 +408,54 @@ export class AdminDashboard implements OnInit {
     this.selectedReserva.set(null);
   }
 
+  openUserDetails(user: any) {
+    if (!user?.id) return;
+
+    this.selectedUserDetail.set(null);
+    this.userDetailError.set('');
+    this.isLoadingUserDetail.set(true);
+
+    this.http
+      .get<AdminUserDetail>(`${environment.apiUrl}/admin/usuarios/${user.id}/detalle`, {
+        headers: this.getAuthHeaders(),
+      })
+      .subscribe({
+        next: (detail) => {
+          this.selectedUserDetail.set(detail);
+          this.isLoadingUserDetail.set(false);
+        },
+        error: (err) => {
+          console.error('Error cargando detalle de usuario', err);
+          this.isLoadingUserDetail.set(false);
+          this.userDetailError.set('No se pudo cargar la ficha del usuario.');
+        },
+      });
+  }
+
+  closeUserDetails() {
+    this.selectedUserDetail.set(null);
+    this.userDetailError.set('');
+    this.isLoadingUserDetail.set(false);
+  }
+
+  getUserVisitedDestinations(detail: AdminUserDetail | null): number {
+    if (!detail) return 0;
+
+    const visited = (detail.reservasRealizadas || [])
+      .map((reserva) => toDestinationCoordinateKey(reserva.destinoNombre))
+      .filter(Boolean);
+
+    return new Set(visited).size;
+  }
+
+  getUserTraveledKm(detail: AdminUserDetail | null): number {
+    if (!detail) return 0;
+
+    return (detail.reservasRealizadas || []).reduce((total, reserva) => {
+      return total + getDistanceFromMadridKm(reserva.destinoNombre);
+    }, 0);
+  }
+
   getReservaStatus(reserva: any): string {
     const estado = String(reserva?.estado || '').toUpperCase();
 
@@ -435,7 +492,7 @@ export class AdminDashboard implements OnInit {
     return new Date(value).toLocaleDateString('es-ES');
   }
 
-  formatMoney(value: number | undefined | null): string {
+  formatMoney(value: number | string | undefined | null): string {
     return `${Number(value || 0).toFixed(2)}€`;
   }
 
@@ -542,10 +599,11 @@ export class AdminDashboard implements OnInit {
     this.editDestinoForm = {
       nombre: destino.nombre || '',
       pais: destino.pais || '',
-      continente: (destino as any).continente || this.getContinenteName(destino.continenteId),
+      continente:
+        (destino as any).continente || this.getContinenteName((destino as any).continenteId),
       precio: Number(destino.precio || 0),
       descripcion: destino.descripcion || '',
-      imagen: destino.imagenUrl || destino.imagen || '',
+      imagen: (destino as any).imagenUrl || (destino as any).imagen || '',
     };
   }
 

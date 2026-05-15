@@ -48,19 +48,24 @@ export class Auth {
           switchMap((perfil) => {
             return this.obtenerSaldo().pipe(
               tap((saldoRes) => {
-                const role = localStorage.getItem('role') || 'USER';
+                const role = localStorage.getItem('role') || perfil.role || 'USER';
+
                 const userData: UserData = {
                   id: String(perfil.id),
                   name: perfil.username,
                   email: perfil.email,
+                  avatarUrl: perfil.avatarUrl || '',
                   saldo: saldoRes.saldo,
                   rol: role,
                   reviews: [],
                 };
+
                 this.user.set(userData);
                 this.credits.set(saldoRes.saldo);
                 this.isLoggedIn.set(true);
+
                 localStorage.setItem('user', JSON.stringify(userData));
+                localStorage.setItem('role', role);
               }),
               map(() => response),
             );
@@ -78,6 +83,47 @@ export class Auth {
     return this.http.get<any>(`${this.apiUrl}/usuarios/me`, {
       headers: this.getAuthHeaders(),
     });
+  }
+
+  actualizarPerfil(data: {
+    username: string;
+    email: string;
+    avatarUrl?: string;
+  }): Observable<UserData> {
+    return this.http
+      .put<any>(`${this.apiUrl}/usuarios/me`, data, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(
+        map((perfil) => {
+          if (perfil.token) {
+            localStorage.setItem('token', perfil.token);
+          }
+
+          const current = this.user();
+          const role =
+            perfil.role || perfil.rol || current?.rol || localStorage.getItem('role') || 'USER';
+          const saldo = Number(perfil.saldo || current?.saldo || 0);
+
+          const userData: UserData = {
+            id: String(perfil.id),
+            name: perfil.username,
+            email: perfil.email,
+            avatarUrl: perfil.avatarUrl || '',
+            saldo,
+            rol: role,
+            reviews: current?.reviews || [],
+          };
+
+          this.user.set(userData);
+          this.credits.set(saldo);
+
+          localStorage.setItem('user', JSON.stringify(userData));
+          localStorage.setItem('role', role);
+
+          return userData;
+        }),
+      );
   }
 
   obtenerSaldo(): Observable<any> {
@@ -122,6 +168,7 @@ export class Auth {
       .pipe(
         map((cuentas) => {
           const list = Array.isArray(cuentas) ? cuentas : cuentas ? [cuentas] : [];
+
           return list.map((c) => ({
             id: c.id,
             numeroTarjeta: c.iban || c.numeroTarjeta || '',
@@ -169,6 +216,7 @@ export class Auth {
 
   updateUser(updates: Partial<UserData>) {
     const current = this.user();
+
     if (current) {
       const updated = { ...current, ...updates };
       this.user.set(updated);
@@ -196,12 +244,15 @@ export class Auth {
 
   isCurrentUserAdmin(): boolean {
     const role = localStorage.getItem('role') || this.user()?.rol;
+
     if (!role) return false;
+
     return role.trim().toUpperCase() === 'ADMIN' || role.trim().toUpperCase() === 'ROLE_ADMIN';
   }
 
   private getAuthHeaders(): HttpHeaders {
     const token = this.getToken();
+
     return token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : new HttpHeaders();
   }
 
@@ -215,19 +266,26 @@ export class Auth {
     }
 
     if (token && storedUser) {
-      this.user.set(JSON.parse(storedUser));
-      this.isLoggedIn.set(true);
-      this.obtenerSaldo().subscribe((res) => {
-        this.credits.set(res.saldo);
-        this.updateUser({ saldo: res.saldo });
-      });
+      try {
+        this.user.set(JSON.parse(storedUser));
+        this.isLoggedIn.set(true);
+
+        this.obtenerSaldo().subscribe((res) => {
+          this.credits.set(res.saldo);
+          this.updateUser({ saldo: res.saldo });
+        });
+      } catch {
+        this.logout();
+      }
     }
   }
 
   private isTokenExpired(token: string): boolean {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
+
       if (!payload.exp) return false;
+
       return payload.exp * 1000 <= Date.now();
     } catch {
       return true;

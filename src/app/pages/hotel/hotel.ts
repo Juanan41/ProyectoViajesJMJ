@@ -19,6 +19,9 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 import { TranslationService } from '../../services/translation';
 import { getHotelPriceValue, getVisibleHotelAmenities } from '../../utils/hotel-amenities';
 
+type TransportType = 'AVION' | 'TREN' | 'BARCO';
+type RoomCategory = 'single' | 'double' | 'suite' | 'group';
+
 @Component({
   selector: 'app-hotel',
   standalone: true,
@@ -31,6 +34,7 @@ export class HotelComponent implements OnInit {
   private router = inject(Router);
   private destinoService = inject(DestinoService);
   private opinionService = inject(OpinionService);
+
   public auth = inject(Auth);
   public translationService = inject(TranslationService);
 
@@ -44,7 +48,7 @@ export class HotelComponent implements OnInit {
 
   readonly maxGuests = 8;
 
-  hotel = signal<any>(null);
+  hotel = signal<any | null>(null);
   habitaciones = signal<any[]>([]);
   selectedRoomId = signal<number | null>(null);
   recommendations = signal<any[]>([]);
@@ -53,7 +57,7 @@ export class HotelComponent implements OnInit {
   checkInDate = '';
   checkOutDate = '';
   guests = 1;
-  selectedTransport: 'AVION' | 'TREN' | 'BARCO' = 'AVION';
+  selectedTransport: TransportType = 'AVION';
 
   hasPaymentCard = signal(false);
   isCheckingCard = signal(true);
@@ -114,7 +118,11 @@ export class HotelComponent implements OnInit {
   }
 
   private selectFirstAvailableRoom() {
-    const firstAvailableRoom = this.habitaciones().find((room) => this.isRoomAvailable(room));
+    const availableRooms = this.habitaciones()
+      .filter((room) => this.isRoomAvailable(room))
+      .sort((a, b) => this.getRoomSortValue(a) - this.getRoomSortValue(b));
+
+    const firstAvailableRoom = availableRooms[0];
     this.selectedRoomId.set(firstAvailableRoom ? Number(firstAvailableRoom.id) : null);
   }
 
@@ -130,7 +138,7 @@ export class HotelComponent implements OnInit {
     if (!this.isRoomAvailable(room)) {
       this.openBookingModal(
         'Habitación no disponible',
-        'Esta habitación no tiene capacidad suficiente para el número de huéspedes seleccionado.',
+        'Esta habitación no es compatible con el número de huéspedes seleccionado.',
         'warning',
       );
       return;
@@ -144,7 +152,22 @@ export class HotelComponent implements OnInit {
   }
 
   isRoomAvailable(room: any): boolean {
-    return this.getRoomCapacity(room) >= this.guests;
+    const capacity = this.getRoomCapacity(room);
+    const category = this.getRoomCategory(room);
+
+    if (this.guests <= 1) {
+      return capacity >= 1;
+    }
+
+    if (this.guests === 2) {
+      return capacity >= 2 && ['double', 'suite', 'group'].includes(category);
+    }
+
+    if (this.guests >= 3 && this.guests <= 4) {
+      return capacity >= this.guests && ['suite', 'group'].includes(category);
+    }
+
+    return capacity >= this.guests && category === 'group';
   }
 
   get compatibleRoomsCount(): number {
@@ -193,7 +216,7 @@ export class HotelComponent implements OnInit {
   private loadOpiniones(id: number) {
     this.opinionService.getOpinionesByAlojamiento(id).subscribe({
       next: (data) => {
-        const mapped = data.map((o) => ({
+        const mapped = (data || []).map((o) => ({
           ...o,
           userName: o.nombreUsuario,
           rating: o.puntuacion,
@@ -240,8 +263,10 @@ export class HotelComponent implements OnInit {
 
   get totalPrice(): number {
     const room = this.selectedRoom();
-    const roomPrice = room ? this.getRoomPrice(room) : this.getHotelPrice(this.hotel());
 
+    if (!room || this.nights <= 0) return 0;
+
+    const roomPrice = this.getRoomPrice(room);
     return roomPrice * this.nights * this.guests + this.getTransportPrice(this.selectedTransport);
   }
 
@@ -252,7 +277,7 @@ export class HotelComponent implements OnInit {
       this.selectedRoom() !== null &&
       this.hasPaymentCard() &&
       !this.isCheckingCard() &&
-      this.auth.credits() >= this.totalPrice
+      Number(this.auth.credits() || 0) >= this.totalPrice
     );
   }
 
@@ -296,8 +321,8 @@ export class HotelComponent implements OnInit {
     return getVisibleHotelAmenities(this.hotel());
   }
 
-  getTransportPrice(type: 'AVION' | 'TREN' | 'BARCO'): number {
-    const costs = {
+  getTransportPrice(type: TransportType): number {
+    const costs: Record<TransportType, number> = {
       AVION: 150,
       TREN: 50,
       BARCO: 100,
@@ -306,8 +331,8 @@ export class HotelComponent implements OnInit {
     return costs[type];
   }
 
-  getTransportLabel(type: 'AVION' | 'TREN' | 'BARCO'): string {
-    const labels = {
+  getTransportLabel(type: TransportType): string {
+    const labels: Record<TransportType, string> = {
       AVION: 'Avión',
       TREN: 'Tren',
       BARCO: 'Barco',
@@ -319,7 +344,7 @@ export class HotelComponent implements OnInit {
   getRoomPrice(room: any): number {
     const roomPrice = Number(room?.precioPorNoche || room?.precio_por_noche || room?.precio || 0);
 
-    if (roomPrice > 0) return roomPrice;
+    if (Number.isFinite(roomPrice) && roomPrice > 0) return roomPrice;
 
     return this.getHotelPrice(this.hotel());
   }
@@ -333,11 +358,112 @@ export class HotelComponent implements OnInit {
   }
 
   getRoomCapacity(room: any): number {
-    return Number(room?.capacidad || room?.capacity || 2);
+    const capacity = Number(room?.capacidad || room?.capacity || 0);
+
+    if (!Number.isFinite(capacity) || capacity <= 0) return 1;
+
+    return capacity;
   }
 
   getRoomCapacityLabel(room: any): string {
     return String(this.getRoomCapacity(room));
+  }
+
+  getRoomCategory(room: any): RoomCategory {
+    const name = this.normalizeText(this.getRoomName(room));
+    const capacity = this.getRoomCapacity(room);
+
+    if (
+      name.includes('grupal') ||
+      name.includes('grupo') ||
+      name.includes('familiar') ||
+      name.includes('family')
+    ) {
+      return 'group';
+    }
+
+    if (name.includes('suite')) {
+      return 'suite';
+    }
+
+    if (name.includes('individual') || name.includes('single')) {
+      return 'single';
+    }
+
+    if (
+      name.includes('doble') ||
+      name.includes('deluxe') ||
+      name.includes('estandar') ||
+      name.includes('standard')
+    ) {
+      return 'double';
+    }
+
+    if (capacity >= 8) return 'group';
+    if (capacity >= 4) return 'suite';
+    if (capacity >= 2) return 'double';
+
+    return 'single';
+  }
+
+  getRoomTypeHelp(room: any): string {
+    const category = this.getRoomCategory(room);
+
+    if (category === 'group') {
+      return 'Habitación grupal recomendada para grupos de 5 a 8 personas.';
+    }
+
+    if (category === 'suite') {
+      return 'Suite recomendada para grupos de 3 o 4 personas.';
+    }
+
+    if (category === 'double') {
+      return 'Habitación recomendada para 1 o 2 personas.';
+    }
+
+    return 'Habitación individual recomendada para 1 persona.';
+  }
+
+  getGuestsRuleMessage(): string {
+    if (this.guests <= 1) {
+      return 'Puedes elegir cualquier habitación con capacidad suficiente.';
+    }
+
+    if (this.guests === 2) {
+      return 'Para 2 huéspedes puedes elegir habitación doble, suite o habitación grupal.';
+    }
+
+    if (this.guests >= 3 && this.guests <= 4) {
+      return 'Para 3 o 4 huéspedes puedes elegir suite o habitación grupal.';
+    }
+
+    return 'Para 5 a 8 huéspedes solo puedes elegir habitación grupal.';
+  }
+
+  getRoomCardClasses(room: any): string {
+    if (this.isRoomSelected(room)) {
+      return 'bg-emerald-500/10 border-emerald-500';
+    }
+
+    if (this.isRoomAvailable(room)) {
+      return 'bg-[rgb(23,25,25)] border-gray-800 hover:border-emerald-500/60';
+    }
+
+    return 'bg-[rgb(23,25,25)] border-gray-800 opacity-50';
+  }
+
+  private getRoomSortValue(room: any): number {
+    const category = this.getRoomCategory(room);
+    const capacity = this.getRoomCapacity(room);
+
+    const categoryOrder: Record<RoomCategory, number> = {
+      single: 1,
+      double: 2,
+      suite: 3,
+      group: 4,
+    };
+
+    return categoryOrder[category] * 100 + capacity;
   }
 
   getDestinationImage(destination: any): string {
@@ -508,7 +634,16 @@ export class HotelComponent implements OnInit {
     if (!this.isRoomAvailable(selectedRoom)) {
       this.openBookingModal(
         'Habitación no disponible',
-        'La habitación seleccionada no tiene capacidad suficiente para los huéspedes indicados.',
+        'La habitación seleccionada no es compatible con los huéspedes indicados.',
+        'warning',
+      );
+      return;
+    }
+
+    if (this.isCheckingCard()) {
+      this.openBookingModal(
+        'Comprobando tarjeta',
+        'Estamos comprobando tus métodos de pago. Inténtalo de nuevo en unos segundos.',
         'warning',
       );
       return;
@@ -523,7 +658,7 @@ export class HotelComponent implements OnInit {
       return;
     }
 
-    if (this.auth.credits() < this.totalPrice) {
+    if (Number(this.auth.credits() || 0) < this.totalPrice) {
       this.openBookingModal(
         'Saldo insuficiente',
         'No tienes saldo suficiente en tu cartera para completar esta reserva.',
@@ -560,5 +695,13 @@ export class HotelComponent implements OnInit {
         );
       },
     });
+  }
+
+  private normalizeText(value: any): string {
+    return String(value || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
   }
 }

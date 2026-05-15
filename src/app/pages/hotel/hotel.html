@@ -88,7 +88,7 @@
               </h2>
 
               <p class="text-gray-500 text-sm mt-1">
-                {{ 'Selecciona una habitación compatible con el número de huéspedes.' | translate }}
+                {{ getGuestsRuleMessage() | translate }}
               </p>
             </div>
 
@@ -118,18 +118,14 @@
             </p>
 
             <p class="text-gray-400 text-sm">
-              {{ 'Reduce el número de huéspedes o elige una habitación con más capacidad.' | translate }}
+              {{ 'Reduce el número de huéspedes o elige otra reserva.' | translate }}
             </p>
           </div>
           }
 
           <div class="space-y-4">
             @for (room of habitaciones(); track room.id) {
-            <div [class]="isRoomSelected(room)
-                ? 'bg-emerald-500/10 border-emerald-500'
-                : isRoomAvailable(room)
-                  ? 'bg-[rgb(23,25,25)] border-gray-800 hover:border-emerald-500/60'
-                  : 'bg-[rgb(23,25,25)] border-gray-800 opacity-50'"
+            <div [ngClass]="getRoomCardClasses(room)"
               class="border rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all">
               <div>
                 <div class="flex flex-wrap items-center gap-3 mb-1">
@@ -147,7 +143,7 @@
                   @if (!isRoomAvailable(room)) {
                   <span
                     class="bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-widest">
-                    {{ 'Capacidad insuficiente' | translate }}
+                    {{ 'No compatible' | translate }}
                   </span>
                   }
                 </div>
@@ -159,15 +155,13 @@
                   {{ getRoomRegimen(room) | translate }}
                 </p>
 
+                <p class="text-gray-500 text-xs mt-2">
+                  {{ getRoomTypeHelp(room) | translate }}
+                </p>
+
                 @if (!isRoomAvailable(room)) {
                 <p class="text-red-400 text-xs mt-2">
-                  {{ 'Esta habitación no admite tantos huéspedes.' | translate }}
-                </p>
-                }
-
-                @if ((getRoomName(room) || '').toLowerCase().includes('suite')) {
-                <p class="text-emerald-400 text-xs mt-2">
-                  {{ 'Suite recomendada para grupos de hasta 4 personas.' | translate }}
+                  {{ 'Esta habitación no es compatible con el número de huéspedes indicado.' | translate }}
                 </p>
                 }
               </div>
@@ -410,7 +404,8 @@
                 class="w-full bg-[rgb(23,25,25)] border border-gray-800 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500" />
 
               <p class="text-gray-500 text-xs mt-2">
-                {{ 'Las suites están pensadas para grupos de hasta 4 personas.' | translate }}
+                {{ '1 huésped: cualquier habitación compatible. 2 huéspedes: doble, suite o grupal. 3-4 huéspedes: suite
+                o grupal. 5-8 huéspedes: solo grupal.' | translate }}
               </p>
             </div>
 
@@ -478,11 +473,11 @@
           </p>
           }
 
-          @if (auth.isLoggedIn() && hasPaymentCard() && auth.credits() < totalPrice) {
-          <p class="text-red-400 text-sm mt-5 bg-red-500/10 border border-red-500/20 rounded-xl p-3">
+          @if (auth.isLoggedIn() && hasPaymentCard() && totalPrice > 0 && auth.credits() < totalPrice) { <p
+            class="text-red-400 text-sm mt-5 bg-red-500/10 border border-red-500/20 rounded-xl p-3">
             {{ 'No tienes saldo suficiente para completar esta reserva.' | translate }}
-          </p>
-          }
+            </p>
+            }
 
             @if (habitaciones().length > 0 && !selectedRoom()) {
             <p class="text-yellow-400 text-sm mt-5 bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-3">
@@ -490,7 +485,7 @@
             </p>
             }
 
-            <button type="button" (click)="reservar()"
+            <button type="button" (click)="reservar()" [class.opacity-80]="!canBook"
               class="w-full mt-6 bg-emerald-500 hover:bg-emerald-400 text-[rgb(23,25,25)] font-black py-4 rounded-xl transition-all uppercase tracking-widest text-xs">
               {{ 'Reservar ahora' | translate }}
             </button>

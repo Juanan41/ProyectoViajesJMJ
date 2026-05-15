@@ -89,6 +89,16 @@ export class Profile implements OnInit {
   reviews = signal<OpinionDTO[]>([]);
   isLoading = signal(true);
 
+  showProfileModal = signal(false);
+  isSavingProfile = signal(false);
+  profileError = signal('');
+
+  editProfileForm = {
+    name: '',
+    email: '',
+    avatarUrl: '',
+  };
+
   visitedDestinationsCount = computed(() => {
     const visitedDestinations = this.pastTrips()
       .map((trip) => toDestinationCoordinateKey(trip.destination))
@@ -145,9 +155,11 @@ export class Profile implements OnInit {
         this.activeTrips.set(
           trips.filter((trip) => trip.estado !== 'CANCELADA' && trip.checkOut >= today),
         );
+
         this.pastTrips.set(
           trips.filter((trip) => trip.estado !== 'CANCELADA' && trip.checkOut < today),
         );
+
         this.reviews.set(reviews);
         this.isLoading.set(false);
       },
@@ -155,6 +167,79 @@ export class Profile implements OnInit {
         this.isLoading.set(false);
       },
     });
+  }
+
+  openEditProfile() {
+    const currentUser = this.user;
+
+    if (!currentUser) return;
+
+    this.profileError.set('');
+
+    this.editProfileForm = {
+      name: currentUser.name || '',
+      email: currentUser.email || '',
+      avatarUrl: currentUser.avatarUrl || '',
+    };
+
+    this.showProfileModal.set(true);
+  }
+
+  closeProfileModal() {
+    if (this.isSavingProfile()) return;
+
+    this.profileError.set('');
+    this.showProfileModal.set(false);
+  }
+
+  saveProfile() {
+    const name = this.editProfileForm.name.trim();
+    const email = this.editProfileForm.email.trim();
+    const avatarUrl = this.editProfileForm.avatarUrl.trim();
+
+    if (!name || !email) {
+      this.profileError.set('El nombre y el email son obligatorios.');
+      return;
+    }
+
+    this.isSavingProfile.set(true);
+    this.profileError.set('');
+
+    this.authService
+      .actualizarPerfil({
+        username: name,
+        email,
+        avatarUrl,
+      })
+      .subscribe({
+        next: () => {
+          this.isSavingProfile.set(false);
+          this.showProfileModal.set(false);
+        },
+        error: (err) => {
+          console.error('Error actualizando perfil', err);
+          this.isSavingProfile.set(false);
+
+          const message =
+            typeof err?.error === 'string'
+              ? err.error
+              : err?.error?.message || 'No se pudo actualizar el perfil.';
+
+          this.profileError.set(message);
+        },
+      });
+  }
+
+  getUserInitials(): string {
+    const currentUser = this.user;
+    const value = currentUser?.name || currentUser?.email || 'U';
+
+    return value
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((part) => part.charAt(0).toUpperCase())
+      .join('');
   }
 
   openTicket(trip: Trip) {

@@ -5,17 +5,22 @@
         class="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-110 transition-transform">
         <lucide-icon [name]="MapIcon" class="w-6 h-6 text-[rgb(23,25,25)]"></lucide-icon>
       </div>
-      <span class="text-xl font-black text-white tracking-tighter uppercase">Viajes<span
-          class="text-emerald-500">JMJ</span></span>
+
+      <span class="text-xl font-black text-white tracking-tighter uppercase">
+        Viajes<span class="text-emerald-500">JMJ</span>
+      </span>
     </a>
 
     <div class="hidden lg:flex items-center gap-8">
       <a routerLink="/continents"
-        class="text-xs font-bold text-gray-400 hover:text-white uppercase tracking-widest transition-colors">{{
-        'Destinos' | translate }}</a>
+        class="text-xs font-bold text-gray-400 hover:text-white uppercase tracking-widest transition-colors">
+        {{ 'Destinos' | translate }}
+      </a>
+
       <a routerLink="/trips"
-        class="text-xs font-bold text-gray-400 hover:text-white uppercase tracking-widest transition-colors">{{ 'Mis
-        Viajes' | translate }}</a>
+        class="text-xs font-bold text-gray-400 hover:text-white uppercase tracking-widest transition-colors">
+        {{ 'Mis Viajes' | translate }}
+      </a>
     </div>
 
     <div class="hidden md:flex flex-1 max-w-md mx-8">
@@ -24,6 +29,7 @@
           <lucide-icon [name]="SearchIcon"
             class="h-4 w-4 text-gray-400 group-focus-within:text-emerald-500 transition-colors"></lucide-icon>
         </div>
+
         <input type="text" [(ngModel)]="searchQuery" name="searchQuery" [placeholder]="'Buscar...' | translate"
           class="w-full bg-white/5 text-white border border-white/10 rounded-2xl py-2 pl-10 pr-4 focus:outline-none focus:border-emerald-500 text-sm" />
       </form>
@@ -36,11 +42,14 @@
 
       @if (!auth.isLoggedIn()) {
       <a routerLink="/login"
-        class="text-xs font-bold text-white uppercase tracking-widest px-6 py-3 border border-white/10 rounded-2xl hover:bg-white/5 transition-all">{{
-        'Entrar' | translate }}</a>
+        class="text-xs font-bold text-white uppercase tracking-widest px-6 py-3 border border-white/10 rounded-2xl hover:bg-white/5 transition-all">
+        {{ 'Entrar' | translate }}
+      </a>
+
       <a routerLink="/register"
-        class="text-xs font-bold text-[rgb(23,25,25)] bg-emerald-500 uppercase tracking-widest px-6 py-3 rounded-2xl hover:bg-emerald-400 transition-all">{{
-        'Registro' | translate }}</a>
+        class="text-xs font-bold text-[rgb(23,25,25)] bg-emerald-500 uppercase tracking-widest px-6 py-3 rounded-2xl hover:bg-emerald-400 transition-all">
+        {{ 'Registro' | translate }}
+      </a>
       } @else {
       <div class="flex items-center gap-3 pl-4 border-l border-white/10 relative">
         <button (click)="isDialogOpen = true"
@@ -50,8 +59,13 @@
         </button>
 
         <button (click)="toggleUserMenu($event)"
-          class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-gray-400 hover:text-emerald-500 border border-white/5 transition-all">
+          class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-gray-400 hover:text-emerald-500 border border-white/5 hover:border-emerald-500/50 transition-all overflow-hidden">
+          @if (getUserAvatarUrl()) {
+          <img [src]="getUserAvatarUrl()" [alt]="auth.user()?.name || 'Usuario'"
+            class="w-full h-full object-cover rounded-xl" />
+          } @else {
           <lucide-icon [name]="UserIcon" class="w-5 h-5"></lucide-icon>
+          }
         </button>
 
         @if (isUserMenuOpen) {
@@ -59,18 +73,30 @@
           class="absolute right-0 top-full mt-2 bg-[rgb(23,25,25)] border border-white/10 rounded-2xl shadow-xl w-56 py-2 z-[9999] flex flex-col backdrop-blur-md">
           <a routerLink="/profile" (click)="isUserMenuOpen = false"
             class="flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-colors uppercase tracking-widest">
-            <lucide-icon [name]="UserIcon" class="w-4 h-4"></lucide-icon> {{ 'Mi Perfil' | translate }}
+            @if (getUserAvatarUrl()) {
+            <img [src]="getUserAvatarUrl()" [alt]="auth.user()?.name || 'Usuario'"
+              class="w-5 h-5 rounded-full object-cover border border-white/10" />
+            } @else {
+            <lucide-icon [name]="UserIcon" class="w-4 h-4"></lucide-icon>
+            }
+
+            {{ 'Mi Perfil' | translate }}
           </a>
+
           @if (auth.user()?.rol === 'ADMIN') {
           <a routerLink="/admin" (click)="isUserMenuOpen = false"
             class="flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-amber-500 hover:text-amber-400 hover:bg-amber-500/10 transition-colors uppercase tracking-widest">
-            <lucide-icon [name]="LayoutDashboardIcon" class="w-4 h-4"></lucide-icon> Panel Admin
+            <lucide-icon [name]="LayoutDashboardIcon" class="w-4 h-4"></lucide-icon>
+            Panel Admin
           </a>
           }
+
           <div class="h-px bg-white/10 my-2"></div>
+
           <button (click)="logout()"
             class="flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-red-500 hover:text-red-400 hover:bg-red-500/10 transition-colors uppercase tracking-widest w-full text-left">
-            <lucide-icon [name]="LogOutIcon" class="w-4 h-4"></lucide-icon> {{ 'Salir' | translate }}
+            <lucide-icon [name]="LogOutIcon" class="w-4 h-4"></lucide-icon>
+            {{ 'Salir' | translate }}
           </button>
         </div>
         }
@@ -90,23 +116,32 @@
 @if (isDialogOpen) {
 <div class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
   <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" (click)="isDialogOpen = false"></div>
+
   <div class="bg-[rgb(23,25,25)] p-6 rounded-2xl border border-white/10 w-full max-w-sm z-[9999] relative">
     <div class="flex justify-between items-center mb-6">
-      <h2 class="text-xl font-bold text-white">{{ 'Gestionar Saldo' | translate }}</h2>
+      <h2 class="text-xl font-bold text-white">
+        {{ 'Gestionar Saldo' | translate }}
+      </h2>
+
       <button (click)="isDialogOpen = false" class="text-gray-400 hover:text-white">
         <lucide-icon [name]="XIcon" class="w-5 h-5"></lucide-icon>
       </button>
     </div>
+
     <div class="space-y-4">
       <input type="number" [(ngModel)]="amount" placeholder="0.00€"
         class="w-full bg-white/5 text-white border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500" />
+
       <div class="flex gap-3">
         <button (click)="handleDeposit()"
-          class="flex-1 bg-emerald-500 text-[rgb(23,25,25)] font-bold p-3 rounded-xl hover:bg-emerald-400 transition-colors uppercase text-xs">{{
-          'Ingresar' | translate }}</button>
+          class="flex-1 bg-emerald-500 text-[rgb(23,25,25)] font-bold p-3 rounded-xl hover:bg-emerald-400 transition-colors uppercase text-xs">
+          {{ 'Ingresar' | translate }}
+        </button>
+
         <button (click)="handleWithdraw()"
-          class="flex-1 bg-white/5 text-white border border-white/10 font-bold p-3 rounded-xl hover:bg-white/10 transition-colors uppercase text-xs">{{
-          'Retirar' | translate }}</button>
+          class="flex-1 bg-white/5 text-white border border-white/10 font-bold p-3 rounded-xl hover:bg-white/10 transition-colors uppercase text-xs">
+          {{ 'Retirar' | translate }}
+        </button>
       </div>
     </div>
   </div>

@@ -36,6 +36,7 @@ export class Navbar {
   amount = '';
   isUserMenuOpen = false;
   balanceNotice = '';
+
   private noticeTimeout: ReturnType<typeof setTimeout> | null = null;
 
   readonly UserIcon = User;
@@ -56,6 +57,10 @@ export class Navbar {
     }
   }
 
+  getUserAvatarUrl(): string {
+    return this.auth.user()?.avatarUrl?.trim() || '';
+  }
+
   toggleLanguage() {
     const current = this.translationService.currentLang();
     this.translationService.setLanguage(current === 'es' ? 'en' : 'es');
@@ -63,8 +68,12 @@ export class Navbar {
 
   handleSearch(event: Event) {
     event.preventDefault();
+
     if (this.searchQuery.trim()) {
-      this.router.navigate(['/search-results'], { queryParams: { q: this.searchQuery } });
+      this.router.navigate(['/search-results'], {
+        queryParams: { q: this.searchQuery },
+      });
+
       this.searchQuery = '';
     }
   }
@@ -82,6 +91,7 @@ export class Navbar {
 
   handleDeposit() {
     const val = parseFloat(this.amount);
+
     if (val > 0) {
       this.auth.updateCredits(val);
       this.showBalanceNotice('Saldo ingresado correctamente');
@@ -92,6 +102,7 @@ export class Navbar {
 
   handleWithdraw() {
     const val = parseFloat(this.amount);
+
     if (val > 0 && val <= (this.auth.user()?.saldo || 0)) {
       this.auth.updateCredits(-val);
       this.showBalanceNotice('Saldo retirado correctamente');

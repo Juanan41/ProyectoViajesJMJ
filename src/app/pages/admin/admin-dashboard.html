@@ -139,8 +139,19 @@
           @for (user of filteredUsuarios; track user.id) {
           <tr class="hover:bg-white/[0.02] transition-colors">
             <td class="px-8 py-6 text-sm font-mono text-gray-500">#{{ user.id }}</td>
-            <td class="px-8 py-6 text-sm font-bold text-white">{{ user.username }}</td>
+
+            <td class="px-8 py-6">
+              <button type="button" (click)="openUserDetails(user)"
+                class="text-sm font-bold text-white hover:text-emerald-400 hover:underline underline-offset-4 transition-colors">
+                {{ user.username }}
+              </button>
+              <p class="text-[10px] text-gray-500 uppercase tracking-widest mt-1">
+                {{ 'Ver ficha' | translate }}
+              </p>
+            </td>
+
             <td class="px-8 py-6 text-sm text-gray-400">{{ user.email }}</td>
+
             <td class="px-8 py-6">
               <span
                 class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/10"
@@ -148,10 +159,16 @@
                 {{ (user.role || 'USER') | translate }}
               </span>
             </td>
+
             <td class="px-8 py-6 text-sm font-bold text-emerald-500">
               {{ user.saldo || 0 }}€
             </td>
+
             <td class="px-8 py-6 text-right">
+              <button type="button" (click)="openUserDetails(user)" class="text-gray-400 hover:text-emerald-400 p-2">
+                <lucide-icon [name]="EyeIcon" class="w-4 h-4"></lucide-icon>
+              </button>
+
               <button type="button" (click)="openEditUsuario(user)" class="text-gray-400 hover:text-white p-2">
                 <lucide-icon [name]="EditIcon" class="w-4 h-4"></lucide-icon>
               </button>
@@ -509,6 +526,192 @@
         </button>
       </div>
     </div>
+  </div>
+</div>
+}
+
+@if (selectedUserDetail() || isLoadingUserDetail() || userDetailError()) {
+<div class="fixed inset-0 z-50 flex items-center justify-center px-4">
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="closeUserDetails()"></div>
+
+  <div
+    class="relative w-full max-w-5xl max-h-[90vh] overflow-y-auto bg-[rgb(33,36,37)] border border-white/10 rounded-3xl shadow-2xl p-6 md:p-8">
+    <button type="button" (click)="closeUserDetails()"
+      class="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center">
+      <lucide-icon [name]="XIcon" class="w-5 h-5 text-gray-300"></lucide-icon>
+    </button>
+
+    @if (isLoadingUserDetail()) {
+    <div class="py-20 text-center">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
+      <p class="text-gray-400">{{ 'Cargando ficha del usuario...' | translate }}</p>
+    </div>
+    } @else if (userDetailError()) {
+    <div class="py-12">
+      <h2 class="text-2xl font-black text-white mb-3">{{ 'Error' | translate }}</h2>
+      <p class="text-red-400">{{ userDetailError() | translate }}</p>
+    </div>
+    } @else {
+    <div class="pr-8">
+      <p class="text-xs font-black text-emerald-500 uppercase tracking-[0.2em] mb-2">
+        {{ 'Ficha de usuario' | translate }} #{{ selectedUserDetail()?.usuario?.id }}
+      </p>
+      <h2 class="text-3xl font-black text-white mb-1">
+        {{ selectedUserDetail()?.usuario?.username }}
+      </h2>
+      <p class="text-gray-400 mb-8">{{ selectedUserDetail()?.usuario?.email }}</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+      <div class="bg-white/5 rounded-2xl p-5 border border-white/5">
+        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{{ 'Saldo' | translate }}</p>
+        <p class="text-2xl font-black text-emerald-400">{{ formatMoney(selectedUserDetail()?.usuario?.saldo) }}</p>
+      </div>
+
+      <div class="bg-white/5 rounded-2xl p-5 border border-white/5">
+        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{{ 'Pendientes' | translate }}</p>
+        <p class="text-2xl font-black text-amber-300">{{ selectedUserDetail()?.resumen?.viajesPendientes || 0 }}</p>
+      </div>
+
+      <div class="bg-white/5 rounded-2xl p-5 border border-white/5">
+        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{{ 'Realizados' | translate }}</p>
+        <p class="text-2xl font-black text-emerald-400">{{ selectedUserDetail()?.resumen?.viajesRealizados || 0 }}</p>
+      </div>
+
+      <div class="bg-white/5 rounded-2xl p-5 border border-white/5">
+        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{{ 'Cancelados' | translate }}</p>
+        <p class="text-2xl font-black text-red-400">{{ selectedUserDetail()?.resumen?.viajesCancelados || 0 }}</p>
+      </div>
+
+      <div class="bg-white/5 rounded-2xl p-5 border border-white/5">
+        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{{ 'Km recorridos' | translate }}</p>
+        <p class="text-2xl font-black text-white">{{ getUserTraveledKm(selectedUserDetail()) | number:'1.0-0' }} km</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <div class="bg-white/5 rounded-[2rem] border border-white/5 p-6">
+        <h3 class="text-lg font-black text-white mb-4">{{ 'Datos de cuenta' | translate }}</h3>
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between gap-4">
+            <span class="text-gray-500">{{ 'Rol' | translate }}</span>
+            <span class="text-white font-bold">{{ selectedUserDetail()?.usuario?.role }}</span>
+          </div>
+          <div class="flex justify-between gap-4">
+            <span class="text-gray-500">{{ 'Destinos únicos' | translate }}</span>
+            <span class="text-white font-bold">{{ getUserVisitedDestinations(selectedUserDetail()) }}</span>
+          </div>
+          <div class="flex justify-between gap-4">
+            <span class="text-gray-500">{{ 'Reseñas' | translate }}</span>
+            <span class="text-white font-bold">{{ selectedUserDetail()?.resumen?.totalResenias || 0 }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white/5 rounded-[2rem] border border-white/5 p-6 lg:col-span-2">
+        <h3 class="text-lg font-black text-white mb-4">{{ 'Tarjeta' | translate }}</h3>
+
+        @if (selectedUserDetail()?.tarjeta) {
+        <div class="bg-[rgb(23,25,25)] rounded-2xl p-5 border border-emerald-500/20">
+          <p class="text-xs text-gray-500 uppercase tracking-widest font-bold mb-2">{{ 'Titular' | translate }}</p>
+          <p class="text-white font-black mb-4">{{ selectedUserDetail()?.tarjeta?.titular }}</p>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <p class="text-xs text-gray-500 uppercase tracking-widest font-bold mb-1">{{ 'Terminación' | translate }}
+              </p>
+              <p class="text-emerald-400 font-black">**** {{ selectedUserDetail()?.tarjeta?.last4 }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500 uppercase tracking-widest font-bold mb-1">{{ 'Entidad' | translate }}</p>
+              <p class="text-gray-300">{{ selectedUserDetail()?.tarjeta?.entidad }}</p>
+            </div>
+          </div>
+        </div>
+        } @else {
+        <p class="text-gray-500">{{ 'Este usuario no tiene tarjeta guardada.' | translate }}</p>
+        }
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <div class="bg-white/5 rounded-[2rem] border border-white/5 p-6">
+        <h3 class="text-lg font-black text-amber-300 mb-4">{{ 'Viajes pendientes' | translate }}</h3>
+        <div class="space-y-3">
+          @for (reserva of selectedUserDetail()?.reservasPendientes || []; track reserva.id) {
+          <div class="bg-[rgb(23,25,25)] rounded-2xl p-4 border border-white/5">
+            <p class="text-white font-bold">{{ reserva.destinoNombre | translate }}</p>
+            <p class="text-sm text-gray-400">{{ reserva.alojamientoNombre | translate }}</p>
+            <p class="text-xs text-gray-500 mt-2">
+              {{ formatDate(reserva.checkIn || reserva.fechaInicio) }} - {{ formatDate(reserva.checkOut ||
+              reserva.fechaFin) }}
+            </p>
+          </div>
+          } @empty {
+          <p class="text-gray-500 text-sm">{{ 'No hay viajes pendientes.' | translate }}</p>
+          }
+        </div>
+      </div>
+
+      <div class="bg-white/5 rounded-[2rem] border border-white/5 p-6">
+        <h3 class="text-lg font-black text-emerald-400 mb-4">{{ 'Viajes realizados' | translate }}</h3>
+        <div class="space-y-3">
+          @for (reserva of selectedUserDetail()?.reservasRealizadas || []; track reserva.id) {
+          <div class="bg-[rgb(23,25,25)] rounded-2xl p-4 border border-white/5">
+            <p class="text-white font-bold">{{ reserva.destinoNombre | translate }}</p>
+            <p class="text-sm text-gray-400">{{ reserva.alojamientoNombre | translate }}</p>
+            <p class="text-xs text-gray-500 mt-2">
+              {{ formatDate(reserva.checkIn || reserva.fechaInicio) }} - {{ formatDate(reserva.checkOut ||
+              reserva.fechaFin) }}
+            </p>
+          </div>
+          } @empty {
+          <p class="text-gray-500 text-sm">{{ 'No hay viajes realizados.' | translate }}</p>
+          }
+        </div>
+      </div>
+
+      <div class="bg-white/5 rounded-[2rem] border border-white/5 p-6">
+        <h3 class="text-lg font-black text-red-400 mb-4">{{ 'Viajes cancelados' | translate }}</h3>
+        <div class="space-y-3">
+          @for (reserva of selectedUserDetail()?.reservasCanceladas || []; track reserva.id) {
+          <div class="bg-[rgb(23,25,25)] rounded-2xl p-4 border border-white/5">
+            <p class="text-white font-bold">{{ reserva.destinoNombre | translate }}</p>
+            <p class="text-sm text-gray-400">{{ reserva.alojamientoNombre | translate }}</p>
+            <p class="text-xs text-gray-500 mt-2">
+              {{ formatDate(reserva.checkIn || reserva.fechaInicio) }} - {{ formatDate(reserva.checkOut ||
+              reserva.fechaFin) }}
+            </p>
+          </div>
+          } @empty {
+          <p class="text-gray-500 text-sm">{{ 'No hay viajes cancelados.' | translate }}</p>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white/5 rounded-[2rem] border border-white/5 p-6">
+      <h3 class="text-lg font-black text-white mb-4">{{ 'Reseñas del usuario' | translate }}</h3>
+
+      <div class="space-y-4">
+        @for (review of selectedUserDetail()?.resenias || []; track review.id) {
+        <div class="bg-[rgb(23,25,25)] rounded-2xl p-4 border border-white/5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+            <div>
+              <p class="text-white font-bold">{{ review.alojamientoNombre | translate }}</p>
+              <p class="text-sm text-gray-500">{{ review.destinoNombre | translate }}</p>
+            </div>
+            <div class="text-yellow-500 font-black">{{ review.puntuacion }}/5</div>
+          </div>
+          <p class="text-gray-300 text-sm">{{ review.comentario | translate }}</p>
+          <p class="text-xs text-gray-500 mt-2">{{ formatDate(review.fechaOpinion) }}</p>
+        </div>
+        } @empty {
+        <p class="text-gray-500 text-sm">{{ 'Este usuario no tiene reseñas.' | translate }}</p>
+        }
+      </div>
+    </div>
+    }
   </div>
 </div>
 }
