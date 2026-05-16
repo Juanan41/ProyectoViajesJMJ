@@ -44,6 +44,10 @@ public class CuentaBancariaService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La entidad es obligatoria");
         }
 
+        if (cuentaBancariaRepository.findByIban(ibanNormalizado).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ese IBAN ya está registrado");
+        }
+
         CuentaBancaria cuenta = new CuentaBancaria();
         cuenta.setIban(ibanNormalizado);
         cuenta.setTitular(dto.getTitular().trim());
@@ -70,6 +74,7 @@ public class CuentaBancariaService {
 
         String ibanNormalizado = normalizarIban(dto.getIban());
 
+
         if (ibanNormalizado.isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El IBAN es obligatorio");
         }
@@ -80,6 +85,12 @@ public class CuentaBancariaService {
 
         if (dto.getEntidad() == null || dto.getEntidad().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La entidad es obligatoria");
+        }
+
+        CuentaBancaria existenteConEseIban = cuentaBancariaRepository.findByIban(ibanNormalizado).orElse(null);
+
+        if (existenteConEseIban != null && !existenteConEseIban.getId().equals(cuenta.getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ese IBAN ya está registrado");
         }
 
         cuenta.setIban(ibanNormalizado);
