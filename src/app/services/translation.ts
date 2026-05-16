@@ -1,7 +1,18 @@
-﻿import { Injectable, signal } from '@angular/core';
+// ProyectoViajesJMJ - services\translation.ts
+// Responsabilidad: traducciones, normalizacion de textos y soporte bilingue.
+// Nota profesional: Mantiene textos traducibles y normalizacion para que ES/EN funcionen sin romper nombres propios.
 
+import { Injectable, signal } from '@angular/core';
+
+/**
+ * Contrato publico usado por componentes y servicios relacionados.
+ */
 export type Language = 'es' | 'en';
 
+/**
+ * Documento profesional: clase principal del archivo.
+ * Mantiene textos traducibles y normalizacion para que ES/EN funcionen sin romper nombres propios.
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -291,7 +302,7 @@ export class TranslationService {
       'Esta habitación no admite tantos huéspedes.': 'This room does not allow that many guests.',
       'Suite recomendada para grupos de hasta 4 personas.':
         'Suite recommended for groups of up to 4 people.',
-      'Elegida': 'Chosen',
+      Elegida: 'Chosen',
       'Elegir habitación': 'Choose room',
       'Habitación seleccionada': 'Selected room',
       'No hay ninguna habitación compatible seleccionada.': 'No compatible room is selected.',
@@ -1069,6 +1080,124 @@ export class TranslationService {
       'Ya existe una cuenta con ese nombre de usuario.':
         'An account with that username already exists.',
       'Usuario registrado correctamente.': 'User registered successfully.',
+
+      // Final translations - profile, rooms, tickets, bookings and user detail modal
+      'Editar perfil': 'Edit profile',
+      Avatar: 'Avatar',
+      'El nombre y el email son obligatorios.': 'Name and email are required.',
+      'No se pudo actualizar el perfil.': 'The profile could not be updated.',
+      'Puedes usar una URL de imagen para tu avatar.': 'You can use an image URL for your avatar.',
+      'Km Recorridos': 'Distance traveled',
+      'Km recorridos': 'Distance traveled',
+
+      'Cargando hotel...': 'Loading hotel...',
+      'Ubicación no disponible': 'Location not available',
+      'No compatible': 'Not compatible',
+      'Esta habitación no es compatible con el número de huéspedes indicado.':
+        'This room is not compatible with the selected number of guests.',
+      'Esta habitación no es compatible con los huéspedes indicados.':
+        'This room is not compatible with the selected guests.',
+      'La habitación seleccionada no es compatible con los huéspedes indicados.':
+        'The selected room is not compatible with the selected guests.',
+      'La habitación seleccionada no es compatible con el número de huéspedes':
+        'The selected room is not compatible with the number of guests.',
+      'La habitación seleccionada no es compatible con el número de huéspedes.':
+        'The selected room is not compatible with the number of guests.',
+      'Reduce el número de huéspedes o elige otra reserva.':
+        'Reduce the number of guests or choose another booking.',
+
+      Habitación: 'Room',
+      'Habitación individual': 'Single room',
+      'Habitación Individual': 'Single room',
+      'Habitación doble': 'Double room',
+      'Habitación Doble': 'Double room',
+      'Habitación deluxe': 'Deluxe room',
+      'Habitación Deluxe': 'Deluxe room',
+      'Habitación estándar': 'Standard room',
+      'Habitación Estándar': 'Standard room',
+      'Habitacion Estandar': 'Standard room',
+      'Habitación grupal': 'Group room',
+      'Habitación Grupal': 'Group room',
+      'Habitación familiar': 'Family room',
+      'Habitacion Familiar': 'Family room',
+      Grupal: 'Group',
+      Familiar: 'Family',
+      Estándar: 'Standard',
+      Estandar: 'Standard',
+      Deluxe: 'Deluxe',
+
+      'Habitación grupal recomendada para grupos de 5 a 8 personas.':
+        'Group room recommended for groups of 5 to 8 people.',
+      'Suite recomendada para grupos de 3 o 4 personas.':
+        'Suite recommended for groups of 3 or 4 people.',
+      'Habitación recomendada para 1 o 2 personas.': 'Room recommended for 1 or 2 people.',
+      'Habitación individual recomendada para 1 persona.': 'Single room recommended for 1 person.',
+      'Puedes elegir cualquier habitación con capacidad suficiente.':
+        'You can choose any room with enough capacity.',
+      'Para 2 huéspedes puedes elegir habitación doble, suite o habitación grupal.':
+        'For 2 guests you can choose a double room, suite, or group room.',
+      'Para 2 huéspedes puedes elegir habitación doble, estándar/deluxe, suite o habitación grupal.':
+        'For 2 guests you can choose a double, standard/deluxe, suite, or group room.',
+      'Para 3 o 4 huéspedes puedes elegir suite o habitación grupal.':
+        'For 3 or 4 guests you can choose a suite or group room.',
+      'Para 5 a 8 huéspedes solo puedes elegir habitación grupal.':
+        'For 5 to 8 guests you can only choose a group room.',
+      '1 huésped: cualquier habitación compatible. 2 huéspedes: doble, suite o grupal. 3-4 huéspedes: suite o grupal. 5-8 huéspedes: solo grupal.':
+        '1 guest: any compatible room. 2 guests: double, suite, or group room. 3-4 guests: suite or group room. 5-8 guests: group room only.',
+      '1 huésped: cualquier habitación compatible. 2 huéspedes: doble, estándar/deluxe, suite o grupal. 3-4 huéspedes: suite o grupal. 5-8 huéspedes: solo grupal.':
+        '1 guest: any compatible room. 2 guests: double, standard/deluxe, suite, or group room. 3-4 guests: suite or group room. 5-8 guests: group room only.',
+
+      'Escribir una reseña': 'Write a review',
+      'Cuenta tu experiencia en este hotel...': 'Share your experience at this hotel...',
+      'Este hotel todavía no tiene reseñas.': 'This hotel does not have any reviews yet.',
+      'También te puede interesar': 'You may also be interested in',
+      'Necesitas iniciar sesión para escribir una reseña.':
+        'You need to sign in to write a review.',
+
+      AVION: 'PLANE',
+      TREN: 'TRAIN',
+      BARCO: 'SHIP',
+
+      'Inicia sesión para poder reservar este hotel.': 'Sign in to book this hotel.',
+      'Necesitas añadir una tarjeta en tu perfil antes de reservar.':
+        'You need to add a card to your profile before booking.',
+      'Comprobando tarjeta': 'Checking card',
+      'Estamos comprobando tus métodos de pago. Inténtalo de nuevo en unos segundos.':
+        'We are checking your payment methods. Try again in a few seconds.',
+      'Procesando...': 'Processing...',
+      'Reservando...': 'Booking...',
+      'Reservar igualmente': 'Book anyway',
+      'Ya tienes un viaje en esas fechas': 'You already have a trip on those dates',
+      'Hemos encontrado otro viaje que coincide con las fechas que has elegido. Puedes cancelar o reservar igualmente.':
+        'We found another trip that overlaps with the dates you selected. You can cancel or book anyway.',
+      'Nueva reserva': 'New booking',
+      'Viajes que coinciden': 'Overlapping trips',
+
+      'Las fechas son obligatorias': 'Dates are required',
+      'Transporte inválido': 'Invalid transport',
+      'Usuario no encontrado': 'User not found',
+      'Habitación no encontrada': 'Room not found',
+      'La habitación no tiene capacidad suficiente': 'The room does not have enough capacity',
+      'El máximo permitido es de 8 huéspedes': 'The maximum allowed is 8 guests',
+      'Error interno al crear la reserva': 'Internal error while creating the booking',
+      'Usuario no autenticado': 'User not authenticated',
+      'Reserva no encontrada': 'Booking not found',
+      'La reserva ya está cancelada': 'The booking is already canceled',
+
+      'Ficha de usuario': 'User profile',
+      'Detalle de usuario': 'User details',
+      'Información del usuario': 'User information',
+      'Datos del usuario': 'User details',
+      'Reservas del usuario': 'User bookings',
+      'Reseñas del usuario': 'User reviews',
+      'Destinos únicos': 'Unique destinations',
+      'Viajes realizados': 'Completed trips',
+      'Viajes pendientes': 'Pending trips',
+      'Tarjeta asociada': 'Linked card',
+      'Sin tarjeta': 'No card',
+      'Ver ficha': 'View details',
+      'Cerrar detalle': 'Close details',
+      'No hay datos disponibles.': 'No data available.',
     },
   };
 
@@ -1199,6 +1328,11 @@ export class TranslationService {
       return `${this.translate(destinationDescription[1])} stands out for its ${this.translateDestinationTheme(destinationDescription[2])}, an essential stop to discover ${this.translate(destinationDescription[3])}.`;
     }
 
+    const improvedDestinationDescription = this.translateImprovedDestinationDescription(value);
+    if (improvedDestinationDescription) {
+      return improvedDestinationDescription;
+    }
+
     const hotelName = value.match(/^Hotel (Central|Grand Palace|Boutique|Vista) (.+)$/i);
     if (hotelName) {
       const hotelStyle = this.translateHotelStyle(hotelName[1]);
@@ -1218,6 +1352,147 @@ export class TranslationService {
     const accommodationIn = value.match(/^Alojamiento cómodo y bien ubicado en (.+)\.$/i);
     if (accommodationIn) {
       return `Comfortable and well-located accommodation in ${this.translate(accommodationIn[1])}.`;
+    }
+
+    const hotelIn = value.match(
+      /^Hotel cómodo y bien ubicado en (.+), ideal para descansar después de descubrir la ciudad\.$/i,
+    );
+    if (hotelIn) {
+      return `Comfortable and well-located hotel in ${this.translate(hotelIn[1])}, ideal for resting after discovering the city.`;
+    }
+
+    return null;
+  }
+
+  private translateImprovedDestinationDescription(value: string): string | null {
+    const patterns: Array<[RegExp, (match: RegExpMatchArray) => string]> = [
+      [
+        /^(.+) ofrece patrimonio urbano, buena gastronomía y espacios culturales para descubrir (.+) con calma\.$/i,
+        (match) =>
+          `${this.translate(match[1])} offers urban heritage, good gastronomy, and cultural spaces to discover ${this.translate(match[2])} at an easy pace.`,
+      ],
+      [
+        /^(.+) combina arquitectura, historia local y una vida urbana activa en uno de los destinos destacados de (.+)\.$/i,
+        (match) =>
+          `${this.translate(match[1])} combines architecture, local history, and active city life in one of ${this.translate(match[2])}'s featured destinations.`,
+      ],
+      [
+        /^(.+) es una opción equilibrada para disfrutar de cultura, paseos céntricos y servicios turísticos de calidad en (.+)\.$/i,
+        (match) =>
+          `${this.translate(match[1])} is a balanced choice for culture, central walks, and quality tourist services in ${this.translate(match[2])}.`,
+      ],
+      [
+        /^(.+) reúne tradición, ambiente local y una oferta cómoda para una escapada urbana por (.+)\.$/i,
+        (match) =>
+          `${this.translate(match[1])} brings together tradition, local atmosphere, and a comfortable offer for an urban getaway in ${this.translate(match[2])}.`,
+      ],
+      [
+        /^(.+) combina patrimonio, mercados y contrastes urbanos para conocer una parte representativa de (.+)\.$/i,
+        (match) =>
+          `${this.translate(match[1])} combines heritage, markets, and urban contrasts to discover a representative side of ${this.translate(match[2])}.`,
+      ],
+      [
+        /^(.+) destaca por su energía local, su gastronomía y sus recorridos culturales dentro de (.+)\.$/i,
+        (match) =>
+          `${this.translate(match[1])} stands out for its local energy, gastronomy, and cultural routes within ${this.translate(match[2])}.`,
+      ],
+      [
+        /^(.+) ofrece historia, paisajes singulares y una cultura local muy presente en la experiencia de viaje por (.+)\.$/i,
+        (match) =>
+          `${this.translate(match[1])} offers history, distinctive landscapes, and a strong local culture throughout a trip to ${this.translate(match[2])}.`,
+      ],
+      [
+        /^(.+) ofrece templos, barrios activos y experiencias urbanas pensadas para explorar (.+) con comodidad\.$/i,
+        (match) =>
+          `${this.translate(match[1])} offers temples, active neighborhoods, and urban experiences designed to explore ${this.translate(match[2])} comfortably.`,
+      ],
+      [
+        /^(.+) permite acercarse a la historia, la vida cotidiana y los paisajes más reconocibles de (.+)\.$/i,
+        (match) =>
+          `${this.translate(match[1])} offers a closer look at the history, daily life, and most recognizable landscapes of ${this.translate(match[2])}.`,
+      ],
+      [
+        /^(.+) combina patrimonio, naturaleza y ambiente urbano para descubrir (.+) desde una perspectiva cercana\.$/i,
+        (match) =>
+          `${this.translate(match[1])} combines heritage, nature, and urban atmosphere to discover ${this.translate(match[2])} from a local perspective.`,
+      ],
+      [
+        /^(.+) destaca por sus colores, mercados y espacios culturales dentro de una ruta completa por (.+)\.$/i,
+        (match) =>
+          `${this.translate(match[1])} stands out for its colors, markets, and cultural spaces within a complete route through ${this.translate(match[2])}.`,
+      ],
+      [
+        /^(.+) es una base interesante para disfrutar de tradición, gastronomía y paisajes característicos de (.+)\.$/i,
+        (match) =>
+          `${this.translate(match[1])} is an interesting base for enjoying tradition, gastronomy, and characteristic landscapes in ${this.translate(match[2])}.`,
+      ],
+      [
+        /^(.+) combina barrios dinámicos, espacios culturales y servicios turísticos consolidados para visitar (.+)\.$/i,
+        (match) =>
+          `${this.translate(match[1])} combines dynamic neighborhoods, cultural spaces, and reliable tourist services for visiting ${this.translate(match[2])}.`,
+      ],
+      [
+        /^(.+) destaca por su vida urbana, sus paisajes reconocibles y una oferta variada para recorrer (.+)\.$/i,
+        (match) =>
+          `${this.translate(match[1])} stands out for city life, recognizable landscapes, and a varied offer for exploring ${this.translate(match[2])}.`,
+      ],
+      [
+        /^(.+) ofrece avenidas, ocio local y puntos de interés adecuados para una estancia cómoda en (.+)\.$/i,
+        (match) =>
+          `${this.translate(match[1])} offers avenues, local leisure, and points of interest for a comfortable stay in ${this.translate(match[2])}.`,
+      ],
+      [
+        /^(.+) reúne cultura, gastronomía y buenas conexiones para descubrir una zona destacada de (.+)\.$/i,
+        (match) =>
+          `${this.translate(match[1])} brings together culture, gastronomy, and good connections for discovering a featured area of ${this.translate(match[2])}.`,
+      ],
+      [
+        /^(.+) combina patrimonio, paisajes naturales y gastronomía local para una ruta completa por (.+)\.$/i,
+        (match) =>
+          `${this.translate(match[1])} combines heritage, natural landscapes, and local gastronomy for a complete route through ${this.translate(match[2])}.`,
+      ],
+      [
+        /^(.+) destaca por sus barrios con carácter, espacios históricos y ambiente cercano dentro de (.+)\.$/i,
+        (match) =>
+          `${this.translate(match[1])} stands out for characterful neighborhoods, historic spaces, and a welcoming atmosphere within ${this.translate(match[2])}.`,
+      ],
+      [
+        /^(.+) ofrece cultura urbana, naturaleza y buenas propuestas de ocio para conocer (.+)\.$/i,
+        (match) =>
+          `${this.translate(match[1])} offers urban culture, nature, and good leisure options for discovering ${this.translate(match[2])}.`,
+      ],
+      [
+        /^(.+) es un destino atractivo para disfrutar de historia, color local y recorridos panorámicos por (.+)\.$/i,
+        (match) =>
+          `${this.translate(match[1])} is an attractive destination for history, local color, and scenic routes through ${this.translate(match[2])}.`,
+      ],
+      [
+        /^(.+) destaca por sus paisajes costeros, naturaleza abierta y ambiente relajado para descubrir (.+)\.$/i,
+        (match) =>
+          `${this.translate(match[1])} stands out for coastal landscapes, open nature, and a relaxed atmosphere for discovering ${this.translate(match[2])}.`,
+      ],
+      [
+        /^(.+) combina playas, cultura local y experiencias al aire libre en una ruta representativa por (.+)\.$/i,
+        (match) =>
+          `${this.translate(match[1])} combines beaches, local culture, and outdoor experiences on a representative route through ${this.translate(match[2])}.`,
+      ],
+      [
+        /^(.+) ofrece lagunas, costas y un entorno tranquilo para disfrutar de (.+) sin prisas\.$/i,
+        (match) =>
+          `${this.translate(match[1])} offers lagoons, coastlines, and a calm setting to enjoy ${this.translate(match[2])} without rushing.`,
+      ],
+      [
+        /^(.+) es una opción adecuada para viajeros que buscan naturaleza, mar y cultura local en (.+)\.$/i,
+        (match) =>
+          `${this.translate(match[1])} is a suitable option for travelers looking for nature, sea, and local culture in ${this.translate(match[2])}.`,
+      ],
+    ];
+
+    for (const [pattern, translateMatch] of patterns) {
+      const match = value.match(pattern);
+      if (match) {
+        return translateMatch(match);
+      }
     }
 
     return null;
@@ -1247,7 +1522,8 @@ export class TranslationService {
         'local traditions, gastronomy, and great Asian landscapes',
       'historia tecnologia y vida callejera intensa':
         'history, technology, and intense street life',
-      'paisajes naturales mercados y cultura local': 'natural landscapes, markets, and local culture',
+      'paisajes naturales mercados y cultura local':
+        'natural landscapes, markets, and local culture',
       'historia colores urbanos y experiencias africanas':
         'history, colorful cities, and African experiences',
       'patrimonio naturaleza y gastronomia regional': 'heritage, nature, and regional gastronomy',
@@ -1260,8 +1536,7 @@ export class TranslationService {
         'Andean landscapes, historic neighborhoods, and South American culture',
       'naturaleza plazas coloniales y gastronomia local':
         'nature, colonial squares, and local gastronomy',
-      'color urbano tradicion y rutas panoramicas':
-        'urban color, tradition, and scenic routes',
+      'color urbano tradicion y rutas panoramicas': 'urban color, tradition, and scenic routes',
       'playas lagunas y naturaleza del pacifico': 'beaches, lagoons, and Pacific nature',
       'paisajes oceanicos cultura local y relax': 'ocean landscapes, local culture, and relaxation',
       'islas costas y experiencias al aire libre': 'islands, coastlines, and outdoor experiences',

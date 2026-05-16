@@ -1,3 +1,20 @@
+/* Estilos globales de la aplicacion: Tailwind y reglas base compartidas por todas las vistas. */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html,
+body {
+  min-height: 100%;
+  background: rgb(33, 36, 37);
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+}
+
+app-root {
+  display: block;
+  min-height: 100vh;
+}

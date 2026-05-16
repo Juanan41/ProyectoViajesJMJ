@@ -1,5 +1,12 @@
+// ProyectoViajesJMJ - data\destinations.ts
+// Responsabilidad: catalogo de destinos, navegacion geografica y busqueda.
+// Nota profesional: Soporta navegacion por destinos, paises, continentes y busqueda bilingue.
+
 import { fetchRemoteStore, putRemoteStore } from './persistence-api';
 
+/**
+ * Contrato publico usado por componentes y servicios relacionados.
+ */
 export interface Review {
   id: string;
   userName: string;
@@ -10,9 +17,18 @@ export interface Review {
   hotelId?: string;
 }
 
+/**
+ * Contrato publico usado por componentes y servicios relacionados.
+ */
 export type TransportType = 'avion' | 'tren' | 'barco';
+/**
+ * Contrato publico usado por componentes y servicios relacionados.
+ */
 export type BookingStatus = 'active' | 'canceled';
 
+/**
+ * Contrato publico usado por componentes y servicios relacionados.
+ */
 export interface BookingTransport {
   type: TransportType;
   name: string;
@@ -23,6 +39,9 @@ export interface BookingTransport {
   terminal?: string | null;
 }
 
+/**
+ * Contrato publico usado por componentes y servicios relacionados.
+ */
 export interface BookingRecord {
   id: string;
   userEmail: string;
@@ -47,6 +66,9 @@ export interface BookingRecord {
   canceledAt?: string;
 }
 
+/**
+ * Contrato publico usado por componentes y servicios relacionados.
+ */
 export interface Hotel {
   id: string;
   name: string;
@@ -67,6 +89,9 @@ export interface Hotel {
   reviews: Review[];
 }
 
+/**
+ * Contrato publico usado por componentes y servicios relacionados.
+ */
 export interface City {
   id: string;
   name: string;
@@ -75,6 +100,9 @@ export interface City {
   description: string;
 }
 
+/**
+ * Contrato publico usado por componentes y servicios relacionados.
+ */
 export interface Country {
   id: string;
   name: string;
@@ -83,6 +111,9 @@ export interface Country {
   image: string;
 }
 
+/**
+ * Contrato publico usado por componentes y servicios relacionados.
+ */
 export interface Continent {
   id: string;
   name: string;
@@ -95,35 +126,35 @@ export const continents: Continent[] = [
     id: 'europe',
     name: 'Europa',
     image:
-      'https://images.unsplash.com/photo-1467269204594-9661b134dd2bauto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?q=80&w=1600&auto=format&fit=crop',
     description: 'Historia, cultura y arquitectura milenaria',
   },
   {
     id: 'asia',
     name: 'Asia',
     image:
-      'https://images.unsplash.com/photo-1528181304800-259b08848526auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1528181304800-259b08848526?q=80&w=1600&auto=format&fit=crop',
     description: 'Tradición ancestral y modernidad vibrante',
   },
   {
     id: 'america',
     name: 'América',
     image:
-      'https://images.unsplash.com/photo-1501466044931-62695aada8e9auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1501466044931-62695aada8e9?q=80&w=1600&auto=format&fit=crop',
     description: 'Naturaleza salvaje y ciudades cosmopolitas',
   },
   {
     id: 'africa',
     name: 'África',
     image:
-      'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?q=80&w=1600&auto=format&fit=crop',
     description: 'Safari, desiertos y culturas ancestrales',
   },
   {
     id: 'oceania',
     name: 'Oceanía',
     image:
-      'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?q=80&w=1600&auto=format&fit=crop',
     description: 'Playas paradisiacas y naturaleza única',
   },
 ];
@@ -135,79 +166,79 @@ export const countries: Country[] = [
     name: 'Francia',
     continentId: 'europe',
     flag: '',
-    image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34w=800',
+    image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=1600&auto=format&fit=crop',
   },
   {
     id: 'spain',
-    name: 'Espaa',
+    name: 'Espa?a',
     continentId: 'europe',
     flag: '',
-    image: 'https://images.unsplash.com/photo-1543783207-ec64e4d95325w=800',
+    image: 'https://images.unsplash.com/photo-1543783207-ec64e4d95325?q=80&w=1600&auto=format&fit=crop',
   },
   {
     id: 'italy',
     name: 'Italia',
     continentId: 'europe',
     flag: '',
-    image: 'https://images.unsplash.com/photo-1504198453319-5ce911bafcdew=800',
+    image: 'https://images.unsplash.com/photo-1504198453319-5ce911bafcde?q=80&w=1600&auto=format&fit=crop',
   },
   {
     id: 'uk',
     name: 'Reino Unido',
     continentId: 'europe',
     flag: '',
-    image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1adw=800',
+    image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=1600&auto=format&fit=crop',
   },
   {
     id: 'germany',
     name: 'Alemania',
     continentId: 'europe',
     flag: '',
-    image: 'https://images.unsplash.com/photo-1467269204594-9661b134dd2bw=800',
+    image: 'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?q=80&w=1600&auto=format&fit=crop',
   },
   {
     id: 'switzerland',
     name: 'Suiza',
     continentId: 'europe',
     flag: '',
-    image: 'https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99w=800',
+    image: 'https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?q=80&w=1600&auto=format&fit=crop',
   },
 
   // Asia
   {
     id: 'japan',
-    name: 'Japn',
+    name: 'Jap?n',
     continentId: 'asia',
     flag: '',
-    image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0ew=800',
+    image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=1600&auto=format&fit=crop',
   },
   {
     id: 'thailand',
     name: 'Tailandia',
     continentId: 'asia',
     flag: '',
-    image: 'https://images.unsplash.com/photo-1552465011-b4e21bf6e79aw=800',
+    image: 'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?q=80&w=1600&auto=format&fit=crop',
   },
   {
     id: 'uae',
-    name: 'Emiratos rabes',
+    name: 'Emiratos ?rabes Unidos',
     continentId: 'asia',
     flag: '',
-    image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880cw=800',
+    image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=1600&auto=format&fit=crop',
   },
   {
     id: 'singapore',
     name: 'Singapur',
     continentId: 'asia',
     flag: '',
-    image: 'https://images.unsplash.com/photo-1525625293386-3f8f99389eddw=800',
+    image: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?q=80&w=1600&auto=format&fit=crop',
   },
   {
     id: 'india',
     name: 'India',
     continentId: 'asia',
     flag: '',
-    image: 'https://images.unsplash.com/photo-1524492412937-b28074a5d7daw=800',
+    image: 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?q=80&w=1600&auto=format&fit=crop',
   },
 
   // América
@@ -216,35 +247,35 @@ export const countries: Country[] = [
     name: 'Estados Unidos',
     continentId: 'america',
     flag: '',
-    image: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8w=800',
+    image: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?q=80&w=1600&auto=format&fit=crop',
   },
   {
     id: 'brazil',
     name: 'Brasil',
     continentId: 'america',
     flag: '',
-    image: 'https://images.unsplash.com/photo-1483729558449-99ef09a8c325w=800',
+    image: 'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?q=80&w=1600&auto=format&fit=crop',
   },
   {
     id: 'argentina',
     name: 'Argentina',
     continentId: 'america',
     flag: '',
-    image: 'https://images.unsplash.com/photo-1589909202802-8f4aadce1849w=800',
+    image: 'https://images.unsplash.com/photo-1589909202802-8f4aadce1849?q=80&w=1600&auto=format&fit=crop',
   },
   {
     id: 'mexico',
-    name: 'Mjico',
+    name: 'M?xico',
     continentId: 'america',
     flag: '',
-    image: 'https://images.unsplash.com/photo-1518659664331-862e3a95a63bw=800',
+    image: 'https://images.unsplash.com/photo-1518659664331-862e3a95a63b?q=80&w=1600&auto=format&fit=crop',
   },
   {
     id: 'canada',
-    name: 'Canad',
+    name: 'Canad?',
     continentId: 'america',
     flag: '',
-    image: 'https://images.unsplash.com/photo-1503614472-8c93d56e92cew=800',
+    image: 'https://images.unsplash.com/photo-1503614472-8c93d56e92ce?q=80&w=1600&auto=format&fit=crop',
   },
 
   // África
@@ -253,21 +284,21 @@ export const countries: Country[] = [
     name: 'Marruecos',
     continentId: 'africa',
     flag: '',
-    image: 'https://images.unsplash.com/photo-1539020140153-e479b8c22e70w=800',
+    image: 'https://images.unsplash.com/photo-1539020140153-e479b8c22e70?q=80&w=1600&auto=format&fit=crop',
   },
   {
     id: 'egypt',
     name: 'Egipto',
     continentId: 'africa',
     flag: '',
-    image: 'https://images.unsplash.com/photo-1539650116574-8efeb43e2750w=800',
+    image: 'https://images.unsplash.com/photo-1539650116574-8efeb43e2750?q=80&w=1600&auto=format&fit=crop',
   },
   {
     id: 'southafrica',
     name: 'Sudfrica',
     continentId: 'africa',
     flag: '',
-    image: 'https://images.unsplash.com/photo-1580060839134-75a5edca2e99w=800',
+    image: 'https://images.unsplash.com/photo-1580060839134-75a5edca2e99?q=80&w=1600&auto=format&fit=crop',
   },
 
   // Oceanía
@@ -276,14 +307,14 @@ export const countries: Country[] = [
     name: 'Australia',
     continentId: 'oceania',
     flag: '',
-    image: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9w=800',
+    image: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?q=80&w=1600&auto=format&fit=crop',
   },
   {
     id: 'newzealand',
     name: 'Nueva Zelanda',
     continentId: 'oceania',
     flag: '',
-    image: 'https://images.unsplash.com/photo-1469521669194-babb45599defw=800',
+    image: 'https://images.unsplash.com/photo-1469521669194-babb45599def?q=80&w=1600&auto=format&fit=crop',
   },
 ];
 
@@ -293,21 +324,21 @@ export const cities: City[] = [
     id: 'paris',
     name: 'Pars',
     countryId: 'france',
-    image: 'https://images.unsplash.com/photo-1431274172761-fca41d930114w=800',
+    image: 'https://images.unsplash.com/photo-1431274172761-fca41d930114?q=80&w=1600&auto=format&fit=crop',
     description: 'La ciudad de la luz, arte y romance',
   },
   {
     id: 'nice',
     name: 'Niza',
     countryId: 'france',
-    image: 'https://images.unsplash.com/photo-1536300007881-21e4f1ed0b6cw=800',
+    image: 'https://images.unsplash.com/photo-1536300007881-21e4f1ed0b6c?q=80&w=1600&auto=format&fit=crop',
     description: 'Perla de la Costa Azul',
   },
   {
     id: 'lyon',
     name: 'Lyon',
     countryId: 'france',
-    image: 'https://images.unsplash.com/photo-1524396309943-e03f5249f002w=800',
+    image: 'https://images.unsplash.com/photo-1524396309943-e03f5249f002?q=80&w=1600&auto=format&fit=crop',
     description: 'Capital gastronmica de Francia',
   },
 
@@ -316,21 +347,21 @@ export const cities: City[] = [
     id: 'madrid',
     name: 'Madrid',
     countryId: 'spain',
-    image: 'https://images.unsplash.com/photo-1539037116277-4db20889f2d4w=800',
+    image: 'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?q=80&w=1600&auto=format&fit=crop',
     description: 'Vibrante capital espaola',
   },
   {
     id: 'barcelona',
     name: 'Barcelona',
     countryId: 'spain',
-    image: 'https://images.unsplash.com/photo-1583422409516-2895a77efdedw=800',
+    image: 'https://images.unsplash.com/photo-1583422409516-2895a77efded?q=80&w=1600&auto=format&fit=crop',
     description: 'Modernismo y mediterrneo',
   },
   {
     id: 'seville',
     name: 'Sevilla',
     countryId: 'spain',
-    image: 'https://images.unsplash.com/photo-1560969184-10fe8719e047w=800',
+    image: 'https://images.unsplash.com/photo-1560969184-10fe8719e047?q=80&w=1600&auto=format&fit=crop',
     description: 'Flamenco y tradicin andaluza',
   },
 
@@ -339,21 +370,21 @@ export const cities: City[] = [
     id: 'rome',
     name: 'Roma',
     countryId: 'italy',
-    image: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5w=800',
+    image: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?q=80&w=1600&auto=format&fit=crop',
     description: 'La ciudad eterna',
   },
   {
     id: 'venice',
     name: 'Venecia',
     countryId: 'italy',
-    image: 'https://images.unsplash.com/photo-1514890547357-a9ee288728e0w=800',
+    image: 'https://images.unsplash.com/photo-1514890547357-a9ee288728e0?q=80&w=1600&auto=format&fit=crop',
     description: 'Ciudad de canales y romance',
   },
   {
     id: 'milan',
     name: 'Miln',
     countryId: 'italy',
-    image: 'https://images.unsplash.com/photo-1513581166391-887a96ddeafdw=800',
+    image: 'https://images.unsplash.com/photo-1513581166391-887a96ddeafd?q=80&w=1600&auto=format&fit=crop',
     description: 'Capital de la moda',
   },
 
@@ -362,14 +393,14 @@ export const cities: City[] = [
     id: 'london',
     name: 'Londres',
     countryId: 'uk',
-    image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1adw=800',
+    image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=1600&auto=format&fit=crop',
     description: 'Cosmopolita y histrica',
   },
   {
     id: 'edinburgh',
     name: 'Edimburgo',
     countryId: 'uk',
-    image: 'https://images.unsplash.com/photo-1580669446032-3e6d747e05b1w=800',
+    image: 'https://images.unsplash.com/photo-1580669446032-3e6d747e05b1?q=80&w=1600&auto=format&fit=crop',
     description: 'Castillos y leyendas escocesas',
   },
 
@@ -378,14 +409,14 @@ export const cities: City[] = [
     id: 'berlin',
     name: 'Berln',
     countryId: 'germany',
-    image: 'https://images.unsplash.com/photo-1560930950-5cc20e80e392w=800',
+    image: 'https://images.unsplash.com/photo-1560930950-5cc20e80e392?q=80&w=1600&auto=format&fit=crop',
     description: 'Historia y cultura vanguardista',
   },
   {
     id: 'munich',
     name: 'Mnich',
     countryId: 'germany',
-    image: 'https://images.unsplash.com/photo-1595867818082-083862f3d630w=800',
+    image: 'https://images.unsplash.com/photo-1595867818082-083862f3d630?q=80&w=1600&auto=format&fit=crop',
     description: 'Tradicin bvara',
   },
 
@@ -394,14 +425,14 @@ export const cities: City[] = [
     id: 'zurich',
     name: 'Zrich',
     countryId: 'switzerland',
-    image: 'https://images.unsplash.com/photo-1521292270410-a8c4d716d518w=800',
+    image: 'https://images.unsplash.com/photo-1521292270410-a8c4d716d518?q=80&w=1600&auto=format&fit=crop',
     description: 'Alpes suizos y elegancia',
   },
   {
     id: 'geneva',
     name: 'Ginebra',
     countryId: 'switzerland',
-    image: 'https://images.unsplash.com/photo-1581359593257-29b5cbbf5b88w=800',
+    image: 'https://images.unsplash.com/photo-1581359593257-29b5cbbf5b88?q=80&w=1600&auto=format&fit=crop',
     description: 'Lujo y diplomacia internacional',
   },
 
@@ -410,21 +441,21 @@ export const cities: City[] = [
     id: 'tokyo',
     name: 'Tokio',
     countryId: 'japan',
-    image: 'https://images.unsplash.com/photo-1641558996066-fcf78962c30aw=800',
+    image: 'https://images.unsplash.com/photo-1641558996066-fcf78962c30a?q=80&w=1600&auto=format&fit=crop',
     description: 'Tecnologa y tradicin',
   },
   {
     id: 'kyoto',
     name: 'Kioto',
     countryId: 'japan',
-    image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0ew=800',
+    image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=1600&auto=format&fit=crop',
     description: 'Templos y jardines zen',
   },
   {
     id: 'osaka',
     name: 'Osaka',
     countryId: 'japan',
-    image: 'https://images.unsplash.com/photo-1590253230532-a67f6bc61c9ew=800',
+    image: 'https://images.unsplash.com/photo-1590253230532-a67f6bc61c9e?q=80&w=1600&auto=format&fit=crop',
     description: 'Gastronoma japonesa',
   },
 
@@ -433,14 +464,14 @@ export const cities: City[] = [
     id: 'bangkok',
     name: 'Bangkok',
     countryId: 'thailand',
-    image: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365w=800',
+    image: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365?q=80&w=1600&auto=format&fit=crop',
     description: 'Templos dorados y mercados',
   },
   {
     id: 'phuket',
     name: 'Phuket',
     countryId: 'thailand',
-    image: 'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5w=800',
+    image: 'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?q=80&w=1600&auto=format&fit=crop',
     description: 'Playas paradisiacas',
   },
 
@@ -449,14 +480,14 @@ export const cities: City[] = [
     id: 'dubai',
     name: 'Dubi',
     countryId: 'uae',
-    image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880cw=800',
+    image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=1600&auto=format&fit=crop',
     description: 'Lujo y arquitectura futurista',
   },
   {
     id: 'abudhabi',
     name: 'Abu Dhabi',
     countryId: 'uae',
-    image: 'https://images.unsplash.com/photo-1512632578888-169bbbc64f33w=800',
+    image: 'https://images.unsplash.com/photo-1512632578888-169bbbc64f33?q=80&w=1600&auto=format&fit=crop',
     description: 'Modernidad rabe',
   },
 
@@ -465,7 +496,7 @@ export const cities: City[] = [
     id: 'singapore',
     name: 'Singapur',
     countryId: 'singapore',
-    image: 'https://images.unsplash.com/photo-1525625293386-3f8f99389eddw=800',
+    image: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?q=80&w=1600&auto=format&fit=crop',
     description: 'Jardn urbano del futuro',
   },
 
@@ -474,14 +505,14 @@ export const cities: City[] = [
     id: 'mumbai',
     name: 'Mumbai',
     countryId: 'india',
-    image: 'https://images.unsplash.com/photo-1567157577867-05ccb1388e66w=800',
+    image: 'https://images.unsplash.com/photo-1567157577867-05ccb1388e66?q=80&w=1600&auto=format&fit=crop',
     description: 'Bollywood y diversidad',
   },
   {
     id: 'newdelhi',
     name: 'Nueva Delhi',
     countryId: 'india',
-    image: 'https://images.unsplash.com/photo-1587474260584-136574528ed5w=800',
+    image: 'https://images.unsplash.com/photo-1587474260584-136574528ed5?q=80&w=1600&auto=format&fit=crop',
     description: 'Historia milenaria',
   },
 
@@ -490,21 +521,21 @@ export const cities: City[] = [
     id: 'newyork',
     name: 'Nueva York',
     countryId: 'usa',
-    image: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9w=800',
+    image: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?q=80&w=1600&auto=format&fit=crop',
     description: 'La ciudad que nunca duerme',
   },
   {
     id: 'losangeles',
     name: 'Los ngeles',
     countryId: 'usa',
-    image: 'https://images.unsplash.com/photo-1534190239940-9ba8944ea261w=800',
+    image: 'https://images.unsplash.com/photo-1534190239940-9ba8944ea261?q=80&w=1600&auto=format&fit=crop',
     description: 'Hollywood y playas',
   },
   {
     id: 'miami',
     name: 'Miami',
     countryId: 'usa',
-    image: 'https://images.unsplash.com/photo-1506966953602-c20cc11f75e3w=800',
+    image: 'https://images.unsplash.com/photo-1506966953602-c20cc11f75e3?q=80&w=1600&auto=format&fit=crop',
     description: 'Sol, playa y vida nocturna',
   },
 
@@ -513,14 +544,14 @@ export const cities: City[] = [
     id: 'riodejaneiro',
     name: 'Ro de Janeiro',
     countryId: 'brazil',
-    image: 'https://images.unsplash.com/photo-1483729558449-99ef09a8c325w=800',
+    image: 'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?q=80&w=1600&auto=format&fit=crop',
     description: 'Carnaval y playas icnicas',
   },
   {
     id: 'saopaulo',
     name: 'Sao Paulo',
     countryId: 'brazil',
-    image: 'https://images.unsplash.com/photo-1578954928-9c501c9e0c8fw=800',
+    image: 'https://images.unsplash.com/photo-1578954928-9c501c9e0c8f?q=80&w=1600&auto=format&fit=crop',
     description: 'Metrpoli cultural',
   },
 
@@ -529,7 +560,7 @@ export const cities: City[] = [
     id: 'buenosaires',
     name: 'Buenos Aires',
     countryId: 'argentina',
-    image: 'https://images.unsplash.com/photo-1589909202802-8f4aadce1849w=800',
+    image: 'https://images.unsplash.com/photo-1589909202802-8f4aadce1849?q=80&w=1600&auto=format&fit=crop',
     description: 'Tango y arquitectura europea',
   },
 
@@ -538,14 +569,14 @@ export const cities: City[] = [
     id: 'mexicocity',
     name: 'Ciudad de Mxico',
     countryId: 'mexico',
-    image: 'https://images.unsplash.com/photo-1518659664331-862e3a95a63bw=800',
+    image: 'https://images.unsplash.com/photo-1518659664331-862e3a95a63b?q=80&w=1600&auto=format&fit=crop',
     description: 'Historia azteca y modernidad',
   },
   {
     id: 'cancun',
     name: 'Cancn',
     countryId: 'mexico',
-    image: 'https://images.unsplash.com/photo-1568402102990-bc541580b59fw=800',
+    image: 'https://images.unsplash.com/photo-1568402102990-bc541580b59f?q=80&w=1600&auto=format&fit=crop',
     description: 'Playas del Caribe mexicano',
   },
 
@@ -554,14 +585,14 @@ export const cities: City[] = [
     id: 'toronto',
     name: 'Toronto',
     countryId: 'canada',
-    image: 'https://images.unsplash.com/photo-1517935706615-2717063c2225w=800',
+    image: 'https://images.unsplash.com/photo-1517935706615-2717063c2225?q=80&w=1600&auto=format&fit=crop',
     description: 'Multicultural y vibrante',
   },
   {
     id: 'vancouver',
     name: 'Vancouver',
     countryId: 'canada',
-    image: 'https://images.unsplash.com/photo-1559511260-66a654ae982aw=800',
+    image: 'https://images.unsplash.com/photo-1559511260-66a654ae982a?q=80&w=1600&auto=format&fit=crop',
     description: 'Naturaleza y ciudad',
   },
 
@@ -570,14 +601,14 @@ export const cities: City[] = [
     id: 'marrakech',
     name: 'Marrakech',
     countryId: 'morocco',
-    image: 'https://images.unsplash.com/photo-1489749798305-4fea3ae63d43w=800',
+    image: 'https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?q=80&w=1600&auto=format&fit=crop',
     description: 'Zocos y palacios',
   },
   {
     id: 'casablanca',
     name: 'Casablanca',
     countryId: 'morocco',
-    image: 'https://images.unsplash.com/photo-1565602726015-10c095699bb6w=800',
+    image: 'https://images.unsplash.com/photo-1565602726015-10c095699bb6?q=80&w=1600&auto=format&fit=crop',
     description: 'Puerto mediterrneo',
   },
 
@@ -586,7 +617,7 @@ export const cities: City[] = [
     id: 'cairo',
     name: 'El Cairo',
     countryId: 'egypt',
-    image: 'https://images.unsplash.com/photo-1572252009286-268acec5ca0aw=800',
+    image: 'https://images.unsplash.com/photo-1572252009286-268acec5ca0a?q=80&w=1600&auto=format&fit=crop',
     description: 'Pirmides y faraones',
   },
 
@@ -595,7 +626,7 @@ export const cities: City[] = [
     id: 'capetown',
     name: 'Ciudad del Cabo',
     countryId: 'southafrica',
-    image: 'https://images.unsplash.com/photo-1580060839134-75a5edca2e99w=800',
+    image: 'https://images.unsplash.com/photo-1580060839134-75a5edca2e99?q=80&w=1600&auto=format&fit=crop',
     description: 'Montaas y ocano',
   },
 
@@ -604,14 +635,14 @@ export const cities: City[] = [
     id: 'sydney',
     name: 'Sdney',
     countryId: 'australia',
-    image: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9w=800',
+    image: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?q=80&w=1600&auto=format&fit=crop',
     description: 'pera icnica y playas',
   },
   {
     id: 'melbourne',
     name: 'Melbourne',
     countryId: 'australia',
-    image: 'https://images.unsplash.com/photo-1514395462725-fb4566210144w=800',
+    image: 'https://images.unsplash.com/photo-1514395462725-fb4566210144?q=80&w=1600&auto=format&fit=crop',
     description: 'Arte y caf',
   },
 
@@ -620,7 +651,7 @@ export const cities: City[] = [
     id: 'auckland',
     name: 'Auckland',
     countryId: 'newzealand',
-    image: 'https://images.unsplash.com/photo-1507699622108-4be3abd695adw=800',
+    image: 'https://images.unsplash.com/photo-1507699622108-4be3abd695ad?q=80&w=1600&auto=format&fit=crop',
     description: 'Ciudad de velas',
   },
 ];
@@ -632,10 +663,10 @@ export const hotels: Hotel[] = [
     name: 'Hotel Le Meurice',
     rating: 5,
     pricePerNight: 850,
-    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945w=800',
+    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1600&auto=format&fit=crop',
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
     ],
     reviews: [
       {
@@ -676,7 +707,7 @@ export const hotels: Hotel[] = [
     name: 'Hôtel Plaza Athénée',
     rating: 5,
     pricePerNight: 920,
-    image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85bw=800',
+    image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1600&auto=format&fit=crop',
     description:
       'Elegancia parisina en la Avenue Montaigne, con vistas a la Torre Eiffel y alta cocina francesa.',
     amenities: ['Spa Dior', 'Piscina interior', 'Restaurante gourmet', 'Servicio de mayordomo'],
@@ -705,9 +736,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
   {
@@ -715,7 +746,7 @@ export const hotels: Hotel[] = [
     name: 'Hotel Fabric',
     rating: 4,
     pricePerNight: 220,
-    image: 'https://images.unsplash.com/photo-1571896349842-33c89424de2dw=800',
+    image: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=1600&auto=format&fit=crop',
     description: 'Boutique hotel moderno en el distrito 11, perfecto para viajeros urbanos.',
     amenities: ['Wifi gratuito', 'Bar de cócteles', 'Diseño contemporáneo'],
     cityId: 'paris',
@@ -743,9 +774,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
 
@@ -755,10 +786,10 @@ export const hotels: Hotel[] = [
     name: 'Hotel Negresco',
     rating: 5,
     pricePerNight: 480,
-    image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4w=800',
+    image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=1600&auto=format&fit=crop',
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1563911302283-d2bc129e7570w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1563911302283-d2bc129e7570?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
     reviews: [
       {
@@ -786,7 +817,7 @@ export const hotels: Hotel[] = [
     name: 'Le Méridien Nice',
     rating: 4,
     pricePerNight: 180,
-    image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeebw=800',
+    image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1600&auto=format&fit=crop',
     description: 'Hotel moderno en el corazón de Niza, cerca de la playa y el casco antiguo.',
     amenities: ['Terraza panorámica', 'Restaurante mediterráneo', 'Bar lounge'],
     cityId: 'nice',
@@ -814,9 +845,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
 
@@ -826,7 +857,7 @@ export const hotels: Hotel[] = [
     name: 'Villa Florentine',
     rating: 5,
     pricePerNight: 320,
-    image: 'https://images.unsplash.com/photo-1563911302283-d2bc129e7570w=800',
+    image: 'https://images.unsplash.com/photo-1563911302283-d2bc129e7570?q=80&w=1600&auto=format&fit=crop',
     description: 'Antiguo convento convertido en hotel de lujo con vistas espectaculares de Lyon.',
     amenities: ['Spa', 'Piscina al aire libre', 'Restaurante gastronómico'],
     cityId: 'lyon',
@@ -854,9 +885,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
   {
@@ -864,7 +895,7 @@ export const hotels: Hotel[] = [
     name: 'Hôtel Le Royal Lyon',
     rating: 5,
     pricePerNight: 290,
-    image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+    image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     description: 'Elegancia y confort en el centro histórico de Lyon.',
     amenities: ['Bar sofisticado', 'Salones elegantes', 'Conserje 24/7'],
     cityId: 'lyon',
@@ -892,9 +923,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
 
@@ -904,10 +935,10 @@ export const hotels: Hotel[] = [
     name: 'Hotel Ritz Madrid',
     rating: 5,
     pricePerNight: 650,
-    image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+    image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1582719478250-c89cae4dc85bw=800',
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
+      'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
     ],
     reviews: [
       {
@@ -941,7 +972,7 @@ export const hotels: Hotel[] = [
     name: 'Gran Meliá Palacio de los Duques',
     rating: 5,
     pricePerNight: 380,
-    image: 'https://images.unsplash.com/photo-1445019980597-93fa8acb246cw=800',
+    image: 'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?q=80&w=1600&auto=format&fit=crop',
     description: 'Palacio del siglo XIX restaurado con elegancia contemporánea.',
     amenities: ['Piscina en la azotea', 'Spa', 'Bar gourmet'],
     cityId: 'madrid',
@@ -969,9 +1000,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
   {
@@ -979,7 +1010,7 @@ export const hotels: Hotel[] = [
     name: 'Room Mate Oscar',
     rating: 4,
     pricePerNight: 140,
-    image: 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
+    image: 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
     description: 'Hotel moderno y colorido en pleno centro de Madrid.',
     amenities: ['Terraza con vistas', 'Bar', 'Diseño vanguardista'],
     cityId: 'madrid',
@@ -1007,9 +1038,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
 
@@ -1019,7 +1050,7 @@ export const hotels: Hotel[] = [
     name: 'Mandarin Oriental Barcelona',
     rating: 5,
     pricePerNight: 620,
-    image: 'https://images.unsplash.com/photo-1584132967334-10e028bd69f7w=800',
+    image: 'https://images.unsplash.com/photo-1584132967334-10e028bd69f7?q=80&w=1600&auto=format&fit=crop',
     description: 'Sofisticación en Paseo de Gracia, con vistas a Gaudí.',
     amenities: ['Piscina en azotea', 'Spa', 'Restaurante Moments 2 estrellas Michelin'],
     cityId: 'barcelona',
@@ -1047,9 +1078,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
   {
@@ -1057,7 +1088,7 @@ export const hotels: Hotel[] = [
     name: 'Hotel Arts Barcelona',
     rating: 5,
     pricePerNight: 480,
-    image: 'https://images.unsplash.com/photo-1561501878-aabd62634533w=800',
+    image: 'https://images.unsplash.com/photo-1561501878-aabd62634533?q=80&w=1600&auto=format&fit=crop',
     description: 'Rascacielos icónico frente al mar con arte contemporáneo.',
     amenities: ['Playa privada', 'Spa', 'Piscina infinity'],
     cityId: 'barcelona',
@@ -1085,9 +1116,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
   {
@@ -1095,7 +1126,7 @@ export const hotels: Hotel[] = [
     name: 'Hotel Praktik Bakery',
     rating: 3,
     pricePerNight: 110,
-    image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeebw=800',
+    image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1600&auto=format&fit=crop',
     description: 'Hotel boutique con panadería artesanal propia.',
     amenities: ['Panadería gourmet', 'Wifi gratis', 'Ubicación céntrica'],
     cityId: 'barcelona',
@@ -1123,9 +1154,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
 
@@ -1135,7 +1166,7 @@ export const hotels: Hotel[] = [
     name: 'Hotel Alfonso XIII',
     rating: 5,
     pricePerNight: 420,
-    image: 'https://images.unsplash.com/photo-1611892440504-42a792e24d32w=800',
+    image: 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=1600&auto=format&fit=crop',
     description: 'Palacio andalusí con patios ajardinados y azulejos tradicionales.',
     amenities: ['Piscina', 'Jardines', 'Arquitectura morisca'],
     cityId: 'seville',
@@ -1163,9 +1194,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
   {
@@ -1173,7 +1204,7 @@ export const hotels: Hotel[] = [
     name: 'EME Catedral Hotel',
     rating: 4,
     pricePerNight: 190,
-    image: 'https://images.unsplash.com/photo-1559599101-f09722fb4948w=800',
+    image: 'https://images.unsplash.com/photo-1559599101-f09722fb4948?q=80&w=1600&auto=format&fit=crop',
     description: 'Vistas directas a la Catedral desde la terraza.',
     amenities: ['Terraza panorámica', 'Bar cocktail', 'Ubicación privilegiada'],
     cityId: 'seville',
@@ -1201,9 +1232,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
 
@@ -1213,7 +1244,7 @@ export const hotels: Hotel[] = [
     name: 'Hotel Eden Rome',
     rating: 5,
     pricePerNight: 750,
-    image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+    image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     description: 'Vistas panorámicas de Roma desde el Pincio.',
     amenities: ['Restaurante La Terrazza', 'Spa', 'Bar panorámico'],
     cityId: 'rome',
@@ -1241,9 +1272,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
   {
@@ -1251,7 +1282,7 @@ export const hotels: Hotel[] = [
     name: 'The St. Regis Rome',
     rating: 5,
     pricePerNight: 680,
-    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945w=800',
+    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1600&auto=format&fit=crop',
     description: 'Elegancia intemporal cerca de Via Veneto.',
     amenities: ['Mayordomo personal', 'Restaurante gourmet', 'Salones históricos'],
     cityId: 'rome',
@@ -1279,9 +1310,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
 
@@ -1291,7 +1322,7 @@ export const hotels: Hotel[] = [
     name: 'The Gritti Palace',
     rating: 5,
     pricePerNight: 890,
-    image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeebw=800',
+    image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1600&auto=format&fit=crop',
     description: 'Palacio del siglo XV en el Gran Canal con vistas excepcionales.',
     amenities: ['Terraza privada', 'Spa', 'Restaurante Club del Doge'],
     cityId: 'venice',
@@ -1319,9 +1350,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
   {
@@ -1329,7 +1360,7 @@ export const hotels: Hotel[] = [
     name: 'Hotel Danieli',
     rating: 5,
     pricePerNight: 720,
-    image: 'https://images.unsplash.com/photo-1445019980597-93fa8acb246cw=800',
+    image: 'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?q=80&w=1600&auto=format&fit=crop',
     description: 'Palacio gótico con vistas a la laguna veneciana.',
     amenities: ['Terraza panorámica', 'Bar histórico', 'Decoración veneciana'],
     cityId: 'venice',
@@ -1357,9 +1388,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
 
@@ -1369,7 +1400,7 @@ export const hotels: Hotel[] = [
     name: 'Armani Hotel Milano',
     rating: 5,
     pricePerNight: 580,
-    image: 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
+    image: 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
     description: 'Diseño minimalista de Giorgio Armani en el corazón de Milán.',
     amenities: ['Spa Armani', 'Restaurante italiano', 'Estilo único'],
     cityId: 'milan',
@@ -1397,9 +1428,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
   {
@@ -1407,7 +1438,7 @@ export const hotels: Hotel[] = [
     name: 'Bulgari Hotel Milano',
     rating: 5,
     pricePerNight: 820,
-    image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4w=800',
+    image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=1600&auto=format&fit=crop',
     description: 'Lujo exclusivo con jardín privado en el centro de Milán.',
     amenities: ['Jardn de 4000m²', 'Spa Bulgari', 'Piscina interior'],
     cityId: 'milan',
@@ -1435,9 +1466,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
 
@@ -1447,7 +1478,7 @@ export const hotels: Hotel[] = [
     name: 'The Savoy',
     rating: 5,
     pricePerNight: 720,
-    image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+    image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     description: 'Icono londinense en el Strand con historia centenaria.',
     amenities: ['American Bar', 'Spa', 'Piscina art déco'],
     cityId: 'london',
@@ -1475,9 +1506,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
   {
@@ -1485,7 +1516,7 @@ export const hotels: Hotel[] = [
     name: "Claridge's",
     rating: 5,
     pricePerNight: 850,
-    image: 'https://images.unsplash.com/photo-1571896349842-33c89424de2dw=800',
+    image: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=1600&auto=format&fit=crop',
     description: 'Art déco y elegancia británica en Mayfair.',
     amenities: ['Afternoon tea legendario', 'Spa', 'Restaurante Davies and Brook'],
     cityId: 'london',
@@ -1513,9 +1544,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
   {
@@ -1523,7 +1554,7 @@ export const hotels: Hotel[] = [
     name: 'The Hoxton Shoreditch',
     rating: 4,
     pricePerNight: 180,
-    image: 'https://images.unsplash.com/photo-1559599101-f09722fb4948w=800',
+    image: 'https://images.unsplash.com/photo-1559599101-f09722fb4948?q=80&w=1600&auto=format&fit=crop',
     description: 'Hotel urbano moderno en el vibrante East London.',
     amenities: ['Bar lounge', 'Diseño industrial', 'Lobby café'],
     cityId: 'london',
@@ -1551,9 +1582,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
 
@@ -1563,7 +1594,7 @@ export const hotels: Hotel[] = [
     name: 'Aman Tokyo',
     rating: 5,
     pricePerNight: 980,
-    image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85bw=800',
+    image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1600&auto=format&fit=crop',
     description:
       'Un santuario urbano en lo alto de la torre Otemachi Tower, ofreciendo un diseño minimalista inspirado en las casas japonesas tradicionales.',
     amenities: [
@@ -1598,9 +1629,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
   {
@@ -1608,7 +1639,7 @@ export const hotels: Hotel[] = [
     name: 'The Peninsula Tokyo',
     rating: 5,
     pricePerNight: 720,
-    image: 'https://images.unsplash.com/photo-1561501878-aabd62634533w=800',
+    image: 'https://images.unsplash.com/photo-1561501878-aabd62634533?q=80&w=1600&auto=format&fit=crop',
     description: 'Lujo contemporáneo con vistas al Palacio Imperial.',
     amenities: ['Spa', 'Piscina', 'Restaurantes japoneses y franceses'],
     cityId: 'tokyo',
@@ -1636,9 +1667,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
   {
@@ -1646,7 +1677,7 @@ export const hotels: Hotel[] = [
     name: 'Shinjuku Granbell Hotel',
     rating: 4,
     pricePerNight: 150,
-    image: 'https://images.unsplash.com/photo-1611892440504-42a792e24d32w=800',
+    image: 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=1600&auto=format&fit=crop',
     description: 'Hotel moderno en Kabukicho con diseño artístico.',
     amenities: ['Bar en azotea', 'Arte urbano', 'Ubicación central'],
     cityId: 'tokyo',
@@ -1674,9 +1705,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
 
@@ -1686,7 +1717,7 @@ export const hotels: Hotel[] = [
     name: 'The Ritz-Carlton Kyoto',
     rating: 5,
     pricePerNight: 680,
-    image: 'https://images.unsplash.com/photo-1584132967334-10e028bd69f7w=800',
+    image: 'https://images.unsplash.com/photo-1584132967334-10e028bd69f7?q=80&w=1600&auto=format&fit=crop',
     description: 'A orillas del río Kamogawa, fusionando tradición y lujo moderno.',
     amenities: ['Spa japonés', 'Jardín zen', 'Restaurante kaiseki'],
     cityId: 'kyoto',
@@ -1714,9 +1745,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
   {
@@ -1724,7 +1755,7 @@ export const hotels: Hotel[] = [
     name: 'Suiran, a Luxury Collection Hotel',
     rating: 5,
     pricePerNight: 550,
-    image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4w=800',
+    image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=1600&auto=format&fit=crop',
     description: 'Refugio tradicional en Arashiyama con onsen privado.',
     amenities: ['Onsen', 'Jardines tradicionales', 'Ceremonia del té'],
     cityId: 'kyoto',
@@ -1752,9 +1783,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
 
@@ -1764,7 +1795,7 @@ export const hotels: Hotel[] = [
     name: 'The St. Regis Osaka',
     rating: 5,
     pricePerNight: 480,
-    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945w=800',
+    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1600&auto=format&fit=crop',
     description: 'Elegancia occidental en el centro comercial de Osaka.',
     amenities: ['Mayordomo', 'Spa Iridium', 'Restaurante francés'],
     cityId: 'osaka',
@@ -1792,9 +1823,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
 
@@ -1804,7 +1835,7 @@ export const hotels: Hotel[] = [
     name: 'The Dolder Grand',
     rating: 5,
     pricePerNight: 620,
-    image: 'https://images.unsplash.com/photo-1521292270410-a8c4d716d518w=800',
+    image: 'https://images.unsplash.com/photo-1521292270410-a8c4d716d518?q=80&w=1600&auto=format&fit=crop',
     description:
       'Un resort de lujo histórico que ofrece impresionantes vistas de Zúrich, el lago y los Alpes, con una impresionante colección de arte.',
     amenities: [
@@ -1839,9 +1870,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
   {
@@ -1849,7 +1880,7 @@ export const hotels: Hotel[] = [
     name: 'Baur au Lac',
     rating: 5,
     pricePerNight: 780,
-    image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+    image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     description: 'Hotel familiar de lujo con jardín privado junto al lago.',
     amenities: ['Jardín privado', 'Restaurante gourmet', 'Servicio personalizado'],
     cityId: 'zurich',
@@ -1877,9 +1908,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
 
@@ -1889,7 +1920,7 @@ export const hotels: Hotel[] = [
     name: 'Burj Al Arab',
     rating: 5,
     pricePerNight: 1850,
-    image: 'https://images.unsplash.com/photo-1582719508461-905c673771fdw=800',
+    image: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?q=80&w=1600&auto=format&fit=crop',
     description: 'El hotel más icónico del mundo en forma de vela.',
     amenities: ['Mayordomo personal', 'Helipuerto', 'Restaurantes submarinos'],
     cityId: 'dubai',
@@ -1917,9 +1948,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
   {
@@ -1927,7 +1958,7 @@ export const hotels: Hotel[] = [
     name: 'Atlantis The Palm',
     rating: 5,
     pricePerNight: 580,
-    image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+    image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     description: 'Resort temático con parque acuático y acuario.',
     amenities: ['Parque acuático', 'Acuario', 'Playa privada'],
     cityId: 'dubai',
@@ -1955,9 +1986,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
   {
@@ -1965,7 +1996,7 @@ export const hotels: Hotel[] = [
     name: 'Rove Downtown Dubai',
     rating: 3,
     pricePerNight: 120,
-    image: 'https://images.unsplash.com/photo-1559599101-f09722fb4948w=800',
+    image: 'https://images.unsplash.com/photo-1559599101-f09722fb4948?q=80&w=1600&auto=format&fit=crop',
     description: 'Hotel moderno y asequible cerca del Burj Khalifa.',
     amenities: ['The Daily restaurant', 'Piscina', 'Gym 24/7'],
     cityId: 'dubai',
@@ -1993,9 +2024,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
 
@@ -2005,7 +2036,7 @@ export const hotels: Hotel[] = [
     name: 'The Plaza Hotel',
     rating: 5,
     pricePerNight: 950,
-    image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85bw=800',
+    image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1600&auto=format&fit=crop',
     description: 'Icono histórico de Nueva York frente a Central Park.',
     amenities: ['The Palm Court', 'Spa Guerlain', 'Servicio legendario'],
     cityId: 'newyork',
@@ -2033,9 +2064,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
   {
@@ -2043,7 +2074,7 @@ export const hotels: Hotel[] = [
     name: 'The St. Regis New York',
     rating: 5,
     pricePerNight: 880,
-    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945w=800',
+    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1600&auto=format&fit=crop',
     description: 'Elegancia Beaux-Arts en la Quinta Avenida.',
     amenities: ['Mayordomo', 'King Cole Bar', 'Ubicación privilegiada'],
     cityId: 'newyork',
@@ -2071,9 +2102,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
   {
@@ -2081,7 +2112,7 @@ export const hotels: Hotel[] = [
     name: 'The Bowery Hotel',
     rating: 4,
     pricePerNight: 340,
-    image: 'https://images.unsplash.com/photo-1571896349842-33c89424de2dw=800',
+    image: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=1600&auto=format&fit=crop',
     description: 'Boutique hotel bohemio en el Lower East Side.',
     amenities: ['Bar lounge', 'Chimenea', 'Estilo vintage'],
     cityId: 'newyork',
@@ -2109,9 +2140,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
 
@@ -2121,7 +2152,7 @@ export const hotels: Hotel[] = [
     name: 'Park Hyatt Sydney',
     rating: 5,
     pricePerNight: 680,
-    image: 'https://images.unsplash.com/photo-1445019980597-93fa8acb246cw=800',
+    image: 'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?q=80&w=1600&auto=format&fit=crop',
     description: 'Vistas incomparables de la pera y el Harbour Bridge.',
     amenities: ['Ubicación frente al puerto', 'Spa', 'Restaurante The Dining Room'],
     cityId: 'sydney',
@@ -2149,9 +2180,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
   {
@@ -2159,7 +2190,7 @@ export const hotels: Hotel[] = [
     name: 'Four Seasons Hotel Sydney',
     rating: 5,
     pricePerNight: 580,
-    image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeebw=800',
+    image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1600&auto=format&fit=crop',
     description: 'Lujo contemporáneo en The Rocks con vistas panorámicas.',
     amenities: ['Piscina infinity', 'Mode Kitchen & Bar', 'Spa'],
     cityId: 'sydney',
@@ -2187,9 +2218,9 @@ export const hotels: Hotel[] = [
       },
     ],
     additionalPhotos: [
-      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+      'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     ],
   },
   {
@@ -2197,7 +2228,7 @@ export const hotels: Hotel[] = [
     name: 'The Balmoral',
     rating: 5,
     pricePerNight: 500,
-    image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeebw=800',
+    image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1600&auto=format&fit=crop',
     description: 'A luxury hotel in the heart of Edinburgh.',
     amenities: ['Pool', 'Spa', 'Restaurant'],
     cityId: 'edinburgh',
@@ -2215,7 +2246,7 @@ export const hotels: Hotel[] = [
     name: 'Hotel Adlon Kempinski',
     rating: 5,
     pricePerNight: 450,
-    image: 'https://images.unsplash.com/photo-1566665797739-1674de7a421aw=800',
+    image: 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?q=80&w=1600&auto=format&fit=crop',
     description: 'Iconic luxury hotel in Berlin near the Brandenburg Gate.',
     amenities: ['Gym', 'Spa', 'Restaurant'],
     cityId: 'berlin',
@@ -2233,7 +2264,7 @@ export const hotels: Hotel[] = [
     name: 'Bayerischer Hof',
     rating: 5,
     pricePerNight: 400,
-    image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+    image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     description: 'Luxury combined with Bavarian tradition.',
     amenities: ['Spa', 'Restaurant', 'Wifi'],
     cityId: 'munich',
@@ -2251,7 +2282,7 @@ export const hotels: Hotel[] = [
     name: 'Four Seasons Hotel des Bergues',
     rating: 5,
     pricePerNight: 600,
-    image: 'https://images.unsplash.com/photo-1542314831-c6a4d14d2847w=800',
+    image: 'https://images.unsplash.com/photo-1542314831-c6a4d14d2847?q=80&w=1600&auto=format&fit=crop',
     description: 'Lakeside elegance in Geneva.',
     amenities: ['Spa', 'Dining', 'Pool'],
     cityId: 'geneva',
@@ -2269,7 +2300,7 @@ export const hotels: Hotel[] = [
     name: 'Mandarin Oriental, Bangkok',
     rating: 5,
     pricePerNight: 350,
-    image: 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461w=800',
+    image: 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1600&auto=format&fit=crop',
     description: 'Legendary hotel by the river.',
     amenities: ['Pool', 'Spa', 'Gym'],
     cityId: 'bangkok',
@@ -2287,7 +2318,7 @@ export const hotels: Hotel[] = [
     name: 'Amanpuri',
     rating: 5,
     pricePerNight: 800,
-    image: 'https://images.unsplash.com/photo-1563911302283-d2bc129e7570w=800',
+    image: 'https://images.unsplash.com/photo-1563911302283-d2bc129e7570?q=80&w=1600&auto=format&fit=crop',
     description: 'A peaceful paradise in Phuket.',
     amenities: ['Private Beach', 'Spa', 'Dining'],
     cityId: 'phuket',
@@ -2305,7 +2336,7 @@ export const hotels: Hotel[] = [
     name: 'Emirates Palace',
     rating: 5,
     pricePerNight: 700,
-    image: 'https://images.unsplash.com/photo-1445019980597-93fa8acb246cw=800',
+    image: 'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?q=80&w=1600&auto=format&fit=crop',
     description: 'Palatial luxury in Abu Dhabi.',
     amenities: ['Private Beach', 'Spa', 'Dining'],
     cityId: 'abudhabi',
@@ -2323,7 +2354,7 @@ export const hotels: Hotel[] = [
     name: 'Marina Bay Sands',
     rating: 5,
     pricePerNight: 550,
-    image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeebw=800',
+    image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1600&auto=format&fit=crop',
     description: 'Iconic hotel with the worlds largest rooftop Infinity Pool.',
     amenities: ['Infinity Pool', 'Casino', 'Dining'],
     cityId: 'singapore',
@@ -2341,7 +2372,7 @@ export const hotels: Hotel[] = [
     name: 'The Taj Mahal Palace',
     rating: 5,
     pricePerNight: 300,
-    image: 'https://images.unsplash.com/photo-1566665797739-1674de7a421aw=800',
+    image: 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?q=80&w=1600&auto=format&fit=crop',
     description: 'A legendary luxury hotel in Mumbai.',
     amenities: ['Spa', 'Pool', 'Dining'],
     cityId: 'mumbai',
@@ -2359,7 +2390,7 @@ export const hotels: Hotel[] = [
     name: 'The Leela Palace',
     rating: 5,
     pricePerNight: 250,
-    image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5faw=800',
+    image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1600&auto=format&fit=crop',
     description: 'Modern Indian luxury in the capital.',
     amenities: ['Spa', 'Dining', 'Pool'],
     cityId: 'newdelhi',
@@ -2535,7 +2566,7 @@ export function ensureDemoBookingsForUser(email: string) {
       countryId: 'france',
       destination: 'París, Francia',
       image:
-        'https://images.unsplash.com/photo-1431274172761-fca41d930114crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwYXJpcyUyMGVpZmZlbCUyMHRvd2VyfGVufDF8fHx8MTc3NTk5MzE5M3ww&ixlib=rb-4.1.0&q=80&w=1080',
+        'https://images.unsplash.com/photo-1431274172761-fca41d930114?q=80&w=1600&auto=format&fit=crop',
       bookingDate: '2026-04-10T10:30:00.000Z',
       checkIn: '2026-05-15',
       checkOut: '2026-05-18',
@@ -2566,7 +2597,7 @@ export function ensureDemoBookingsForUser(email: string) {
       countryId: 'japan',
       destination: 'Tokio, Japón',
       image:
-        'https://images.unsplash.com/photo-1641558996066-fcf78962c30acrop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0b2t5byUyMGNpdHklMjBzdHJlZXR8ZW58MXx8fHwxNzc1OTYyMjM3fDA&ixlib=rb-4.1.0&q=80&w=1080',
+        'https://images.unsplash.com/photo-1641558996066-fcf78962c30a?q=80&w=1600&auto=format&fit=crop',
       bookingDate: '2026-03-20T09:00:00.000Z',
       checkIn: '2026-06-01',
       checkOut: '2026-06-08',

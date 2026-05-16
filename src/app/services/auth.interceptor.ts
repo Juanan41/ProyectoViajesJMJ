@@ -1,3 +1,7 @@
+// ProyectoViajesJMJ - services\auth.interceptor.ts
+// Responsabilidad: autenticacion, autorizacion y control de sesion.
+// Nota profesional: Gestiona autenticacion y sesion; los cambios aqui afectan al acceso de usuarios.
+
 import { HttpInterceptorFn } from '@angular/common/http';
 
 function isTokenExpired(token: string): boolean {

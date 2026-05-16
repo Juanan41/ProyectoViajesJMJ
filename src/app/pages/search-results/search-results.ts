@@ -1,3 +1,7 @@
+// ProyectoViajesJMJ - pages\search-results\search-results.ts
+// Responsabilidad: catalogo de destinos, navegacion geografica y busqueda.
+// Nota profesional: Soporta navegacion por destinos, paises, continentes y busqueda bilingue.
+
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -16,6 +20,10 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 
 type SortOption = 'relevance' | 'priceAsc' | 'priceDesc' | 'nameAsc';
 
+/**
+ * Documento profesional: clase principal del archivo.
+ * Soporta navegacion por destinos, paises, continentes y busqueda bilingue.
+ */
 @Component({
   selector: 'app-search-results',
   standalone: true,

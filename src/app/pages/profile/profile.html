@@ -1,3 +1,8 @@
+<!-- ProyectoViajesJMJ - pages\profile\profile.html -->
+<!-- Responsabilidad: perfil de usuario, datos personales y metricas visibles. -->
+<!-- Nota profesional: Expone informacion personal y metricas del usuario; preservar privacidad y consistencia. -->
+
+<!-- Estructura de vista: cada bloque visible esta pensado para orientar navegacion, estado de carga y acciones del usuario. -->
 <div class="flex-1 w-full max-w-7xl mx-auto px-4 py-8 relative">
   @if (!user) {
   <div class="flex-1 flex items-center justify-center">
@@ -11,8 +16,8 @@
   <div class="bg-[rgb(33,36,37)] border border-gray-800 rounded-[2rem] p-6 md:p-8 mb-12">
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
       <div class="flex items-center gap-5">
-        @if (user?.avatarUrl) {
-        <img [src]="user?.avatarUrl" [alt]="user?.name || 'Usuario'"
+        @if (user.avatarUrl) {
+        <img [src]="user.avatarUrl" [alt]="user.name || 'Usuario'"
           class="w-20 h-20 rounded-3xl object-cover border border-emerald-500/30" />
         } @else {
         <div
@@ -25,8 +30,8 @@
           <p class="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-1">
             {{ 'Mi Perfil' | translate }}
           </p>
-          <h1 class="text-3xl font-black text-white mb-1">{{ user?.name }}</h1>
-          <p class="text-gray-400">{{ user?.email }}</p>
+          <h1 class="text-3xl font-black text-white mb-1">{{ user.name }}</h1>
+          <p class="text-gray-400">{{ user.email }}</p>
         </div>
       </div>
 
@@ -63,7 +68,7 @@
 
     <div class="bg-[rgb(33,36,37)] p-6 rounded-2xl border border-gray-800">
       <h3 class="text-gray-400 font-medium mb-1"> {{ 'Saldo Disponible' | translate }} </h3>
-      <p class="text-3xl font-bold text-emerald-500">{{ (user?.saldo || 0) | number:'1.2-2' }}€</p>
+      <p class="text-3xl font-bold text-emerald-500">{{ (user.saldo || 0) | number:'1.2-2' }}€</p>
     </div>
   </div>
 
@@ -251,7 +256,7 @@
         }
 
         <div>
-          <p class="text-white font-bold">{{ editProfileForm.name || user?.name }}</p>
+          <p class="text-white font-bold">{{ editProfileForm.name || user.name }}</p>
           <p class="text-gray-500 text-sm">{{ 'Puedes usar una URL de imagen para tu avatar.' | translate }}</p>
         </div>
       </div>
@@ -408,7 +413,7 @@
         <div class="flex justify-between items-center mb-6">
           <div>
             <p class="text-xs text-gray-500 font-medium mb-1">{{ 'Pasajero' | translate }}</p>
-            <p class="font-bold uppercase">{{ user?.name }}</p>
+            <p class="font-bold uppercase">{{ user.name }}</p>
           </div>
 
           <div class="text-right">

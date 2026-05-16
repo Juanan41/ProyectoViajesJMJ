@@ -1,3 +1,7 @@
+// ProyectoViajesJMJ - pages\hotel\hotel.ts
+// Responsabilidad: catalogo de alojamientos, habitaciones y detalle hotelero.
+// Nota profesional: Representa el catalogo hotelero, sus habitaciones y las opciones que se pueden reservar.
+
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
@@ -22,6 +26,10 @@ import { getHotelPriceValue, getVisibleHotelAmenities } from '../../utils/hotel-
 type TransportType = 'AVION' | 'TREN' | 'BARCO';
 type RoomCategory = 'single' | 'double' | 'suite' | 'group';
 
+/**
+ * Documento profesional: clase principal del archivo.
+ * Representa el catalogo hotelero, sus habitaciones y las opciones que se pueden reservar.
+ */
 @Component({
   selector: 'app-hotel',
   standalone: true,
@@ -75,6 +83,15 @@ export class HotelComponent implements OnInit {
     message: string;
     type: 'warning' | 'error';
   } | null>(null);
+
+  travelOverlapModal = signal<{
+    requestedStart: string;
+    requestedEnd: string;
+    conflicts: any[];
+  } | null>(null);
+
+  pendingBookingRequest = signal<any | null>(null);
+  isCreatingBooking = signal(false);
 
   ngOnInit() {
     this.route.paramMap.subscribe((params) => {
@@ -151,6 +168,7 @@ export class HotelComponent implements OnInit {
     return this.selectedRoomId() === Number(room?.id);
   }
 
+  // Mantiene en el cliente la misma matriz de compatibilidad que valida el backend.
   isRoomAvailable(room: any): boolean {
     const capacity = this.getRoomCapacity(room);
     const category = this.getRoomCategory(room);
@@ -266,6 +284,7 @@ export class HotelComponent implements OnInit {
 
     if (!room || this.nights <= 0) return 0;
 
+    // Precio estimado visible antes de reservar; el backend vuelve a calcularlo y valida saldo.
     const roomPrice = this.getRoomPrice(room);
     return roomPrice * this.nights * this.guests + this.getTransportPrice(this.selectedTransport);
   }
@@ -277,8 +296,13 @@ export class HotelComponent implements OnInit {
       this.selectedRoom() !== null &&
       this.hasPaymentCard() &&
       !this.isCheckingCard() &&
+      !this.isCreatingBooking() &&
       Number(this.auth.credits() || 0) >= this.totalPrice
     );
+  }
+
+  isBooking(): boolean {
+    return this.isCreatingBooking();
   }
 
   getHotelPrice(hotel: any): number {
@@ -430,7 +454,7 @@ export class HotelComponent implements OnInit {
     }
 
     if (this.guests === 2) {
-      return 'Para 2 huéspedes puedes elegir habitación doble, suite o habitación grupal.';
+      return 'Para 2 huéspedes puedes elegir habitación doble, estándar/deluxe, suite o habitación grupal.';
     }
 
     if (this.guests >= 3 && this.guests <= 4) {
@@ -593,6 +617,7 @@ export class HotelComponent implements OnInit {
   }
 
   reservar() {
+    // Las validaciones se ordenan de lo más barato a lo más crítico antes de crear la reserva.
     if (!this.auth.isLoggedIn()) {
       this.openBookingModal(
         'Inicia sesión',
@@ -675,8 +700,108 @@ export class HotelComponent implements OnInit {
       huespedes: this.guests,
     };
 
+    this.checkTravelOverlapBeforeBooking(bookingRequest);
+  }
+
+  private checkTravelOverlapBeforeBooking(bookingRequest: any) {
+    this.destinoService.getMisReservas().subscribe({
+      next: (reservas) => {
+        const conflicts = this.getOverlappingReservations(reservas || []);
+
+        if (conflicts.length > 0) {
+          this.pendingBookingRequest.set(bookingRequest);
+
+          this.travelOverlapModal.set({
+            requestedStart: this.checkInDate,
+            requestedEnd: this.checkOutDate,
+            conflicts,
+          });
+
+          return;
+        }
+
+        this.createReservation(bookingRequest);
+      },
+      error: () => {
+        this.createReservation(bookingRequest);
+      },
+    });
+  }
+
+  private getOverlappingReservations(reservas: any[]): any[] {
+    const requestedStart = this.getDateOnlyForOverlap(this.checkInDate);
+    const requestedEnd = this.getDateOnlyForOverlap(this.checkOutDate);
+
+    if (!requestedStart || !requestedEnd) return [];
+
+    return reservas.filter((reserva) => {
+      const estado = String(reserva?.estado || '').toUpperCase();
+
+      if (estado === 'CANCELADA') return false;
+
+      const reservationStart = this.getDateOnlyForOverlap(reserva.checkIn || reserva.fechaInicio);
+      const reservationEnd = this.getDateOnlyForOverlap(reserva.checkOut || reserva.fechaFin);
+
+      if (!reservationStart || !reservationEnd) return false;
+
+      // Intervalos semiabiertos [entrada, salida): salir el mismo día que entra otro viaje no bloquea.
+      return requestedStart < reservationEnd && reservationStart < requestedEnd;
+    });
+  }
+
+  private getDateOnlyForOverlap(value: string | Date | undefined | null): Date | null {
+    if (!value) return null;
+
+    if (value instanceof Date) {
+      if (Number.isNaN(value.getTime())) return null;
+
+      const date = new Date(value);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    }
+
+    const text = String(value);
+    const datePart = text.includes('T') ? text.split('T')[0] : text;
+    const parts = datePart.split('-').map(Number);
+
+    if (parts.length >= 3 && parts.every((part) => Number.isFinite(part))) {
+      const [year, month, day] = parts;
+      return new Date(year, month - 1, day);
+    }
+
+    const fallback = new Date(text);
+
+    if (Number.isNaN(fallback.getTime())) return null;
+
+    fallback.setHours(0, 0, 0, 0);
+    return fallback;
+  }
+
+  closeTravelOverlapModal() {
+    if (this.isCreatingBooking()) return;
+
+    this.travelOverlapModal.set(null);
+    this.pendingBookingRequest.set(null);
+  }
+
+  confirmTravelOverlapBooking() {
+    const bookingRequest = this.pendingBookingRequest();
+
+    if (!bookingRequest || this.isCreatingBooking()) return;
+
+    this.travelOverlapModal.set(null);
+    this.createReservation(bookingRequest);
+  }
+
+  private createReservation(bookingRequest: any) {
+    this.isCreatingBooking.set(true);
+
+    // El servidor es la fuente de verdad para capacidad, compatibilidad, precio final y saldo.
     this.destinoService.crearReserva(bookingRequest).subscribe({
       next: (res) => {
+        this.isCreatingBooking.set(false);
+        this.pendingBookingRequest.set(null);
+
         this.auth.obtenerSaldo().subscribe({
           next: (saldoRes) => {
             this.auth.credits.set(saldoRes.saldo);
@@ -688,6 +813,8 @@ export class HotelComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al realizar la reserva:', err);
+        this.isCreatingBooking.set(false);
+
         this.openBookingModal(
           'No se pudo completar la reserva',
           'Hubo un error al reservar. Revisa tu saldo, las fechas o la disponibilidad del hotel.',
@@ -695,6 +822,16 @@ export class HotelComponent implements OnInit {
         );
       },
     });
+  }
+
+  formatDate(value: string | Date | undefined | null): string {
+    if (!value) return '-';
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) return '-';
+
+    return date.toLocaleDateString('es-ES');
   }
 
   private normalizeText(value: any): string {

@@ -1,3 +1,7 @@
+// ProyectoViajesJMJ - pages\profile\profile.ts
+// Responsabilidad: perfil de usuario, datos personales y metricas visibles.
+// Nota profesional: Expone informacion personal y metricas del usuario; preservar privacidad y consistencia.
+
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
@@ -29,6 +33,9 @@ import {
 } from '../../data/destination-coordinates';
 import { catchError, forkJoin, of } from 'rxjs';
 
+/**
+ * Contrato publico usado por componentes y servicios relacionados.
+ */
 export interface Trip {
   bookingId: string;
   id: string;
@@ -55,6 +62,10 @@ export interface Trip {
   } | null;
 }
 
+/**
+ * Documento profesional: clase principal del archivo.
+ * Expone informacion personal y metricas del usuario; preservar privacidad y consistencia.
+ */
 @Component({
   selector: 'app-profile',
   standalone: true,
@@ -99,6 +110,7 @@ export class Profile implements OnInit {
     avatarUrl: '',
   };
 
+  // Las estadísticas del perfil se calculan solo con viajes finalizados para no inflar métricas.
   visitedDestinationsCount = computed(() => {
     const visitedDestinations = this.pastTrips()
       .map((trip) => toDestinationCoordinateKey(trip.destination))
@@ -365,6 +377,7 @@ export class Profile implements OnInit {
   private toTrip(reserva: ReservaResponse): Trip {
     let transportObj = null;
 
+    // El ticket se deriva de la reserva para mantener consistencia entre perfil, viajes y recibo.
     if (reserva.transporteTipo) {
       const ticket = this.ticketService.getTicketData(reserva);
 

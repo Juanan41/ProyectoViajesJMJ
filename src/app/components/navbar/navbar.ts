@@ -1,3 +1,7 @@
+// ProyectoViajesJMJ - components\navbar\navbar.ts
+// Responsabilidad: estructura global de navegacion, layout y composicion de la aplicacion.
+// Nota profesional: Forma parte de la estructura base de la aplicacion y se renderiza en multiples pantallas.
+
 import { Component, inject, HostListener, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
@@ -19,6 +23,10 @@ import {
   Minus,
 } from 'lucide-angular';
 
+/**
+ * Documento profesional: clase principal del archivo.
+ * Forma parte de la estructura base de la aplicacion y se renderiza en multiples pantallas.
+ */
 @Component({
   selector: 'app-navbar',
   standalone: true,

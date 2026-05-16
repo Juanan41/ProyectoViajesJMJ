@@ -1,3 +1,7 @@
+// ProyectoViajesJMJ - pages\admin\admin-dashboard.ts
+// Responsabilidad: funciones del panel de administracion y gestion operativa.
+// Nota profesional: Centraliza operaciones sensibles del panel admin; revisar permisos y borrados antes de modificar.
+
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -74,13 +78,20 @@ interface EditHotelForm {
 interface AdminUserDetail {
   usuario: any;
   tarjeta: any | null;
+  cuenta?: any | null;
   resumen: any;
+  reservas?: any[];
   reservasPendientes: any[];
   reservasRealizadas: any[];
   reservasCanceladas: any[];
   resenias: any[];
+  opiniones?: any[];
 }
 
+/**
+ * Documento profesional: clase principal del archivo.
+ * Centraliza operaciones sensibles del panel admin; revisar permisos y borrados antes de modificar.
+ */
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
@@ -117,6 +128,9 @@ export class AdminDashboard implements OnInit {
   hotelesLoadError = signal('');
   hotelPage = signal(1);
   hotelPageSize = 50;
+
+  destinoPage = signal(1);
+  destinoPageSize = 24;
 
   selectedReserva = signal<any | null>(null);
 
@@ -196,7 +210,10 @@ export class AdminDashboard implements OnInit {
 
   loadDestinos() {
     this.destinoService.getDestinos().subscribe({
-      next: (data) => this.destinos.set(data || []),
+      next: (data) => {
+        this.destinos.set(data || []);
+        this.destinoPage.set(1);
+      },
       error: (err) => {
         console.error('Error cargando destinos', err);
         this.destinos.set([]);
@@ -265,10 +282,23 @@ export class AdminDashboard implements OnInit {
     }
   }
 
+  goToDestino(destino: any) {
+    if (!destino?.id) return;
+
+    this.router.navigate(['/hotels', destino.id]);
+  }
+
+  goToHotel(hotel: any) {
+    if (!hotel?.id) return;
+
+    this.router.navigate(['/hotel', hotel.id]);
+  }
+
   get filteredReservas() {
     const filter = this.reservaFilter();
     const query = this.normalize(this.reservaSearch);
 
+    // El panel admin filtra en memoria los datos ya cargados para no multiplicar llamadas.
     return this.reservas().filter((reserva) => {
       const estado = this.getReservaStatus(reserva);
       const matchesStatus = filter === 'TODAS' || estado === filter;
@@ -304,6 +334,44 @@ export class AdminDashboard implements OnInit {
         [destino.nombre, destino.pais, (destino as any).continente].join(' '),
       ).includes(query),
     );
+  }
+
+  get totalDestinoPages(): number {
+    return Math.max(1, Math.ceil(this.filteredDestinos.length / this.destinoPageSize));
+  }
+
+  get paginatedDestinos() {
+    const page = Math.min(this.destinoPage(), this.totalDestinoPages);
+    const start = (page - 1) * this.destinoPageSize;
+    const end = start + this.destinoPageSize;
+
+    return this.filteredDestinos.slice(start, end);
+  }
+
+  get destinoPageStart(): number {
+    if (this.filteredDestinos.length === 0) return 0;
+
+    return (this.destinoPage() - 1) * this.destinoPageSize + 1;
+  }
+
+  get destinoPageEnd(): number {
+    return Math.min(this.destinoPage() * this.destinoPageSize, this.filteredDestinos.length);
+  }
+
+  resetDestinoPagination() {
+    this.destinoPage.set(1);
+  }
+
+  previousDestinoPage() {
+    if (this.destinoPage() > 1) {
+      this.destinoPage.update((page) => page - 1);
+    }
+  }
+
+  nextDestinoPage() {
+    if (this.destinoPage() < this.totalDestinoPages) {
+      this.destinoPage.update((page) => page + 1);
+    }
   }
 
   get filteredHoteles() {
@@ -411,6 +479,7 @@ export class AdminDashboard implements OnInit {
   openUserDetails(user: any) {
     if (!user?.id) return;
 
+    // La ficha combina resumen, tarjeta, reservas y reseñas en una sola lectura de detalle.
     this.selectedUserDetail.set(null);
     this.userDetailError.set('');
     this.isLoadingUserDetail.set(true);
@@ -421,7 +490,14 @@ export class AdminDashboard implements OnInit {
       })
       .subscribe({
         next: (detail) => {
-          this.selectedUserDetail.set(detail);
+          this.selectedUserDetail.set({
+            ...detail,
+            tarjeta: detail.tarjeta || detail.cuenta || null,
+            resenias: detail.resenias || detail.opiniones || [],
+            reservasPendientes: detail.reservasPendientes || [],
+            reservasRealizadas: detail.reservasRealizadas || [],
+            reservasCanceladas: detail.reservasCanceladas || [],
+          });
           this.isLoadingUserDetail.set(false);
         },
         error: (err) => {
@@ -438,8 +514,25 @@ export class AdminDashboard implements OnInit {
     this.isLoadingUserDetail.set(false);
   }
 
+  getUserAvatar(user: any): string {
+    return user?.avatarUrl || user?.avatar || user?.fotoPerfil || user?.imagen || '';
+  }
+
+  getUserInitial(user: any): string {
+    const name = user?.username || user?.name || user?.email || 'U';
+
+    return String(name).trim().charAt(0).toUpperCase() || 'U';
+  }
+
   getUserVisitedDestinations(detail: AdminUserDetail | null): number {
     if (!detail) return 0;
+
+    // Preferimos el resumen del backend y calculamos un respaldo si llega vacío.
+    const backendValue = Number(detail.resumen?.destinosUnicos);
+
+    if (Number.isFinite(backendValue) && backendValue > 0) {
+      return backendValue;
+    }
 
     const visited = (detail.reservasRealizadas || [])
       .map((reserva) => toDestinationCoordinateKey(reserva.destinoNombre))
@@ -459,14 +552,20 @@ export class AdminDashboard implements OnInit {
   getReservaStatus(reserva: any): string {
     const estado = String(reserva?.estado || '').toUpperCase();
 
+    // Si el backend aún no marcó una reserva antigua como completada, se deriva por fecha fin.
     if (estado === 'CANCELADA') return 'CANCELADA';
     if (estado === 'COMPLETADA') return 'COMPLETADA';
 
     const checkOut = reserva?.checkOut || reserva?.fechaFin;
-    const checkOutDate = checkOut ? new Date(checkOut) : null;
+    const checkOutDate = this.parseDateOnly(checkOut);
 
-    if (checkOutDate && !Number.isNaN(checkOutDate.getTime()) && checkOutDate < new Date()) {
-      return 'COMPLETADA';
+    if (checkOutDate) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (checkOutDate < today) {
+        return 'COMPLETADA';
+      }
     }
 
     return 'CONFIRMADA';
@@ -486,14 +585,47 @@ export class AdminDashboard implements OnInit {
     return 'bg-amber-500/10 text-amber-300 border-amber-500/20';
   }
 
-  formatDate(value: string | undefined | null): string {
-    if (!value) return '-';
+  formatDate(value: string | Date | undefined | null): string {
+    const date = this.parseDateOnly(value);
 
-    return new Date(value).toLocaleDateString('es-ES');
+    if (!date) return '-';
+
+    return date.toLocaleDateString('es-ES');
   }
 
   formatMoney(value: number | string | undefined | null): string {
     return `${Number(value || 0).toFixed(2)}€`;
+  }
+
+  private parseDateOnly(value: string | Date | undefined | null): Date | null {
+    if (!value) return null;
+
+    if (value instanceof Date) {
+      if (Number.isNaN(value.getTime())) return null;
+
+      const date = new Date(value);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    }
+
+    const text = String(value);
+
+    if (!text) return null;
+
+    const datePart = text.includes('T') ? text.split('T')[0] : text;
+    const parts = datePart.split('-').map(Number);
+
+    if (parts.length >= 3 && parts.every((part) => Number.isFinite(part))) {
+      const [year, month, day] = parts;
+      return new Date(year, month - 1, day);
+    }
+
+    const fallback = new Date(text);
+
+    if (Number.isNaN(fallback.getTime())) return null;
+
+    fallback.setHours(0, 0, 0, 0);
+    return fallback;
   }
 
   private normalize(value: string | number | null | undefined): string {
@@ -732,6 +864,7 @@ export class AdminDashboard implements OnInit {
 
   onHotelDestinoChange(destinoId: number | string | null) {
     const destino = this.destinos().find((item) => item.id === Number(destinoId));
+
     if (!destino) return;
 
     this.editHotelForm.destinoId = destino.id;
@@ -814,6 +947,7 @@ export class AdminDashboard implements OnInit {
 
   confirmAction() {
     const modal = this.confirmModal();
+
     if (!modal) return;
 
     if (modal.action === 'delete-user') {

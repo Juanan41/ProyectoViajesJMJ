@@ -1,8 +1,15 @@
+// ProyectoViajesJMJ - services\destino.service.ts
+// Responsabilidad: catalogo de destinos, navegacion geografica y busqueda.
+// Nota profesional: Soporta navegacion por destinos, paises, continentes y busqueda bilingue.
+
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 
+/**
+ * Contrato publico usado por componentes y servicios relacionados.
+ */
 export interface DestinoDTO {
   id: number;
   nombre: string;
@@ -17,6 +24,10 @@ export interface DestinoDTO {
   precioPorNoche: number;
 }
 
+/**
+ * Documento profesional: clase principal del archivo.
+ * Soporta navegacion por destinos, paises, continentes y busqueda bilingue.
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -26,15 +37,16 @@ export class DestinoService {
   private serverUrl = environment.apiUrl.replace('/api', '');
 
   private fallbackImages = [
-    'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?q=80&w=2020',
-    'https://images.unsplash.com/photo-1464817739973-0128fe77aaa1?q=80&w=2070',
-    'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?q=80&w=1972',
-    'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?q=80&w=2070',
-    'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?q=80&w=2076',
+    'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?q=80&w=1600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1464817739973-0128fe77aaa1?q=80&w=1600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?q=80&w=1600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?q=80&w=1600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?q=80&w=1600&auto=format&fit=crop',
   ];
 
   private defaultBackendImage = 'photo-1436491865332-7a61a109cc05';
 
+  // Alias de búsqueda para mantener el buscador bilingüe sin traducir nombres propios.
   private englishAliases: Record<string, string[]> = {
     paris: ['paris'],
     roma: ['rome'],
@@ -164,7 +176,7 @@ export class DestinoService {
 
   public getFullImageUrl(imagePath: string): string {
     if (!imagePath) {
-      return 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=800';
+      return 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1600&auto=format&fit=crop';
     }
 
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
@@ -176,6 +188,7 @@ export class DestinoService {
   }
 
   private fixBrokenText(value: any): string {
+    // Normaliza textos heredados con mojibake antes de pintarlos o compararlos.
     return String(value || '')
       .replaceAll('B?lgica', 'Bélgica')
       .replaceAll('Espa?a', 'España')
@@ -211,6 +224,7 @@ export class DestinoService {
     const hasBackendDefault = path && path.includes(this.defaultBackendImage);
 
     if (!path || hasBackendDefault) {
+      // Si el backend devuelve su imagen genérica, se sustituye por un fallback visual estable.
       const index = Number(d.id || 0) % this.fallbackImages.length;
       path = this.fallbackImages[index];
     }
@@ -395,6 +409,7 @@ export class DestinoService {
   getDestinosByPais(pais: string): Observable<DestinoDTO[]> {
     const query = this.normalizeText(pais);
 
+    // Compara país real y alias en inglés para que el buscador ES/EN devuelva los mismos destinos.
     return this.getDestinos().pipe(
       map((destinos) =>
         (destinos || []).filter((d) => {
@@ -478,7 +493,15 @@ export class DestinoService {
     const token = localStorage.getItem('token');
     const options = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
 
+    // La reserva se envía cruda porque el backend recalcula precio, capacidad y saldo.
     return this.http.post(`${environment.apiUrl}/reservas`, reserva, options);
+  }
+
+  getMisReservas(): Observable<any[]> {
+    const token = localStorage.getItem('token');
+    const options = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+
+    return this.http.get<any[]>(`${environment.apiUrl}/reservas/mis-reservas`, options);
   }
 
   searchDestinos(query: string): Observable<DestinoDTO[]> {

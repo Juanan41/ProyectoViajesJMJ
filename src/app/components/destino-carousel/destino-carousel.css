@@ -1,3 +1,7 @@
+/* ProyectoViajesJMJ - components/destino-carousel/destino-carousel.css
+   Responsabilidad: estilos locales del componente dentro de la experiencia Angular. */
+/* Nota profesional: mantener aqui reglas acotadas al componente para evitar efectos colaterales en otras vistas. */
+
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }

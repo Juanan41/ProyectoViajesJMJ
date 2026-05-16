@@ -1,3 +1,7 @@
+// ProyectoViajesJMJ - pages\trips\trips.ts
+// Responsabilidad: flujo de reservas, viajes y estados asociados.
+// Nota profesional: Contiene reglas de reserva, estados de viaje y datos usados por tickets/recibos/perfil.
+
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -20,6 +24,10 @@ import { TicketData, TicketService } from '../../services/ticket.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { catchError, of } from 'rxjs';
 
+/**
+ * Documento profesional: clase principal del archivo.
+ * Contiene reglas de reserva, estados de viaje y datos usados por tickets/recibos/perfil.
+ */
 @Component({
   selector: 'app-trips',
   standalone: true,

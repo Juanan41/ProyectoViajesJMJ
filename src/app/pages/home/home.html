@@ -1,3 +1,8 @@
+<!-- ProyectoViajesJMJ - pages\home\home.html -->
+<!-- Responsabilidad: pieza de soporte usada por la aplicacion ProyectoViajesJMJ. -->
+<!-- Nota profesional: Plantilla visual de la pantalla; separar estado visual de reglas de negocio siempre que sea posible. -->
+
+<!-- Estructura de vista: cada bloque visible esta pensado para orientar navegacion, estado de carga y acciones del usuario. -->
 @if (!auth.isLoggedIn()) {
   <app-destino-carousel [destinos]="destinos()"></app-destino-carousel>
 } @else {

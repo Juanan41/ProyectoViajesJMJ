@@ -1,3 +1,8 @@
+<!-- ProyectoViajesJMJ - pages\hotel\hotel.html -->
+<!-- Responsabilidad: catalogo de alojamientos, habitaciones y detalle hotelero. -->
+<!-- Nota profesional: Representa el catalogo hotelero, sus habitaciones y las opciones que se pueden reservar. -->
+
+<!-- Estructura de vista: cada bloque visible esta pensado para orientar navegacion, estado de carga y acciones del usuario. -->
 @if (!hotel()) {
 <div class="flex-1 flex flex-col items-center justify-center py-20">
   <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mb-4"></div>
@@ -404,7 +409,7 @@
                 class="w-full bg-[rgb(23,25,25)] border border-gray-800 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500" />
 
               <p class="text-gray-500 text-xs mt-2">
-                {{ '1 huésped: cualquier habitación compatible. 2 huéspedes: doble, suite o grupal. 3-4 huéspedes: suite
+                {{ '1 huésped: cualquier habitación compatible. 2 huéspedes: doble, estándar/deluxe, suite o grupal. 3-4 huéspedes: suite
                 o grupal. 5-8 huéspedes: solo grupal.' | translate }}
               </p>
             </div>
@@ -485,14 +490,95 @@
             </p>
             }
 
-            <button type="button" (click)="reservar()" [class.opacity-80]="!canBook"
+            <button type="button" (click)="reservar()" [disabled]="isBooking()"
+              [class.opacity-80]="!canBook || isBooking()" [class.cursor-not-allowed]="isBooking()"
               class="w-full mt-6 bg-emerald-500 hover:bg-emerald-400 text-[rgb(23,25,25)] font-black py-4 rounded-xl transition-all uppercase tracking-widest text-xs">
+              @if (isBooking()) {
+              {{ 'Procesando...' | translate }}
+              } @else {
               {{ 'Reservar ahora' | translate }}
+              }
             </button>
         </div>
       </aside>
     </div>
   </div>
+
+  @if (travelOverlapModal()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center px-4">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="closeTravelOverlapModal()"></div>
+
+    <div class="relative w-full max-w-lg bg-[rgb(23,25,25)] border border-yellow-500/20 rounded-3xl shadow-2xl p-6">
+      <button type="button" (click)="closeTravelOverlapModal()"
+        class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors text-gray-300">
+        ✕
+      </button>
+
+      <div
+        class="w-14 h-14 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 flex items-center justify-center mb-5 text-2xl font-black">
+        !
+      </div>
+
+      <h3 class="text-2xl font-black text-white mb-2">
+        {{ 'Ya tienes un viaje en esas fechas' | translate }}
+      </h3>
+
+      <p class="text-gray-400 mb-5">
+        {{ 'Hemos encontrado otro viaje que coincide con las fechas que has elegido. Puedes cancelar o reservar
+        igualmente.' | translate }}
+      </p>
+
+      <div class="bg-[rgb(33,36,37)] border border-white/10 rounded-2xl p-4 mb-5">
+        <p class="text-xs text-gray-500 uppercase tracking-widest font-bold mb-2">
+          {{ 'Nueva reserva' | translate }}
+        </p>
+
+        <p class="text-white font-bold">
+          {{ formatDate(travelOverlapModal()?.requestedStart) }} -
+          {{ formatDate(travelOverlapModal()?.requestedEnd) }}
+        </p>
+      </div>
+
+      <div class="space-y-3 mb-6">
+        <p class="text-xs text-gray-500 uppercase tracking-widest font-bold">
+          {{ 'Viajes que coinciden' | translate }}
+        </p>
+
+        @for (conflict of travelOverlapModal()?.conflicts || []; track conflict.id) {
+        <div class="bg-[rgb(33,36,37)] border border-yellow-500/10 rounded-2xl p-4">
+          <p class="text-white font-bold">
+            {{ conflict.destinoNombre | translate }}
+          </p>
+
+          <p class="text-sm text-gray-400">
+            {{ conflict.alojamientoNombre | translate }}
+          </p>
+
+          <p class="text-xs text-gray-500 mt-2">
+            {{ formatDate(conflict.checkIn) }} - {{ formatDate(conflict.checkOut) }}
+          </p>
+        </div>
+        }
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button type="button" (click)="closeTravelOverlapModal()"
+          class="flex-1 py-3 rounded-xl border border-white/10 text-white font-bold hover:bg-white/10 transition-colors">
+          {{ 'Cancelar' | translate }}
+        </button>
+
+        <button type="button" (click)="confirmTravelOverlapBooking()" [disabled]="isBooking()"
+          class="flex-1 py-3 rounded-xl bg-emerald-500 text-[rgb(23,25,25)] font-black hover:bg-emerald-400 disabled:bg-gray-700 disabled:text-gray-400 transition-colors">
+          @if (isBooking()) {
+          {{ 'Reservando...' | translate }}
+          } @else {
+          {{ 'Reservar igualmente' | translate }}
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+  }
 
   @if (bookingModal()) {
   <div class="fixed inset-0 z-50 flex items-center justify-center px-4">

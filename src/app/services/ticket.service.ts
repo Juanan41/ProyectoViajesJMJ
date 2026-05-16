@@ -1,6 +1,13 @@
+// ProyectoViajesJMJ - services\ticket.service.ts
+// Responsabilidad: generacion de tickets, recibos y datos de confirmacion.
+// Nota profesional: Prepara datos de justificante para mostrar o descargar una reserva confirmada.
+
 import { Injectable } from '@angular/core';
 import { ReservaResponse } from './reserva.service';
 
+/**
+ * Contrato publico usado por componentes y servicios relacionados.
+ */
 export interface TicketData {
   tipoTransporte: string;
   nombreTransporte: string;
@@ -11,6 +18,10 @@ export interface TicketData {
   codigoTicket: string;
 }
 
+/**
+ * Documento profesional: clase principal del archivo.
+ * Prepara datos de justificante para mostrar o descargar una reserva confirmada.
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -20,6 +31,7 @@ export class TicketService {
     const idTicket = String(id).padStart(8, '0');
     const idTransporte = String(id).padStart(5, '0');
 
+    // Los tickets deben ser deterministas: mismo id de reserva, mismos datos visuales.
     const rawType = (reserva?.transporteTipo || reserva?.transporteNombre || 'AVION').toUpperCase();
 
     const isTrain = rawType.includes('TREN');

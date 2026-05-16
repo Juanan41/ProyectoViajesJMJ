@@ -1,3 +1,7 @@
+// ProyectoViajesJMJ - pages\receipt\receipt.ts
+// Responsabilidad: generacion de tickets, recibos y datos de confirmacion.
+// Nota profesional: Prepara datos de justificante para mostrar o descargar una reserva confirmada.
+
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
@@ -21,6 +25,10 @@ import { TicketData, TicketService } from '../../services/ticket.service';
 import { Auth } from '../../services/auth';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
+/**
+ * Documento profesional: clase principal del archivo.
+ * Prepara datos de justificante para mostrar o descargar una reserva confirmada.
+ */
 @Component({
   selector: 'app-receipt',
   standalone: true,
@@ -51,6 +59,7 @@ export class Receipt implements OnInit {
   isDownloadingPdf = signal(false);
   pdfError = signal('');
 
+  // El recibo reutiliza el mismo generador de ticket que el perfil para evitar datos divergentes.
   ticketData = computed<TicketData>(() => this.ticketService.getTicketData(this.reserva()));
 
   ngOnInit() {
@@ -104,6 +113,7 @@ export class Receipt implements OnInit {
     const total = this.reserva()?.precioTotal || 0;
     const transport = this.getTransportAmount();
 
+    // Se separa alojamiento/transporte solo a nivel visual; el total oficial llega del backend.
     return Math.max(total - transport, 0);
   }
 
@@ -164,6 +174,7 @@ export class Receipt implements OnInit {
       await this.waitForImages(element);
       window.scrollTo(0, 0);
 
+      // Captura el recibo con su tamaño real para que el PDF no recorte contenido responsive.
       const rect = element.getBoundingClientRect();
       const captureWidth = Math.ceil(element.scrollWidth || rect.width);
       const captureHeight = Math.ceil(element.scrollHeight || rect.height);

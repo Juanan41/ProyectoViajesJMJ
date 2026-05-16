@@ -1,3 +1,7 @@
+// ProyectoViajesJMJ - components\destino-carousel\destino-carousel.ts
+// Responsabilidad: catalogo de destinos, navegacion geografica y busqueda.
+// Nota profesional: Soporta navegacion por destinos, paises, continentes y busqueda bilingue.
+
 import {
   Component,
   Input,
@@ -14,6 +18,10 @@ import { LucideAngularModule, MapPin } from 'lucide-angular';
 import { DestinoDTO } from '../../services/destino.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
+/**
+ * Documento profesional: clase principal del archivo.
+ * Soporta navegacion por destinos, paises, continentes y busqueda bilingue.
+ */
 @Component({
   selector: 'app-destino-carousel',
   standalone: true,
