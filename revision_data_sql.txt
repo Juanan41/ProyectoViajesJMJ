@@ -1,0 +1,60 @@
+﻿
+  src\main\resources\data.sql:5:-- =====================================================
+  src\main\resources\data.sql:6:
+> src\main\resources\data.sql:7:TRUNCATE TABLE reservas CASCADE;
+> src\main\resources\data.sql:8:TRUNCATE TABLE opiniones CASCADE;
+> src\main\resources\data.sql:9:TRUNCATE TABLE habitacion RESTART IDENTITY CASCADE;
+> src\main\resources\data.sql:10:TRUNCATE TABLE alojamientos RESTART IDENTITY CASCADE;
+> src\main\resources\data.sql:11:TRUNCATE TABLE destinos RESTART IDENTITY CASCADE;
+> src\main\resources\data.sql:12:TRUNCATE TABLE continente RESTART IDENTITY CASCADE;
+  src\main\resources\data.sql:13:
+> src\main\resources\data.sql:14:INSERT INTO usuarios (username, email, password, role, saldo)
+  src\main\resources\data.sql:15:VALUES ('Juan Antonio', 'juan@viajes.com', '$2a$10$cNbNdxo49Ei00ifujZ5nH.JzUrhhH5J.jpOxrrcEy1TaeY1i/vz3q', 'ADMIN', 5000.00)
+  src\main\resources\data.sql:16:ON CONFLICT (email) DO NOTHING;
+  src\main\resources\data.sql:17:
+> src\main\resources\data.sql:18:INSERT INTO usuarios (username, email, password, role, saldo)
+  src\main\resources\data.sql:19:VALUES ('Miguel', 'miguel@viajes.com', '$2a$10$cNbNdxo49Ei00ifujZ5nH.JzUrhhH5J.jpOxrrcEy1TaeY1i/vz3q', 'ADMIN', 5000.00)
+  src\main\resources\data.sql:20:ON CONFLICT (email) DO NOTHING;
+  src\main\resources\data.sql:21:
+> src\main\resources\data.sql:22:INSERT INTO usuarios (username, email, password, role, saldo)
+  src\main\resources\data.sql:23:VALUES ('Joel', 'joel@viajes.com', '$2a$10$cNbNdxo49Ei00ifujZ5nH.JzUrhhH5J.jpOxrrcEy1TaeY1i/vz3q', 'ADMIN', 5000.00)
+  src\main\resources\data.sql:24:ON CONFLICT (email) DO NOTHING;
+  src\main\resources\data.sql:25:
+  src\main\resources\data.sql:26:INSERT INTO continente (id, nombre) VALUES
+  src\main\resources\data.sql:27:    (1, 'Europa'),
+  src\main\resources\data.sql:28:    (2, 'Asia'),
+  src\main\resources\data.sql:6717:    ('Eric Benitez', 'eric.benitez@viajesjmj.test', 5795.30, 'ES9100010001000000000040', 'Caja Horizonte')
+  src\main\resources\data.sql:6718:), upsert_users AS (
+> src\main\resources\data.sql:6719:  INSERT INTO usuarios (username, email, password, role, saldo)
+  src\main\resources\data.sql:6720:  SELECT nombre, email, '$2a$10$cNbNdxo49Ei00ifujZ5nH.JzUrhhH5J.jpOxrrcEy1TaeY1i/vz3q', 'USER', saldo
+  src\main\resources\data.sql:6721:  FROM demo_users
+  src\main\resources\data.sql:6722:  ON CONFLICT (email) DO NOTHING
+  src\main\resources\data.sql:6723:  RETURNING id, username, email
+  src\main\resources\data.sql:6724:)
+> src\main\resources\data.sql:6725:INSERT INTO cuentas_bancarias (titular, iban, swift_bic, entidad, fecha_registro, activa, usuario_id)
+  src\main\resources\data.sql:6726:SELECT du.nombre, du.iban, 'JMJDESMMXXX', du.entidad, NOW(), true, u.id
+  src\main\resources\data.sql:6727:FROM demo_users du
+  src\main\resources\data.sql:6728:JOIN usuarios u ON u.email = du.email
+  src\main\resources\data.sql:6729:ON CONFLICT (usuario_id) DO NOTHING;
+  src\main\resources\data.sql:6730:
+  src\main\resources\data.sql:6731:-- Tres reservas por usuario demo: una realizada, una futura y una cancelada.
+  src\main\resources\data.sql:6734:         ROW_NUMBER() OVER (ORDER BY u.email) AS idx
+  src\main\resources\data.sql:6735:  FROM usuarios u
+> src\main\resources\data.sql:6736:  WHERE u.email LIKE '%@viajesjmj.test' AND u.role = 'USER'
+  src\main\resources\data.sql:6737:), reserva_base AS (
+  src\main\resources\data.sql:6738:  SELECT d.usuario_id,
+  src\main\resources\data.sql:6739:         d.idx,
+  src\main\resources\data.sql:6740:         gs.r,
+  src\main\resources\data.sql:6741:         CASE gs.r WHEN 1 THEN 2 WHEN 2 THEN 5 ELSE 3 END AS huespedes,
+  src\main\resources\data.sql:6742:         CASE gs.r WHEN 1 THEN 'AVION' WHEN 2 THEN 'TREN' ELSE 'BARCO' END AS transporte,
+  src\main\resources\data.sql:6783:         ROW_NUMBER() OVER (ORDER BY u.email) AS idx
+  src\main\resources\data.sql:6784:  FROM usuarios u
+> src\main\resources\data.sql:6785:  WHERE u.email LIKE '%@viajesjmj.test' AND u.role = 'USER'
+  src\main\resources\data.sql:6786:), review_base AS (
+  src\main\resources\data.sql:6787:  SELECT d.usuario_id, d.idx, gs.r
+  src\main\resources\data.sql:6788:  FROM demo d
+  src\main\resources\data.sql:6789:  CROSS JOIN generate_series(1, 2) AS gs(r)
+  src\main\resources\data.sql:6790:), review_target AS (
+  src\main\resources\data.sql:6791:  SELECT rb.*, a.id AS alojamiento_id
+
+

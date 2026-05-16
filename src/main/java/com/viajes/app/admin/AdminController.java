@@ -31,12 +31,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 /**
  * Documento profesional: clase principal del archivo.
  * Centraliza operaciones sensibles del panel admin; revisar permisos y borrados antes de modificar.
@@ -123,11 +125,20 @@ public class AdminController {
                 })
                 .toList();
 
-        long destinosUnicos = reservasRealizadas.stream()
+        long destinosUnicos = reservasUsuario.stream()
+                .filter(reserva -> !getReservaStatus(reserva).equals("CANCELADA"))
                 .map(this::getDestinoIdFromReserva)
                 .filter(destinoId -> destinoId != null)
                 .distinct()
                 .count();
+
+        long kmRecorridos = reservasRealizadas.stream()
+                .mapToLong(this::getKmDesdeMadrid)
+                .sum();
+
+        double totalGastado = reservasRealizadas.stream()
+                .mapToDouble(reserva -> reserva.getPrecioTotal() != null ? reserva.getPrecioTotal() : 0)
+                .sum();
 
         Map<String, Object> tarjetaResponse = cuentaBancariaRepository.findByUsuarioId(usuario.getId())
                 .map(this::toCuentaResponse)
@@ -140,6 +151,10 @@ public class AdminController {
         resumen.put("viajesRealizados", reservasRealizadas.size());
         resumen.put("viajesCancelados", reservasCanceladas.size());
         resumen.put("destinosUnicos", destinosUnicos);
+        resumen.put("kmRecorridos", kmRecorridos);
+        resumen.put("totalGastado", totalGastado);
+        resumen.put("totalReservas", reservasUsuario.size());
+        resumen.put("totalOpiniones", opinionesUsuario.size());
         resumen.put("totalResenias", opinionesUsuario.size());
         resumen.put("resenias", opinionesUsuario.size());
         resumen.put("resenas", opinionesUsuario.size());
@@ -182,13 +197,36 @@ public class AdminController {
         return reservaService.obtenerTodasReservas();
     }
 
+    @GetMapping("/destinos")
+    public List<DestinoDTO> listarDestinos() {
+        return destinoRepository.findAll()
+                .stream()
+                .sorted(Comparator.comparing(Destino::getId))
+                .map(this::toDestinoResponse)
+                .toList();
+    }
+
     @GetMapping("/alojamientos")
     public List<Map<String, Object>> listarAlojamientos() {
-        return alojamientoRepository.findAll()
+        List<Alojamiento> alojamientos = alojamientoRepository.findAll()
                 .stream()
                 .sorted(Comparator.comparing(Alojamiento::getId))
-                .map(this::toAlojamientoResponse)
                 .toList();
+        Map<Long, RatingStats> ratingStats = getRatingStats(alojamientos);
+        Map<Long, Long> reservationCounts = getReservationCounts(alojamientos);
+
+        return alojamientos.stream()
+                .map(alojamiento -> toAlojamientoResponse(
+                        alojamiento,
+                        ratingStats.get(alojamiento.getId()),
+                        reservationCounts.getOrDefault(alojamiento.getId(), 0L)
+                ))
+                .toList();
+    }
+
+    @GetMapping("/hoteles")
+    public List<Map<String, Object>> listarHoteles() {
+        return listarAlojamientos();
     }
 
     @PutMapping("/usuarios/{id}")
@@ -317,6 +355,12 @@ public class AdminController {
         return toAlojamientoResponse(guardado);
     }
 
+    @PostMapping("/hoteles")
+    @Transactional
+    public Map<String, Object> crearHotel(@RequestBody Map<String, Object> request) {
+        return crearAlojamiento(request);
+    }
+
     @PutMapping("/alojamientos/{id}")
     @Transactional
     public Map<String, Object> actualizarAlojamiento(@PathVariable Long id, @RequestBody Map<String, Object> request) {
@@ -327,6 +371,12 @@ public class AdminController {
 
         Alojamiento guardado = alojamientoRepository.save(alojamiento);
         return toAlojamientoResponse(guardado);
+    }
+
+    @PutMapping("/hoteles/{id}")
+    @Transactional
+    public Map<String, Object> actualizarHotel(@PathVariable Long id, @RequestBody Map<String, Object> request) {
+        return actualizarAlojamiento(id, request);
     }
 
     @DeleteMapping("/alojamientos/{id}")
@@ -347,6 +397,12 @@ public class AdminController {
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("message", "Alojamiento eliminado");
         return response;
+    }
+
+    @DeleteMapping("/hoteles/{id}")
+    @Transactional
+    public Map<String, Object> eliminarHotel(@PathVariable Long id) {
+        return eliminarAlojamiento(id);
     }
 
     private void rellenarDestino(Destino destino, Map<String, Object> request, boolean creando) {
@@ -575,6 +631,87 @@ public class AdminController {
         return reserva.getHabitacion().getAlojamiento().getDestino().getId();
     }
 
+    private long getKmDesdeMadrid(Reserva reserva) {
+        if (reserva.getHabitacion() == null) return 0;
+        if (reserva.getHabitacion().getAlojamiento() == null) return 0;
+        if (reserva.getHabitacion().getAlojamiento().getDestino() == null) return 0;
+
+        Destino destino = reserva.getHabitacion().getAlojamiento().getDestino();
+        String nombre = normalizeText(destino.getNombre());
+        String pais = normalizeText(destino.getPais());
+
+        Map<String, Long> ciudadKm = Map.ofEntries(
+                Map.entry("madrid", 0L),
+                Map.entry("barcelona", 505L),
+                Map.entry("sevilla", 390L),
+                Map.entry("valencia", 303L),
+                Map.entry("paris", 1053L),
+                Map.entry("londres", 1263L),
+                Map.entry("roma", 1365L),
+                Map.entry("nueva york", 5768L),
+                Map.entry("los angeles", 9395L),
+                Map.entry("miami", 7105L),
+                Map.entry("san francisco", 9330L),
+                Map.entry("tokio", 10759L),
+                Map.entry("dubai", 5652L),
+                Map.entry("sidney", 17692L),
+                Map.entry("buenos aires", 10050L),
+                Map.entry("rio de janeiro", 8125L),
+                Map.entry("el cairo", 3350L),
+                Map.entry("ciudad del cabo", 8560L)
+        );
+
+        if (ciudadKm.containsKey(nombre)) {
+            return ciudadKm.get(nombre);
+        }
+
+        Map<String, Long> paisKm = Map.ofEntries(
+                Map.entry("espana", 350L),
+                Map.entry("francia", 1050L),
+                Map.entry("italia", 1400L),
+                Map.entry("alemania", 1650L),
+                Map.entry("reino unido", 1450L),
+                Map.entry("paises bajos", 1480L),
+                Map.entry("belgica", 1320L),
+                Map.entry("austria", 1800L),
+                Map.entry("suiza", 1250L),
+                Map.entry("grecia", 2350L),
+                Map.entry("portugal", 500L),
+                Map.entry("republica checa", 1780L),
+                Map.entry("hungria", 1980L),
+                Map.entry("polonia", 2300L),
+                Map.entry("suecia", 2600L),
+                Map.entry("estados unidos", 7300L),
+                Map.entry("canada", 6200L),
+                Map.entry("mexico", 9000L),
+                Map.entry("brasil", 7900L),
+                Map.entry("argentina", 10100L),
+                Map.entry("chile", 10700L),
+                Map.entry("colombia", 8000L),
+                Map.entry("peru", 9500L),
+                Map.entry("australia", 17400L),
+                Map.entry("nueva zelanda", 19800L),
+                Map.entry("japon", 10800L),
+                Map.entry("china", 9200L),
+                Map.entry("india", 7300L),
+                Map.entry("egipto", 3350L),
+                Map.entry("marruecos", 1050L),
+                Map.entry("sudafrica", 8500L)
+        );
+
+        return paisKm.getOrDefault(pais, 2500L);
+    }
+
+    private String normalizeText(String value) {
+        if (value == null) {
+            return "";
+        }
+
+        return java.text.Normalizer.normalize(value.toLowerCase(), java.text.Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .trim();
+    }
+
     private String getTransporteNombre(TransporteTipo transporte) {
         if (transporte == null) return null;
 
@@ -629,6 +766,12 @@ public class AdminController {
     }
 
     private Map<String, Object> toAlojamientoResponse(Alojamiento alojamiento) {
+        Map<Long, RatingStats> ratingStats = getRatingStats(List.of(alojamiento));
+        long reservas = reservaRepository.countByHabitacionAlojamientoId(alojamiento.getId());
+        return toAlojamientoResponse(alojamiento, ratingStats.get(alojamiento.getId()), reservas);
+    }
+
+    private Map<String, Object> toAlojamientoResponse(Alojamiento alojamiento, RatingStats ratingStats, long reservas) {
         Map<String, Object> response = new LinkedHashMap<>();
         Destino destino = alojamiento.getDestino();
 
@@ -640,10 +783,63 @@ public class AdminController {
         response.put("precioPorNoche", alojamiento.getPrecioPorNoche());
         response.put("destinoId", destino != null ? destino.getId() : null);
         response.put("destinoNombre", destino != null ? destino.getNombre() : "");
-        response.put("reservas", reservaRepository.countByHabitacionAlojamientoId(alojamiento.getId()));
+        response.put("reservas", reservas);
+        response.put("rating", ratingStats != null ? ratingStats.rating() : null);
+        response.put("estrellas", ratingStats != null ? ratingStats.rating() : null);
+        response.put("totalOpiniones", ratingStats != null ? ratingStats.total() : 0);
+        response.put("reviewCount", ratingStats != null ? ratingStats.total() : 0);
+        response.put("sinResenas", ratingStats == null || ratingStats.total() == 0);
 
         return response;
     }
+
+    private Map<Long, Long> getReservationCounts(List<Alojamiento> alojamientos) {
+        List<Long> ids = alojamientos.stream()
+                .map(Alojamiento::getId)
+                .filter(id -> id != null)
+                .toList();
+
+        if (ids.isEmpty()) {
+            return Map.of();
+        }
+
+        return reservaRepository.countByAlojamientoIds(ids)
+                .stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> ((Number) row[1]).longValue()
+                ));
+    }
+
+    private Map<Long, RatingStats> getRatingStats(List<Alojamiento> alojamientos) {
+        List<Long> ids = alojamientos.stream()
+                .map(Alojamiento::getId)
+                .filter(id -> id != null)
+                .toList();
+
+        if (ids.isEmpty()) {
+            return Map.of();
+        }
+
+        return opinionRepository.findRatingStatsByAlojamientoIds(ids)
+                .stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> new RatingStats(roundRating((Number) row[1]), ((Number) row[2]).longValue())
+                ));
+    }
+
+    private double roundRating(Number rating) {
+        if (rating == null) {
+            return 0;
+        }
+
+        return BigDecimal.valueOf(rating.doubleValue())
+                .setScale(1, RoundingMode.HALF_UP)
+                .doubleValue();
+    }
+
+    private record RatingStats(double rating, long total) {}
 
     private String getString(Map<String, Object> request, String key) {
         Object value = request.get(key);
