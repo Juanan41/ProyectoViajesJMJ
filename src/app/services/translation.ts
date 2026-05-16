@@ -1209,6 +1209,7 @@ export class TranslationService {
       de: 'of',
       Anterior: 'Previous',
       Siguiente: 'Next',
+      Página: 'Page',
 
       'Cargando ficha del usuario...': 'Loading user profile card...',
       Error: 'Error',

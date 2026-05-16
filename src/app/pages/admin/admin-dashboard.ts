@@ -91,6 +91,11 @@ export class AdminDashboard implements OnInit {
   isLoadingUserDetail = signal(false);
   userDetailError = signal('');
 
+  readonly userDetailBookingsPageSize = 5;
+  readonly userDetailReviewsPageSize = 4;
+  userDetailBookingsPage = signal(1);
+  userDetailReviewsPage = signal(1);
+
   showDestinoModal = signal(false);
   destinoMode = signal<DestinoMode>('create');
   selectedDestino = signal<any | null>(null);
@@ -580,6 +585,8 @@ export class AdminDashboard implements OnInit {
   openUserDetails(user: any): void {
     this.selectedUserDetail.set(null);
     this.userDetailError.set('');
+    this.userDetailBookingsPage.set(1);
+    this.userDetailReviewsPage.set(1);
     this.isLoadingUserDetail.set(true);
 
     this.adminService.getUsuarioDetalle(user.id).subscribe({
@@ -599,6 +606,8 @@ export class AdminDashboard implements OnInit {
     this.selectedUserDetail.set(null);
     this.isLoadingUserDetail.set(false);
     this.userDetailError.set('');
+    this.userDetailBookingsPage.set(1);
+    this.userDetailReviewsPage.set(1);
   }
 
   getUserVisitedDestinations(detail: AdminUserDetailDTO | null): number {
@@ -630,7 +639,7 @@ export class AdminDashboard implements OnInit {
     }, 0);
   }
 
-  getUserReservations(detail: AdminUserDetailDTO | null): ReservaAdminResponse[] {
+  getUserReservations(detail: AdminUserDetailDTO | null | undefined): ReservaAdminResponse[] {
     if (!detail) return [];
 
     return [
@@ -919,6 +928,54 @@ export class AdminDashboard implements OnInit {
 
   closeNotice(): void {
     this.noticeModal.set(null);
+  }
+
+
+  getPaginatedUserReservations(detail: AdminUserDetailDTO | null | undefined): any[] {
+    const reservas = this.getUserReservations(detail);
+    const start = (this.userDetailBookingsPage() - 1) * this.userDetailBookingsPageSize;
+
+    return reservas.slice(start, start + this.userDetailBookingsPageSize);
+  }
+
+  getUserReservationsTotalPages(detail: AdminUserDetailDTO | null | undefined): number {
+    const total = this.getUserReservations(detail).length;
+
+    return Math.max(1, Math.ceil(total / this.userDetailBookingsPageSize));
+  }
+
+  changeUserReservationsPage(direction: number) {
+    const totalPages = this.getUserReservationsTotalPages(this.selectedUserDetail());
+    const nextPage = this.userDetailBookingsPage() + direction;
+
+    this.userDetailBookingsPage.set(Math.min(Math.max(nextPage, 1), totalPages));
+  }
+
+  getPaginatedUserOpinions(detail: AdminUserDetailDTO | null | undefined): any[] {
+    const opiniones = detail?.opiniones || [];
+    const start = (this.userDetailReviewsPage() - 1) * this.userDetailReviewsPageSize;
+
+    return opiniones.slice(start, start + this.userDetailReviewsPageSize);
+  }
+
+  getUserOpinionsTotalPages(detail: AdminUserDetailDTO | null | undefined): number {
+    const total = detail?.opiniones?.length || 0;
+
+    return Math.max(1, Math.ceil(total / this.userDetailReviewsPageSize));
+  }
+
+  changeUserOpinionsPage(direction: number) {
+    const totalPages = this.getUserOpinionsTotalPages(this.selectedUserDetail());
+    const nextPage = this.userDetailReviewsPage() + direction;
+
+    this.userDetailReviewsPage.set(Math.min(Math.max(nextPage, 1), totalPages));
+  }
+
+  getCardLastDigits(card: any): string {
+    const value = card?.last4 || card?.ultimos4 || card?.numeroUltimos4 || card?.iban || '';
+    const onlyNumbers = String(value).replace(/\D/g, '');
+
+    return onlyNumbers ? onlyNumbers.slice(-4) : '----';
   }
 
   getReservaStatus(reserva: any): string {
