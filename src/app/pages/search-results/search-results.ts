@@ -121,11 +121,16 @@ export class SearchResults implements OnInit {
     };
   }
 
+  applyFilters() {
+    this.showFilters.set(false);
+  }
+
   getPrice(item: DestinoDTO): number {
     return Number(item.precioPorNoche || item.precio || 0);
   }
 
   getArray(length: number): any[] {
-    return new Array(length || 0);
+    const safeLength = Math.max(3, Math.min(5, Math.round(Number(length || 0))));
+    return new Array(safeLength);
   }
 }

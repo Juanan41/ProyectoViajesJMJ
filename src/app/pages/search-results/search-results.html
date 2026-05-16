@@ -71,6 +71,14 @@
       <div class="md:col-span-3 flex justify-end">
         <button
           type="button"
+          (click)="applyFilters()"
+          class="mr-5 bg-emerald-500 text-[rgb(23,25,25)] px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-emerald-400 transition-colors"
+        >
+          {{ 'Aplicar filtros' | translate }}
+        </button>
+
+        <button
+          type="button"
           (click)="clearFilters()"
           class="text-xs font-black uppercase tracking-widest text-gray-400 hover:text-white transition-colors"
         >

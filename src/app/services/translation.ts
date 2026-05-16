@@ -58,6 +58,10 @@ export class TranslationService {
       Puerta: 'Gate',
       Asiento: 'Seat',
       'Boarding Pass': 'Boarding Pass',
+      Vuelo: 'Flight',
+      vuelo: 'flight',
+      tren: 'train',
+      barco: 'ship',
       Avión: 'Plane',
       Tren: 'Train',
       Barco: 'Ship',
@@ -1198,6 +1202,38 @@ export class TranslationService {
       'Ver ficha': 'View details',
       'Cerrar detalle': 'Close details',
       'No hay datos disponibles.': 'No data available.',
+
+      'usuarios encontrados': 'users found',
+      'destinos encontrados': 'destinations found',
+      'hoteles encontrados': 'hotels found',
+      de: 'of',
+      Anterior: 'Previous',
+      Siguiente: 'Next',
+
+      'Cargando ficha del usuario...': 'Loading user profile card...',
+      Error: 'Error',
+      Pendientes: 'Pending',
+      Realizados: 'Completed',
+      Cancelados: 'Canceled',
+      'Datos de cuenta': 'Account data',
+      Tarjeta: 'Card',
+      Terminación: 'Ending',
+      Entidad: 'Bank',
+      'Este usuario no tiene tarjeta guardada.': 'This user has no saved card.',
+
+      'Viajes cancelados': 'Canceled trips',
+      'No hay viajes pendientes.': 'There are no pending trips.',
+      'No hay viajes realizados.': 'There are no completed trips.',
+      'No hay viajes cancelados.': 'There are no canceled trips.',
+      'No hay reservas del usuario.': 'This user has no bookings.',
+      'Este usuario no tiene reseñas.': 'This user has no reviews.',
+      'No hay usuarios que coincidan con los filtros.': 'No users match the filters.',
+      'No se pudo cargar la ficha del usuario.': 'The user profile card could not be loaded.',
+      'Ver alojamientos': 'View accommodation',
+      'Cargando hoteles...': 'Loading hotels...',
+      Reintentar: 'Try again',
+      'No se pudieron cargar los hoteles.': 'Hotels could not be loaded.',
+      '¿Seguro que quieres eliminar este hotel?': 'Are you sure you want to delete this hotel?',
     },
   };
 
@@ -1354,11 +1390,28 @@ export class TranslationService {
       return `Comfortable and well-located accommodation in ${this.translate(accommodationIn[1])}.`;
     }
 
+    const shortHotelIn = value.match(/^Hotel cÃ³modo y bien ubicado en (.+)\.$/i);
+    if (shortHotelIn) {
+      return `Comfortable and well-located hotel in ${this.translate(shortHotelIn[1])}.`;
+    }
+
     const hotelIn = value.match(
       /^Hotel cómodo y bien ubicado en (.+), ideal para descansar después de descubrir la ciudad\.$/i,
     );
     if (hotelIn) {
       return `Comfortable and well-located hotel in ${this.translate(hotelIn[1])}, ideal for resting after discovering the city.`;
+    }
+
+    const shortHotelInClean = value.match(/^Hotel cómodo y bien ubicado en (.+)\.$/i);
+    if (shortHotelInClean) {
+      return `Comfortable and well-located hotel in ${this.translate(shortHotelInClean[1])}.`;
+    }
+
+    const hotelInClean = value.match(
+      /^Hotel cómodo y bien ubicado en (.+), ideal para descansar después de descubrir la ciudad\.$/i,
+    );
+    if (hotelInClean) {
+      return `Comfortable and well-located hotel in ${this.translate(hotelInClean[1])}, ideal for resting after discovering the city.`;
     }
 
     return null;

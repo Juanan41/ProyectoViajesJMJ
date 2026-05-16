@@ -137,7 +137,11 @@ export class Hotels implements OnInit {
   }
 
   getHotelRating(hotel: any): number {
-    return Number(hotel?.estrellas || hotel?.rating || 5);
+    return Number(hotel?.rating ?? hotel?.estrellas ?? 0);
+  }
+
+  hasHotelReviews(hotel: any): boolean {
+    return Number(hotel?.totalOpiniones ?? hotel?.reviewCount ?? 0) > 0 && this.getHotelRating(hotel) > 0;
   }
 
   getHotelDescription(hotel: any): string {
@@ -157,7 +161,8 @@ export class Hotels implements OnInit {
   }
 
   getArray(length: number): any[] {
-    return Array.from({ length: length || 0 });
+    const safeLength = Math.max(0, Math.min(5, Math.round(Number(length || 0))));
+    return Array.from({ length: safeLength });
   }
 
   private normalizeText(value: string): string {

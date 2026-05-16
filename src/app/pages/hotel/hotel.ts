@@ -319,7 +319,11 @@ export class HotelComponent implements OnInit {
   }
 
   getHotelRating(hotel: any): number {
-    return Number(hotel?.estrellas || hotel?.rating || 5);
+    return Number(hotel?.rating ?? hotel?.estrellas ?? 0);
+  }
+
+  hasHotelReviews(hotel: any): boolean {
+    return Number(hotel?.totalOpiniones ?? hotel?.reviewCount ?? this.reviews().length ?? 0) > 0 && this.getHotelRating(hotel) > 0;
   }
 
   getHotelDescription(hotel: any): string {
@@ -500,7 +504,8 @@ export class HotelComponent implements OnInit {
   }
 
   getArray(length: number | undefined | null): any[] {
-    return Array.from({ length: length || 0 });
+    const safeLength = Math.max(0, Math.min(5, Math.round(Number(length || 0))));
+    return Array.from({ length: safeLength });
   }
 
   getRatingLabel(rating: number): string {

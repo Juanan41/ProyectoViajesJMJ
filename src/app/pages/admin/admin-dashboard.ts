@@ -1,218 +1,209 @@
-// ProyectoViajesJMJ - pages\admin\admin-dashboard.ts
-// Responsabilidad: funciones del panel de administracion y gestion operativa.
-// Nota profesional: Centraliza operaciones sensibles del panel admin; revisar permisos y borrados antes de modificar.
-
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { DestinoService, DestinoDTO } from '../../services/destino.service';
-import { Auth } from '../../services/auth';
-import { environment } from '../../../environments/environment';
-import { TranslatePipe } from '../../pipes/translate.pipe';
+import { RouterModule } from '@angular/router';
 import {
   LucideAngularModule,
-  Plus,
-  Trash2,
-  Edit,
-  LayoutDashboard,
-  Map,
   Users,
-  TrendingUp,
+  MapPin,
+  Hotel,
+  CalendarCheck,
+  Pencil,
+  Trash2,
+  Plus,
   Search,
-  X,
   Eye,
-  Building2,
+  X,
+  CheckCircle2,
+  AlertTriangle,
 } from 'lucide-angular';
+import {
+  AdminHotelDTO,
+  AdminService,
+  AdminUserDetailDTO,
+  ReservaAdminResponse,
+} from '../../services/admin.service';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 import {
   getDistanceFromMadridKm,
   toDestinationCoordinateKey,
 } from '../../data/destination-coordinates';
 
 type AdminTab = 'stats' | 'users' | 'destinos' | 'hoteles' | 'reservas';
-type ReservaFilter = 'TODAS' | 'CONFIRMADA' | 'CANCELADA' | 'COMPLETADA';
-type HotelSort = 'nombre' | 'destino' | 'precio' | 'reservas';
+type DestinoMode = 'create' | 'edit';
+type HotelMode = 'create' | 'edit';
 
-interface AdminConfirmModal {
-  action: 'delete-user' | 'delete-destino' | 'delete-hotel';
-  id: number;
-  title: string;
-  message: string;
-  confirmText: string;
-}
-
-interface AdminNoticeModal {
-  type: 'success' | 'error';
-  title: string;
-  message: string;
-}
-
-interface EditUserForm {
-  id: number;
-  username: string;
-  email: string;
-  role: string;
-  saldo: number;
-}
-
-interface EditDestinoForm {
-  nombre: string;
-  pais: string;
-  continente: string;
-  precio: number;
-  descripcion: string;
-  imagen: string;
-}
-
-interface EditHotelForm {
-  id: number;
-  nombre: string;
-  ciudad: string;
-  pais: string;
-  tipo: string;
-  precioPorNoche: number;
-  destinoId: number | null;
-}
-
-interface AdminUserDetail {
-  usuario: any;
-  tarjeta: any | null;
-  cuenta?: any | null;
-  resumen: any;
-  reservas?: any[];
-  reservasPendientes: any[];
-  reservasRealizadas: any[];
-  reservasCanceladas: any[];
-  resenias: any[];
-  opiniones?: any[];
-}
-
-/**
- * Documento profesional: clase principal del archivo.
- * Centraliza operaciones sensibles del panel admin; revisar permisos y borrados antes de modificar.
- */
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, RouterModule, LucideAngularModule, TranslatePipe],
   templateUrl: './admin-dashboard.html',
 })
 export class AdminDashboard implements OnInit {
-  private destinoService = inject(DestinoService);
-  private http = inject(HttpClient);
-  private router = inject(Router);
-  public auth = inject(Auth);
+  private adminService = inject(AdminService);
 
-  readonly PlusIcon = Plus;
-  readonly TrashIcon = Trash2;
-  readonly EditIcon = Edit;
-  readonly DashboardIcon = LayoutDashboard;
-  readonly MapIcon = Map;
   readonly UsersIcon = Users;
-  readonly StatsIcon = TrendingUp;
+  readonly MapPinIcon = MapPin;
+  readonly HotelIcon = Hotel;
+  readonly CalendarCheckIcon = CalendarCheck;
+  readonly PencilIcon = Pencil;
+  readonly TrashIcon = Trash2;
+  readonly PlusIcon = Plus;
   readonly SearchIcon = Search;
-  readonly XIcon = X;
   readonly EyeIcon = Eye;
-  readonly HotelIcon = Building2;
+  readonly XIcon = X;
+  readonly CheckIcon = CheckCircle2;
+  readonly AlertIcon = AlertTriangle;
 
   activeTab = signal<AdminTab>('stats');
 
-  destinos = signal<DestinoDTO[]>([]);
   usuarios = signal<any[]>([]);
-  reservas = signal<any[]>([]);
+  destinos = signal<any[]>([]);
+  reservas = signal<ReservaAdminResponse[]>([]);
+  hoteles = signal<AdminHotelDTO[]>([]);
 
-  hoteles = signal<any[]>([]);
-  hotelesLoaded = signal(false);
-  isLoadingHoteles = signal(false);
-  hotelesLoadError = signal('');
-  hotelPage = signal(1);
-  hotelPageSize = 50;
-
-  destinoPage = signal(1);
-  destinoPageSize = 24;
-
-  selectedReserva = signal<any | null>(null);
-
-  selectedUserDetail = signal<AdminUserDetail | null>(null);
-  isLoadingUserDetail = signal(false);
-  userDetailError = signal('');
-
-  reservaFilter = signal<ReservaFilter>('TODAS');
-  reservaSearch = '';
   userSearch = '';
   destinoSearch = '';
   hotelSearch = '';
-  hotelSort = signal<HotelSort>('nombre');
+  reservaSearch = '';
+  reservaStatusFilter = 'ALL';
 
-  isDeleting = signal(false);
+  userPage = signal(1);
+  readonly userPageSize = 10;
 
-  confirmModal = signal<AdminConfirmModal | null>(null);
-  noticeModal = signal<AdminNoticeModal | null>(null);
+  destinoPage = signal(1);
+  readonly destinoPageSize = 12;
+
+  hotelPage = signal(1);
+  readonly hotelPageSize = 10;
+
+  hotelSort: 'nombre' | 'destino' | 'precio' | 'reservas' = 'nombre';
+
+  isLoadingHoteles = signal(false);
+  hotelesLoadError = signal('');
 
   showUserModal = signal(false);
+  selectedUser = signal<any | null>(null);
   isSavingUser = signal(false);
   userError = signal('');
 
-  editUserForm: EditUserForm = {
-    id: 0,
+  selectedUserDetail = signal<AdminUserDetailDTO | null>(null);
+  isLoadingUserDetail = signal(false);
+  userDetailError = signal('');
+
+  showDestinoModal = signal(false);
+  destinoMode = signal<DestinoMode>('create');
+  selectedDestino = signal<any | null>(null);
+  isSavingDestino = signal(false);
+  destinoError = signal('');
+
+  showHotelModal = signal(false);
+  hotelMode = signal<HotelMode>('create');
+  selectedHotel = signal<AdminHotelDTO | null>(null);
+  isSavingHotel = signal(false);
+  hotelError = signal('');
+
+  selectedReserva = signal<ReservaAdminResponse | null>(null);
+
+  isDeleting = signal(false);
+
+  confirmModal = signal<{
+    title: string;
+    message: string;
+    confirmText: string;
+    action: () => void;
+  } | null>(null);
+
+  noticeModal = signal<{
+    title: string;
+    message: string;
+    type: 'success' | 'error';
+  } | null>(null);
+
+  userForm = {
+    id: null as number | null,
     username: '',
     email: '',
     role: 'USER',
     saldo: 0,
   };
 
-  showDestinoModal = signal(false);
-  destinoMode = signal<'create' | 'edit'>('create');
-  destinoToEdit = signal<DestinoDTO | null>(null);
-  isSavingDestino = signal(false);
-  destinoError = signal('');
-
-  editDestinoForm: EditDestinoForm = {
+  destinoForm = {
+    id: null as number | null,
     nombre: '',
     pais: '',
-    continente: 'Europa',
+    continente: '',
     precio: 0,
-    descripcion: '',
     imagen: '',
+    descripcion: '',
   };
 
-  showHotelModal = signal(false);
-  hotelMode = signal<'create' | 'edit'>('create');
-  hotelToEdit = signal<any | null>(null);
-  isSavingHotel = signal(false);
-  hotelError = signal('');
-
-  editHotelForm: EditHotelForm = {
-    id: 0,
+  hotelForm = {
+    id: null as number | null,
+    destinoId: null as number | null,
     nombre: '',
+    tipo: 'HOTEL',
     ciudad: '',
     pais: '',
-    tipo: 'HOTEL',
     precioPorNoche: 0,
-    destinoId: null,
   };
 
-  hotelTypes = ['HOTEL'];
+  readonly continentes = [
+    'Europa',
+    'Asia',
+    'África',
+    'América del Norte',
+    'América del Sur',
+    'Oceanía',
+  ];
 
-  continentes = ['Europa', 'Asia', 'África', 'América del Norte', 'América del Sur', 'Oceanía'];
+  readonly hotelTypes = ['HOTEL', 'APARTAMENTO', 'RESORT', 'HOSTAL'];
 
-  ngOnInit() {
-    if (!this.auth.isCurrentUserAdmin()) {
-      this.router.navigate(['/']);
-      return;
-    }
-
-    this.loadDestinos();
-    this.loadUsuarios();
-    this.loadReservas();
+  ngOnInit(): void {
+    this.loadAll();
   }
 
-  loadDestinos() {
-    this.destinoService.getDestinos().subscribe({
-      next: (data) => {
-        this.destinos.set(data || []);
-        this.destinoPage.set(1);
+  loadAll(): void {
+    this.loadUsuarios();
+    this.loadDestinos();
+    this.loadReservas();
+    this.loadHoteles();
+  }
+
+  setTab(tab: AdminTab): void {
+    this.activeTab.set(tab);
+
+    if (tab === 'users') {
+      this.resetUserPagination();
+    }
+
+    if (tab === 'destinos') {
+      this.resetDestinoPagination();
+    }
+
+    if (tab === 'hoteles') {
+      this.resetHotelPagination();
+    }
+  }
+
+  loadUsuarios(): void {
+    this.adminService.getUsuarios().subscribe({
+      next: (usuarios) => {
+        this.usuarios.set(usuarios || []);
+        this.resetUserPagination();
+      },
+      error: (err) => {
+        console.error('Error cargando usuarios', err);
+        this.usuarios.set([]);
+      },
+    });
+  }
+
+  loadDestinos(): void {
+    this.adminService.getDestinos().subscribe({
+      next: (destinos) => {
+        this.destinos.set(destinos || []);
+        this.resetDestinoPagination();
       },
       error: (err) => {
         console.error('Error cargando destinos', err);
@@ -221,136 +212,114 @@ export class AdminDashboard implements OnInit {
     });
   }
 
-  loadUsuarios() {
-    this.http
-      .get<any[]>(`${environment.apiUrl}/admin/usuarios`, {
-        headers: this.getAuthHeaders(),
-      })
-      .subscribe({
-        next: (data) => this.usuarios.set(data || []),
-        error: (err) => {
-          console.error('Error cargando usuarios', err);
-          this.usuarios.set([]);
-        },
-      });
-  }
-
-  loadReservas() {
-    this.http
-      .get<any[]>(`${environment.apiUrl}/admin/reservas`, {
-        headers: this.getAuthHeaders(),
-      })
-      .subscribe({
-        next: (data) => this.reservas.set(data || []),
-        error: (err) => {
-          console.error('Error cargando reservas', err);
-          this.reservas.set([]);
-        },
-      });
-  }
-
-  loadHoteles() {
-    this.isLoadingHoteles.set(true);
-    this.hotelesLoadError.set('');
-
-    this.http
-      .get<any[]>(`${environment.apiUrl}/admin/alojamientos`, {
-        headers: this.getAuthHeaders(),
-      })
-      .subscribe({
-        next: (data) => {
-          this.hoteles.set(data || []);
-          this.hotelesLoaded.set(true);
-          this.hotelPage.set(1);
-          this.isLoadingHoteles.set(false);
-        },
-        error: (err) => {
-          console.error('Error cargando hoteles', err);
-          this.hoteles.set([]);
-          this.hotelesLoaded.set(false);
-          this.isLoadingHoteles.set(false);
-          this.hotelesLoadError.set('No se pudieron cargar los hoteles.');
-        },
-      });
-  }
-
-  setTab(tab: AdminTab) {
-    this.activeTab.set(tab);
-
-    if (tab === 'hoteles' && !this.hotelesLoaded()) {
-      this.loadHoteles();
-    }
-  }
-
-  goToDestino(destino: any) {
-    if (!destino?.id) return;
-
-    this.router.navigate(['/hotels', destino.id]);
-  }
-
-  goToHotel(hotel: any) {
-    if (!hotel?.id) return;
-
-    this.router.navigate(['/hotel', hotel.id]);
-  }
-
-  get filteredReservas() {
-    const filter = this.reservaFilter();
-    const query = this.normalize(this.reservaSearch);
-
-    // El panel admin filtra en memoria los datos ya cargados para no multiplicar llamadas.
-    return this.reservas().filter((reserva) => {
-      const estado = this.getReservaStatus(reserva);
-      const matchesStatus = filter === 'TODAS' || estado === filter;
-
-      const text = this.normalize(
-        [
-          reserva.usuarioUsername,
-          reserva.usuarioEmail,
-          reserva.destinoNombre,
-          reserva.alojamientoNombre,
-          reserva.estado,
-          reserva.id,
-        ].join(' '),
-      );
-
-      return matchesStatus && (!query || text.includes(query));
+  loadReservas(): void {
+    this.adminService.getReservas().subscribe({
+      next: (reservas) => {
+        this.reservas.set(reservas || []);
+      },
+      error: (err) => {
+        console.error('Error cargando reservas', err);
+        this.reservas.set([]);
+      },
     });
   }
 
-  get filteredUsuarios() {
-    const query = this.normalize(this.userSearch);
+  loadHoteles(): void {
+    this.isLoadingHoteles.set(true);
+    this.hotelesLoadError.set('');
 
-    return this.usuarios().filter((user) =>
-      this.normalize([user.username, user.email, user.role].join(' ')).includes(query),
-    );
+    this.adminService.getHoteles().subscribe({
+      next: (hoteles) => {
+        this.hoteles.set(hoteles || []);
+        this.isLoadingHoteles.set(false);
+        this.resetHotelPagination();
+      },
+      error: (err) => {
+        console.error('Error cargando hoteles', err);
+        this.hoteles.set([]);
+        this.isLoadingHoteles.set(false);
+        this.hotelesLoadError.set('No se pudieron cargar los hoteles.');
+      },
+    });
   }
 
-  get filteredDestinos() {
-    const query = this.normalize(this.destinoSearch);
+  get filteredUsuarios(): any[] {
+    const search = this.normalize(this.userSearch);
 
-    return this.destinos().filter((destino) =>
-      this.normalize(
-        [destino.nombre, destino.pais, (destino as any).continente].join(' '),
-      ).includes(query),
-    );
+    if (!search) {
+      return this.usuarios();
+    }
+
+    return this.usuarios().filter((user) => {
+      return (
+        this.normalize(user.username).includes(search) ||
+        this.normalize(user.email).includes(search) ||
+        this.normalize(user.role).includes(search)
+      );
+    });
+  }
+
+  get paginatedUsuarios(): any[] {
+    const start = (this.userPage() - 1) * this.userPageSize;
+    return this.filteredUsuarios.slice(start, start + this.userPageSize);
+  }
+
+  get totalUserPages(): number {
+    return Math.max(1, Math.ceil(this.filteredUsuarios.length / this.userPageSize));
+  }
+
+  get userPageStart(): number {
+    if (this.filteredUsuarios.length === 0) return 0;
+    return (this.userPage() - 1) * this.userPageSize + 1;
+  }
+
+  get userPageEnd(): number {
+    return Math.min(this.userPage() * this.userPageSize, this.filteredUsuarios.length);
+  }
+
+  resetUserPagination(): void {
+    this.userPage.set(1);
+  }
+
+  previousUserPage(): void {
+    if (this.userPage() > 1) {
+      this.userPage.update((page) => page - 1);
+    }
+  }
+
+  nextUserPage(): void {
+    if (this.userPage() < this.totalUserPages) {
+      this.userPage.update((page) => page + 1);
+    }
+  }
+
+  get filteredDestinos(): any[] {
+    const search = this.normalize(this.destinoSearch);
+
+    if (!search) {
+      return this.destinos();
+    }
+
+    return this.destinos().filter((destino) => {
+      return (
+        this.normalize(destino.nombre).includes(search) ||
+        this.normalize(destino.pais).includes(search) ||
+        this.normalize(destino.continente).includes(search)
+      );
+    });
+  }
+
+  get paginatedDestinos(): any[] {
+    const start = (this.destinoPage() - 1) * this.destinoPageSize;
+    return this.filteredDestinos.slice(start, start + this.destinoPageSize);
   }
 
   get totalDestinoPages(): number {
     return Math.max(1, Math.ceil(this.filteredDestinos.length / this.destinoPageSize));
   }
 
-  get paginatedDestinos() {
-    const page = Math.min(this.destinoPage(), this.totalDestinoPages);
-    const start = (page - 1) * this.destinoPageSize;
-    const end = start + this.destinoPageSize;
-
-    return this.filteredDestinos.slice(start, end);
-  }
-
   get destinoPageStart(): number {
     if (this.filteredDestinos.length === 0) return 0;
-
     return (this.destinoPage() - 1) * this.destinoPageSize + 1;
   }
 
@@ -358,41 +327,47 @@ export class AdminDashboard implements OnInit {
     return Math.min(this.destinoPage() * this.destinoPageSize, this.filteredDestinos.length);
   }
 
-  resetDestinoPagination() {
+  resetDestinoPagination(): void {
     this.destinoPage.set(1);
   }
 
-  previousDestinoPage() {
+  previousDestinoPage(): void {
     if (this.destinoPage() > 1) {
       this.destinoPage.update((page) => page - 1);
     }
   }
 
-  nextDestinoPage() {
+  nextDestinoPage(): void {
     if (this.destinoPage() < this.totalDestinoPages) {
       this.destinoPage.update((page) => page + 1);
     }
   }
 
-  get filteredHoteles() {
-    const query = this.normalize(this.hotelSearch);
+  get filteredHoteles(): AdminHotelDTO[] {
+    const search = this.normalize(this.hotelSearch);
 
-    const hoteles = this.hoteles().filter((hotel) =>
-      this.normalize(
-        [hotel.nombre, hotel.ciudad, hotel.pais, hotel.destinoNombre, hotel.tipo].join(' '),
-      ).includes(query),
-    );
+    const filtered = this.hoteles().filter((hotel) => {
+      if (!search) return true;
 
-    return [...hoteles].sort((a, b) => {
-      if (this.hotelSort() === 'precio') {
+      return (
+        this.normalize(hotel.nombre).includes(search) ||
+        this.normalize(hotel.destinoNombre).includes(search) ||
+        this.normalize(hotel.ciudad).includes(search) ||
+        this.normalize(hotel.pais).includes(search) ||
+        this.normalize(hotel.tipo).includes(search)
+      );
+    });
+
+    return filtered.sort((a, b) => {
+      if (this.hotelSort === 'precio') {
         return Number(a.precioPorNoche || 0) - Number(b.precioPorNoche || 0);
       }
 
-      if (this.hotelSort() === 'reservas') {
+      if (this.hotelSort === 'reservas') {
         return Number(b.reservas || 0) - Number(a.reservas || 0);
       }
 
-      if (this.hotelSort() === 'destino') {
+      if (this.hotelSort === 'destino') {
         return String(a.destinoNombre || '').localeCompare(String(b.destinoNombre || ''));
       }
 
@@ -400,21 +375,17 @@ export class AdminDashboard implements OnInit {
     });
   }
 
+  get paginatedHoteles(): AdminHotelDTO[] {
+    const start = (this.hotelPage() - 1) * this.hotelPageSize;
+    return this.filteredHoteles.slice(start, start + this.hotelPageSize);
+  }
+
   get totalHotelPages(): number {
     return Math.max(1, Math.ceil(this.filteredHoteles.length / this.hotelPageSize));
   }
 
-  get paginatedHoteles() {
-    const page = Math.min(this.hotelPage(), this.totalHotelPages);
-    const start = (page - 1) * this.hotelPageSize;
-    const end = start + this.hotelPageSize;
-
-    return this.filteredHoteles.slice(start, end);
-  }
-
   get hotelPageStart(): number {
     if (this.filteredHoteles.length === 0) return 0;
-
     return (this.hotelPage() - 1) * this.hotelPageSize + 1;
   }
 
@@ -422,33 +393,48 @@ export class AdminDashboard implements OnInit {
     return Math.min(this.hotelPage() * this.hotelPageSize, this.filteredHoteles.length);
   }
 
-  resetHotelPagination() {
+  resetHotelPagination(): void {
     this.hotelPage.set(1);
   }
 
-  previousHotelPage() {
+  previousHotelPage(): void {
     if (this.hotelPage() > 1) {
       this.hotelPage.update((page) => page - 1);
     }
   }
 
-  nextHotelPage() {
+  nextHotelPage(): void {
     if (this.hotelPage() < this.totalHotelPages) {
       this.hotelPage.update((page) => page + 1);
     }
   }
 
+  get filteredReservas(): ReservaAdminResponse[] {
+    const search = this.normalize(this.reservaSearch);
+    const status = this.reservaStatusFilter;
+
+    return this.reservas().filter((reserva) => {
+      const matchesSearch =
+        !search ||
+        this.normalize(reserva.usuarioUsername).includes(search) ||
+        this.normalize(reserva.usuarioEmail).includes(search) ||
+        this.normalize(reserva.destinoNombre).includes(search) ||
+        this.normalize(reserva.alojamientoNombre).includes(search);
+
+      const matchesStatus = status === 'ALL' || this.getReservaStatus(reserva) === status;
+
+      return matchesSearch && matchesStatus;
+    });
+  }
+
   get totalRevenue(): number {
-    return this.reservas().reduce((total, reserva) => total + Number(reserva.precioTotal || 0), 0);
+    return this.reservas()
+      .filter((reserva) => this.getReservaStatus(reserva) !== 'CANCELADA')
+      .reduce((total, reserva) => total + Number(reserva.precioTotal || 0), 0);
   }
 
   get activeReservationsCount(): number {
     return this.reservas().filter((reserva) => this.getReservaStatus(reserva) === 'CONFIRMADA')
-      .length;
-  }
-
-  get canceledReservationsCount(): number {
-    return this.reservas().filter((reserva) => this.getReservaStatus(reserva) === 'CANCELADA')
       .length;
   }
 
@@ -457,189 +443,37 @@ export class AdminDashboard implements OnInit {
       .length;
   }
 
+  get canceledReservationsCount(): number {
+    return this.reservas().filter((reserva) => this.getReservaStatus(reserva) === 'CANCELADA')
+      .length;
+  }
+
   get topBookingUser(): string {
-    const counts = new globalThis.Map<string, number>();
+    const counter = new Map<string, number>();
 
     this.reservas().forEach((reserva) => {
-      const user = reserva.usuarioUsername || reserva.usuarioEmail || 'Sin usuario';
-      counts.set(user, (counts.get(user) || 0) + 1);
+      const name = reserva.usuarioUsername || reserva.usuarioEmail || 'Usuario';
+      counter.set(name, (counter.get(name) || 0) + 1);
     });
 
-    return [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || 'Sin datos';
-  }
+    let topUser = '-';
+    let topCount = 0;
 
-  openReservaDetails(reserva: any) {
-    this.selectedReserva.set(reserva);
-  }
-
-  closeReservaDetails() {
-    this.selectedReserva.set(null);
-  }
-
-  openUserDetails(user: any) {
-    if (!user?.id) return;
-
-    // La ficha combina resumen, tarjeta, reservas y reseñas en una sola lectura de detalle.
-    this.selectedUserDetail.set(null);
-    this.userDetailError.set('');
-    this.isLoadingUserDetail.set(true);
-
-    this.http
-      .get<AdminUserDetail>(`${environment.apiUrl}/admin/usuarios/${user.id}/detalle`, {
-        headers: this.getAuthHeaders(),
-      })
-      .subscribe({
-        next: (detail) => {
-          this.selectedUserDetail.set({
-            ...detail,
-            tarjeta: detail.tarjeta || detail.cuenta || null,
-            resenias: detail.resenias || detail.opiniones || [],
-            reservasPendientes: detail.reservasPendientes || [],
-            reservasRealizadas: detail.reservasRealizadas || [],
-            reservasCanceladas: detail.reservasCanceladas || [],
-          });
-          this.isLoadingUserDetail.set(false);
-        },
-        error: (err) => {
-          console.error('Error cargando detalle de usuario', err);
-          this.isLoadingUserDetail.set(false);
-          this.userDetailError.set('No se pudo cargar la ficha del usuario.');
-        },
-      });
-  }
-
-  closeUserDetails() {
-    this.selectedUserDetail.set(null);
-    this.userDetailError.set('');
-    this.isLoadingUserDetail.set(false);
-  }
-
-  getUserAvatar(user: any): string {
-    return user?.avatarUrl || user?.avatar || user?.fotoPerfil || user?.imagen || '';
-  }
-
-  getUserInitial(user: any): string {
-    const name = user?.username || user?.name || user?.email || 'U';
-
-    return String(name).trim().charAt(0).toUpperCase() || 'U';
-  }
-
-  getUserVisitedDestinations(detail: AdminUserDetail | null): number {
-    if (!detail) return 0;
-
-    // Preferimos el resumen del backend y calculamos un respaldo si llega vacío.
-    const backendValue = Number(detail.resumen?.destinosUnicos);
-
-    if (Number.isFinite(backendValue) && backendValue > 0) {
-      return backendValue;
-    }
-
-    const visited = (detail.reservasRealizadas || [])
-      .map((reserva) => toDestinationCoordinateKey(reserva.destinoNombre))
-      .filter(Boolean);
-
-    return new Set(visited).size;
-  }
-
-  getUserTraveledKm(detail: AdminUserDetail | null): number {
-    if (!detail) return 0;
-
-    return (detail.reservasRealizadas || []).reduce((total, reserva) => {
-      return total + getDistanceFromMadridKm(reserva.destinoNombre);
-    }, 0);
-  }
-
-  getReservaStatus(reserva: any): string {
-    const estado = String(reserva?.estado || '').toUpperCase();
-
-    // Si el backend aún no marcó una reserva antigua como completada, se deriva por fecha fin.
-    if (estado === 'CANCELADA') return 'CANCELADA';
-    if (estado === 'COMPLETADA') return 'COMPLETADA';
-
-    const checkOut = reserva?.checkOut || reserva?.fechaFin;
-    const checkOutDate = this.parseDateOnly(checkOut);
-
-    if (checkOutDate) {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      if (checkOutDate < today) {
-        return 'COMPLETADA';
+    counter.forEach((count, user) => {
+      if (count > topCount) {
+        topUser = user;
+        topCount = count;
       }
-    }
+    });
 
-    return 'CONFIRMADA';
+    return topUser;
   }
 
-  getReservaStatusClass(reserva: any): string {
-    const status = this.getReservaStatus(reserva);
-
-    if (status === 'CANCELADA') {
-      return 'bg-red-500/10 text-red-400 border-red-500/20';
-    }
-
-    if (status === 'COMPLETADA') {
-      return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
-    }
-
-    return 'bg-amber-500/10 text-amber-300 border-amber-500/20';
-  }
-
-  formatDate(value: string | Date | undefined | null): string {
-    const date = this.parseDateOnly(value);
-
-    if (!date) return '-';
-
-    return date.toLocaleDateString('es-ES');
-  }
-
-  formatMoney(value: number | string | undefined | null): string {
-    return `${Number(value || 0).toFixed(2)}€`;
-  }
-
-  private parseDateOnly(value: string | Date | undefined | null): Date | null {
-    if (!value) return null;
-
-    if (value instanceof Date) {
-      if (Number.isNaN(value.getTime())) return null;
-
-      const date = new Date(value);
-      date.setHours(0, 0, 0, 0);
-      return date;
-    }
-
-    const text = String(value);
-
-    if (!text) return null;
-
-    const datePart = text.includes('T') ? text.split('T')[0] : text;
-    const parts = datePart.split('-').map(Number);
-
-    if (parts.length >= 3 && parts.every((part) => Number.isFinite(part))) {
-      const [year, month, day] = parts;
-      return new Date(year, month - 1, day);
-    }
-
-    const fallback = new Date(text);
-
-    if (Number.isNaN(fallback.getTime())) return null;
-
-    fallback.setHours(0, 0, 0, 0);
-    return fallback;
-  }
-
-  private normalize(value: string | number | null | undefined): string {
-    return String(value || '')
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .trim();
-  }
-
-  openEditUsuario(user: any) {
+  openUserModal(user: any): void {
     this.userError.set('');
+    this.selectedUser.set(user);
 
-    this.editUserForm = {
+    this.userForm = {
       id: user.id,
       username: user.username || '',
       email: user.email || '',
@@ -650,458 +484,488 @@ export class AdminDashboard implements OnInit {
     this.showUserModal.set(true);
   }
 
-  closeUserModal() {
+  closeUserModal(): void {
     if (this.isSavingUser()) return;
 
     this.showUserModal.set(false);
+    this.selectedUser.set(null);
     this.userError.set('');
   }
 
-  saveUser() {
-    if (!this.editUserForm.username.trim() || !this.editUserForm.email.trim()) {
-      this.userError.set('El nombre y el email son obligatorios.');
+  saveUser(): void {
+    if (!this.userForm.id) return;
+
+    const username = this.userForm.username.trim();
+    const email = this.userForm.email.trim();
+
+    if (!username || !email) {
+      this.userError.set('Todos los campos son obligatorios.');
       return;
     }
 
     this.isSavingUser.set(true);
     this.userError.set('');
 
-    this.http
-      .put<any>(`${environment.apiUrl}/admin/usuarios/${this.editUserForm.id}`, this.editUserForm, {
-        headers: this.getAuthHeaders(),
+    this.adminService
+      .updateUsuario(this.userForm.id, {
+        username,
+        email,
+        role: this.userForm.role,
+        saldo: Number(this.userForm.saldo || 0),
       })
       .subscribe({
         next: () => {
           this.isSavingUser.set(false);
           this.showUserModal.set(false);
+          this.showNotice(
+            'Usuario actualizado',
+            'El usuario se ha actualizado correctamente.',
+            'success',
+          );
           this.loadUsuarios();
-
-          this.noticeModal.set({
-            type: 'success',
-            title: 'Usuario actualizado',
-            message: 'Los datos del usuario se han guardado correctamente.',
-          });
         },
         error: (err) => {
-          console.error('Error actualizando usuario', err);
+          console.error('Error guardando usuario', err);
           this.isSavingUser.set(false);
-
-          const message =
-            typeof err?.error === 'string'
-              ? err.error
-              : err?.error?.message || 'No se pudo actualizar el usuario.';
-
-          this.userError.set(message);
+          this.userError.set('No se pudo guardar el usuario.');
         },
       });
   }
 
-  deleteUsuario(id: number) {
+  askDeleteUser(user: any): void {
+    if (user.role === 'ADMIN') {
+      this.showNotice(
+        'No se pudo eliminar el usuario',
+        'No se puede borrar un administrador',
+        'error',
+      );
+      return;
+    }
+
     this.confirmModal.set({
-      action: 'delete-user',
-      id,
       title: 'Eliminar usuario',
       message: '¿Seguro que quieres eliminar este usuario? Esta acción no se puede deshacer.',
-      confirmText: 'Eliminar usuario',
+      confirmText: 'Eliminar',
+      action: () => this.deleteUser(user.id),
     });
   }
 
-  openCreateDestino() {
-    this.destinoMode.set('create');
-    this.destinoToEdit.set(null);
-    this.destinoError.set('');
-    this.showDestinoModal.set(true);
+  deleteUser(id: number): void {
+    this.isDeleting.set(true);
 
-    this.editDestinoForm = {
-      nombre: '',
-      pais: '',
-      continente: 'Europa',
-      precio: 0,
-      descripcion: '',
-      imagen: '',
-    };
-  }
-
-  openEditDestino(destino: DestinoDTO) {
-    this.destinoMode.set('edit');
-    this.destinoToEdit.set(destino);
-    this.destinoError.set('');
-    this.showDestinoModal.set(true);
-
-    this.editDestinoForm = {
-      nombre: destino.nombre || '',
-      pais: destino.pais || '',
-      continente:
-        (destino as any).continente || this.getContinenteName((destino as any).continenteId),
-      precio: Number(destino.precio || 0),
-      descripcion: destino.descripcion || '',
-      imagen: (destino as any).imagenUrl || (destino as any).imagen || '',
-    };
-  }
-
-  closeDestinoModal() {
-    if (this.isSavingDestino()) return;
-
-    this.showDestinoModal.set(false);
-    this.destinoToEdit.set(null);
-    this.destinoMode.set('create');
-    this.destinoError.set('');
-  }
-
-  saveDestino() {
-    if (!this.editDestinoForm.nombre.trim() || !this.editDestinoForm.pais.trim()) {
-      this.destinoError.set('El nombre y el país son obligatorios.');
-      return;
-    }
-
-    this.isSavingDestino.set(true);
-    this.destinoError.set('');
-
-    const mode = this.destinoMode();
-
-    const request = {
-      nombre: this.editDestinoForm.nombre,
-      pais: this.editDestinoForm.pais,
-      continente: this.editDestinoForm.continente,
-      precio: Number(this.editDestinoForm.precio || 0),
-      descripcion: this.editDestinoForm.descripcion,
-      imagen: this.editDestinoForm.imagen,
-    };
-
-    const destino = this.destinoToEdit();
-
-    const request$ =
-      mode === 'edit' && destino
-        ? this.http.put<DestinoDTO>(`${environment.apiUrl}/admin/destinos/${destino.id}`, request, {
-            headers: this.getAuthHeaders(),
-          })
-        : this.http.post<DestinoDTO>(`${environment.apiUrl}/admin/destinos`, request, {
-            headers: this.getAuthHeaders(),
-          });
-
-    request$.subscribe({
+    this.adminService.deleteUsuario(id).subscribe({
       next: () => {
-        this.isSavingDestino.set(false);
-        this.closeDestinoModal();
-        this.loadDestinos();
-
-        this.noticeModal.set({
-          type: 'success',
-          title: mode === 'edit' ? 'Destino actualizado' : 'Destino creado',
-          message: 'Los cambios del destino se han guardado correctamente.',
-        });
+        this.isDeleting.set(false);
+        this.confirmModal.set(null);
+        this.showNotice(
+          'Usuario eliminado',
+          'El usuario se ha eliminado correctamente.',
+          'success',
+        );
+        this.loadUsuarios();
       },
       error: (err) => {
-        console.error('Error guardando destino', err);
-        this.isSavingDestino.set(false);
-
-        const message =
-          typeof err?.error === 'string'
-            ? err.error
-            : err?.error?.message || 'No se pudo guardar el destino.';
-
-        this.destinoError.set(message);
-      },
-    });
-  }
-
-  deleteDestino(id: number) {
-    if (!id) return;
-
-    this.confirmModal.set({
-      action: 'delete-destino',
-      id,
-      title: 'Eliminar destino',
-      message:
-        '¿Seguro que quieres eliminar este destino? Si tiene alojamientos asociados, no se podrá borrar.',
-      confirmText: 'Eliminar destino',
-    });
-  }
-
-  openCreateHotel() {
-    this.hotelMode.set('create');
-    this.hotelToEdit.set(null);
-    this.hotelError.set('');
-    this.showHotelModal.set(true);
-
-    const firstDestino = this.destinos()[0];
-
-    this.editHotelForm = {
-      id: 0,
-      nombre: '',
-      ciudad: firstDestino?.nombre || '',
-      pais: firstDestino?.pais || '',
-      tipo: 'HOTEL',
-      precioPorNoche: 0,
-      destinoId: firstDestino?.id || null,
-    };
-  }
-
-  openEditHotel(hotel: any) {
-    this.hotelMode.set('edit');
-    this.hotelToEdit.set(hotel);
-    this.hotelError.set('');
-    this.showHotelModal.set(true);
-
-    this.editHotelForm = {
-      id: hotel.id,
-      nombre: hotel.nombre || '',
-      ciudad: hotel.ciudad || '',
-      pais: hotel.pais || '',
-      tipo: hotel.tipo || 'HOTEL',
-      precioPorNoche: Number(hotel.precioPorNoche || 0),
-      destinoId: Number(hotel.destinoId || 0),
-    };
-  }
-
-  closeHotelModal() {
-    if (this.isSavingHotel()) return;
-
-    this.showHotelModal.set(false);
-    this.hotelToEdit.set(null);
-    this.hotelError.set('');
-  }
-
-  onHotelDestinoChange(destinoId: number | string | null) {
-    const destino = this.destinos().find((item) => item.id === Number(destinoId));
-
-    if (!destino) return;
-
-    this.editHotelForm.destinoId = destino.id;
-    this.editHotelForm.ciudad = destino.nombre || this.editHotelForm.ciudad;
-    this.editHotelForm.pais = destino.pais || this.editHotelForm.pais;
-  }
-
-  saveHotel() {
-    if (!this.editHotelForm.nombre.trim() || !this.editHotelForm.destinoId) {
-      this.hotelError.set('El nombre y el destino son obligatorios.');
-      return;
-    }
-
-    this.isSavingHotel.set(true);
-    this.hotelError.set('');
-
-    const mode = this.hotelMode();
-
-    const request = {
-      nombre: this.editHotelForm.nombre,
-      ciudad: this.editHotelForm.ciudad,
-      pais: this.editHotelForm.pais,
-      tipo: this.editHotelForm.tipo,
-      precioPorNoche: Number(this.editHotelForm.precioPorNoche || 0),
-      destinoId: this.editHotelForm.destinoId,
-    };
-
-    const hotel = this.hotelToEdit();
-
-    const request$ =
-      mode === 'edit' && hotel
-        ? this.http.put<any>(`${environment.apiUrl}/admin/alojamientos/${hotel.id}`, request, {
-            headers: this.getAuthHeaders(),
-          })
-        : this.http.post<any>(`${environment.apiUrl}/admin/alojamientos`, request, {
-            headers: this.getAuthHeaders(),
-          });
-
-    request$.subscribe({
-      next: () => {
-        this.isSavingHotel.set(false);
-        this.closeHotelModal();
-        this.loadHoteles();
-
-        this.noticeModal.set({
-          type: 'success',
-          title: mode === 'edit' ? 'Hotel actualizado' : 'Hotel creado',
-          message: 'Los cambios del hotel se han guardado correctamente.',
-        });
-      },
-      error: (err) => {
-        console.error('Error guardando hotel', err);
-        this.isSavingHotel.set(false);
-
-        this.hotelError.set(
-          typeof err?.error === 'string'
-            ? err.error
-            : err?.error?.message || 'No se pudo guardar el hotel.',
+        console.error('Error eliminando usuario', err);
+        this.isDeleting.set(false);
+        this.confirmModal.set(null);
+        this.showNotice(
+          'No se pudo eliminar el usuario',
+          'Ha ocurrido un error al eliminar el usuario.',
+          'error',
         );
       },
     });
   }
 
-  deleteHotel(id: number) {
-    this.confirmModal.set({
-      action: 'delete-hotel',
-      id,
-      title: 'Eliminar hotel',
-      message:
-        '¿Seguro que quieres eliminar este hotel? Si tiene reservas asociadas, no se podrá borrar.',
-      confirmText: 'Eliminar hotel',
+  openUserDetails(user: any): void {
+    this.selectedUserDetail.set(null);
+    this.userDetailError.set('');
+    this.isLoadingUserDetail.set(true);
+
+    this.adminService.getUsuarioDetalle(user.id).subscribe({
+      next: (detail) => {
+        this.selectedUserDetail.set(detail);
+        this.isLoadingUserDetail.set(false);
+      },
+      error: (err) => {
+        console.error('Error cargando ficha de usuario', err);
+        this.userDetailError.set('No se pudo cargar la ficha del usuario.');
+        this.isLoadingUserDetail.set(false);
+      },
     });
   }
 
-  cancelConfirm() {
+  closeUserDetails(): void {
+    this.selectedUserDetail.set(null);
+    this.isLoadingUserDetail.set(false);
+    this.userDetailError.set('');
+  }
+
+  getUserVisitedDestinations(detail: AdminUserDetailDTO | null): number {
+    if (!detail) return 0;
+
+    if (Number(detail.resumen?.destinosUnicos || 0) > 0) {
+      return Number(detail.resumen.destinosUnicos);
+    }
+
+    const reservas = [...(detail.reservasRealizadas || []), ...(detail.reservasPendientes || [])];
+
+    const destinos = reservas
+      .filter((reserva) => this.getReservaStatus(reserva) !== 'CANCELADA')
+      .map((reserva) => toDestinationCoordinateKey(reserva.destinoNombre))
+      .filter(Boolean);
+
+    return new Set(destinos).size;
+  }
+
+  getUserTraveledKm(detail: AdminUserDetailDTO | null): number {
+    if (!detail) return 0;
+
+    if (Number(detail.resumen?.kmRecorridos || 0) > 0) {
+      return Number(detail.resumen.kmRecorridos);
+    }
+
+    return (detail.reservasRealizadas || []).reduce((total, reserva) => {
+      return total + getDistanceFromMadridKm(reserva.destinoNombre || '');
+    }, 0);
+  }
+
+  getUserReservations(detail: AdminUserDetailDTO | null): ReservaAdminResponse[] {
+    if (!detail) return [];
+
+    return [
+      ...(detail.reservasPendientes || []),
+      ...(detail.reservasRealizadas || []),
+      ...(detail.reservasCanceladas || []),
+    ];
+  }
+
+  openCreateDestino(): void {
+    this.destinoMode.set('create');
+    this.selectedDestino.set(null);
+    this.destinoError.set('');
+
+    this.destinoForm = {
+      id: null,
+      nombre: '',
+      pais: '',
+      continente: this.continentes[0],
+      precio: 0,
+      imagen: '',
+      descripcion: '',
+    };
+
+    this.showDestinoModal.set(true);
+  }
+
+  openEditDestino(destino: any): void {
+    this.destinoMode.set('edit');
+    this.selectedDestino.set(destino);
+    this.destinoError.set('');
+
+    this.destinoForm = {
+      id: destino.id,
+      nombre: destino.nombre || '',
+      pais: destino.pais || '',
+      continente: destino.continente || this.continentes[0],
+      precio: Number(destino.precio || 0),
+      imagen: destino.imagen || '',
+      descripcion: destino.descripcion || '',
+    };
+
+    this.showDestinoModal.set(true);
+  }
+
+  closeDestinoModal(): void {
+    if (this.isSavingDestino()) return;
+
+    this.showDestinoModal.set(false);
+    this.destinoError.set('');
+    this.selectedDestino.set(null);
+  }
+
+  saveDestino(): void {
+    const nombre = this.destinoForm.nombre.trim();
+    const pais = this.destinoForm.pais.trim();
+
+    if (!nombre || !pais || !this.destinoForm.continente) {
+      this.destinoError.set('Todos los campos son obligatorios.');
+      return;
+    }
+
+    if (Number(this.destinoForm.precio) <= 0) {
+      this.destinoError.set('El precio debe ser mayor que 0.');
+      return;
+    }
+
+    const dto = {
+      nombre,
+      pais,
+      continente: this.destinoForm.continente,
+      precio: Number(this.destinoForm.precio),
+      imagen: this.destinoForm.imagen.trim(),
+      descripcion: this.destinoForm.descripcion.trim(),
+    };
+
+    this.isSavingDestino.set(true);
+    this.destinoError.set('');
+
+    const request$ =
+      this.destinoMode() === 'create'
+        ? this.adminService.createDestino(dto)
+        : this.adminService.updateDestino(this.destinoForm.id!, dto);
+
+    request$.subscribe({
+      next: () => {
+        this.isSavingDestino.set(false);
+        this.showDestinoModal.set(false);
+
+        const title = this.destinoMode() === 'create' ? 'Destino creado' : 'Destino actualizado';
+        const message =
+          this.destinoMode() === 'create'
+            ? 'El destino se ha creado correctamente.'
+            : 'El destino se ha actualizado correctamente.';
+
+        this.showNotice(title, message, 'success');
+        this.loadDestinos();
+      },
+      error: (err) => {
+        console.error('Error guardando destino', err);
+        this.isSavingDestino.set(false);
+        this.destinoError.set('No se pudo guardar el destino.');
+      },
+    });
+  }
+
+  askDeleteDestino(destino: any): void {
+    this.confirmModal.set({
+      title: 'Eliminar destino',
+      message:
+        '¿Seguro que quieres eliminar este destino? Si tiene reservas asociadas, puede que no se pueda borrar.',
+      confirmText: 'Eliminar',
+      action: () => this.deleteDestino(destino.id),
+    });
+  }
+
+  deleteDestino(id: number): void {
+    this.isDeleting.set(true);
+
+    this.adminService.deleteDestino(id).subscribe({
+      next: () => {
+        this.isDeleting.set(false);
+        this.confirmModal.set(null);
+        this.showNotice(
+          'Destino eliminado',
+          'El destino se ha eliminado correctamente.',
+          'success',
+        );
+        this.loadDestinos();
+      },
+      error: (err) => {
+        console.error('Error eliminando destino', err);
+        this.isDeleting.set(false);
+        this.confirmModal.set(null);
+        this.showNotice(
+          'No se pudo eliminar el destino',
+          'No se pudo eliminar el destino.',
+          'error',
+        );
+      },
+    });
+  }
+
+  openCreateHotel(): void {
+    this.hotelMode.set('create');
+    this.selectedHotel.set(null);
+    this.hotelError.set('');
+
+    this.hotelForm = {
+      id: null,
+      destinoId: this.destinos()[0]?.id || null,
+      nombre: '',
+      tipo: 'HOTEL',
+      ciudad: '',
+      pais: '',
+      precioPorNoche: 0,
+    };
+
+    this.showHotelModal.set(true);
+  }
+
+  openEditHotel(hotel: AdminHotelDTO): void {
+    this.hotelMode.set('edit');
+    this.selectedHotel.set(hotel);
+    this.hotelError.set('');
+
+    this.hotelForm = {
+      id: hotel.id,
+      destinoId: hotel.destinoId,
+      nombre: hotel.nombre || '',
+      tipo: hotel.tipo || 'HOTEL',
+      ciudad: hotel.ciudad || '',
+      pais: hotel.pais || '',
+      precioPorNoche: Number(hotel.precioPorNoche || 0),
+    };
+
+    this.showHotelModal.set(true);
+  }
+
+  closeHotelModal(): void {
+    if (this.isSavingHotel()) return;
+
+    this.showHotelModal.set(false);
+    this.selectedHotel.set(null);
+    this.hotelError.set('');
+  }
+
+  saveHotel(): void {
+    if (!this.hotelForm.destinoId || !this.hotelForm.nombre.trim()) {
+      this.hotelError.set('El nombre y el destino son obligatorios.');
+      return;
+    }
+
+    if (Number(this.hotelForm.precioPorNoche) <= 0) {
+      this.hotelError.set('El precio debe ser mayor que 0.');
+      return;
+    }
+
+    const dto = {
+      destinoId: Number(this.hotelForm.destinoId),
+      nombre: this.hotelForm.nombre.trim(),
+      tipo: this.hotelForm.tipo,
+      ciudad: this.hotelForm.ciudad.trim(),
+      pais: this.hotelForm.pais.trim(),
+      precioPorNoche: Number(this.hotelForm.precioPorNoche),
+    };
+
+    this.isSavingHotel.set(true);
+    this.hotelError.set('');
+
+    const request$ =
+      this.hotelMode() === 'create'
+        ? this.adminService.createHotel(dto)
+        : this.adminService.updateHotel(this.hotelForm.id!, dto);
+
+    request$.subscribe({
+      next: () => {
+        this.isSavingHotel.set(false);
+        this.showHotelModal.set(false);
+
+        const title = this.hotelMode() === 'create' ? 'Hotel creado' : 'Hotel actualizado';
+        this.showNotice(title, 'Los cambios del hotel se han guardado correctamente.', 'success');
+        this.loadHoteles();
+      },
+      error: (err) => {
+        console.error('Error guardando hotel', err);
+        this.isSavingHotel.set(false);
+        this.hotelError.set('No se pudo guardar el hotel.');
+      },
+    });
+  }
+
+  askDeleteHotel(hotel: AdminHotelDTO): void {
+    this.confirmModal.set({
+      title: 'Eliminar hotel',
+      message: '¿Seguro que quieres eliminar este hotel?',
+      confirmText: 'Eliminar',
+      action: () => this.deleteHotel(hotel.id),
+    });
+  }
+
+  deleteHotel(id: number): void {
+    this.isDeleting.set(true);
+
+    this.adminService.deleteHotel(id).subscribe({
+      next: () => {
+        this.isDeleting.set(false);
+        this.confirmModal.set(null);
+        this.showNotice('Hotel eliminado', 'El hotel se ha eliminado correctamente.', 'success');
+        this.loadHoteles();
+      },
+      error: (err) => {
+        console.error('Error eliminando hotel', err);
+        this.isDeleting.set(false);
+        this.confirmModal.set(null);
+        this.showNotice('No se pudo eliminar el hotel', 'No se pudo eliminar el hotel.', 'error');
+      },
+    });
+  }
+
+  openReservaDetail(reserva: ReservaAdminResponse): void {
+    this.selectedReserva.set(reserva);
+  }
+
+  closeReservaDetail(): void {
+    this.selectedReserva.set(null);
+  }
+
+  closeConfirmModal(): void {
     if (this.isDeleting()) return;
 
     this.confirmModal.set(null);
   }
 
-  confirmAction() {
+  confirmAction(): void {
     const modal = this.confirmModal();
 
-    if (!modal) return;
+    if (!modal || this.isDeleting()) return;
 
-    if (modal.action === 'delete-user') {
-      this.confirmDeleteUsuario(modal.id);
-      return;
-    }
-
-    if (modal.action === 'delete-destino') {
-      this.confirmDeleteDestino(modal.id);
-      return;
-    }
-
-    if (modal.action === 'delete-hotel') {
-      this.confirmDeleteHotel(modal.id);
-    }
+    modal.action();
   }
 
-  private confirmDeleteUsuario(id: number) {
-    this.isDeleting.set(true);
-
-    this.http
-      .delete(`${environment.apiUrl}/admin/usuarios/${id}`, {
-        headers: this.getAuthHeaders(),
-      })
-      .subscribe({
-        next: () => {
-          this.confirmModal.set(null);
-          this.isDeleting.set(false);
-          this.loadUsuarios();
-          this.loadReservas();
-
-          this.noticeModal.set({
-            type: 'success',
-            title: 'Usuario eliminado',
-            message: 'El usuario se ha eliminado correctamente.',
-          });
-        },
-        error: (err) => {
-          console.error('Error eliminando usuario', err);
-          this.confirmModal.set(null);
-          this.isDeleting.set(false);
-
-          const message =
-            typeof err?.error === 'string'
-              ? err.error
-              : err?.error?.message || 'No se pudo eliminar el usuario.';
-
-          this.noticeModal.set({
-            type: 'error',
-            title: 'No se pudo eliminar el usuario',
-            message,
-          });
-        },
-      });
+  showNotice(title: string, message: string, type: 'success' | 'error'): void {
+    this.noticeModal.set({ title, message, type });
   }
 
-  private confirmDeleteDestino(id: number) {
-    this.isDeleting.set(true);
-
-    this.http
-      .delete(`${environment.apiUrl}/admin/destinos/${id}`, {
-        headers: this.getAuthHeaders(),
-      })
-      .subscribe({
-        next: () => {
-          this.confirmModal.set(null);
-          this.isDeleting.set(false);
-          this.loadDestinos();
-
-          this.noticeModal.set({
-            type: 'success',
-            title: 'Destino eliminado',
-            message: 'El destino se ha eliminado correctamente.',
-          });
-        },
-        error: (err) => {
-          console.error('Error eliminando destino', err);
-          this.confirmModal.set(null);
-          this.isDeleting.set(false);
-
-          const message =
-            typeof err?.error === 'string'
-              ? err.error
-              : err?.error?.message || 'No se pudo eliminar el destino.';
-
-          this.noticeModal.set({
-            type: 'error',
-            title: 'No se pudo eliminar el destino',
-            message,
-          });
-        },
-      });
-  }
-
-  private confirmDeleteHotel(id: number) {
-    this.isDeleting.set(true);
-
-    this.http
-      .delete(`${environment.apiUrl}/admin/alojamientos/${id}`, {
-        headers: this.getAuthHeaders(),
-      })
-      .subscribe({
-        next: () => {
-          this.confirmModal.set(null);
-          this.isDeleting.set(false);
-          this.loadHoteles();
-
-          this.noticeModal.set({
-            type: 'success',
-            title: 'Hotel eliminado',
-            message: 'El hotel se ha eliminado correctamente.',
-          });
-        },
-        error: (err) => {
-          console.error('Error eliminando hotel', err);
-          this.confirmModal.set(null);
-          this.isDeleting.set(false);
-
-          this.noticeModal.set({
-            type: 'error',
-            title: 'No se pudo eliminar el hotel',
-            message:
-              typeof err?.error === 'string'
-                ? err.error
-                : err?.error?.message || 'No se pudo eliminar el hotel.',
-          });
-        },
-      });
-  }
-
-  closeNotice() {
+  closeNotice(): void {
     this.noticeModal.set(null);
   }
 
-  getContinenteName(id: number | undefined | null): string {
-    if (id === 1) return 'Europa';
-    if (id === 2) return 'Asia';
-    if (id === 3) return 'África';
-    if (id === 4) return 'América del Norte';
-    if (id === 5) return 'América del Sur';
-    if (id === 6) return 'Oceanía';
+  getReservaStatus(reserva: any): string {
+    const estado = String(reserva?.estado || '').toUpperCase();
 
-    return 'Europa';
-  }
+    if (estado === 'CANCELADA') return 'CANCELADA';
 
-  private getAuthHeaders(): HttpHeaders {
-    const token = this.auth.getToken() || localStorage.getItem('token');
+    const endDate = reserva?.checkOut || reserva?.fechaFin;
 
-    let headers = new HttpHeaders();
+    if (endDate) {
+      const today = new Date().toISOString().split('T')[0];
+      const dateText = String(endDate).includes('T')
+        ? String(endDate).split('T')[0]
+        : String(endDate);
 
-    if (token) {
-      headers = headers.set('Authorization', `Bearer ${token}`);
+      if (dateText < today) {
+        return 'COMPLETADA';
+      }
     }
 
-    return headers;
+    return estado || 'CONFIRMADA';
+  }
+
+  formatMoney(value: number | string | undefined | null): string {
+    const numberValue = Number(value || 0);
+
+    return new Intl.NumberFormat('es-ES', {
+      style: 'currency',
+      currency: 'EUR',
+    }).format(numberValue);
+  }
+
+  formatDate(value: string | Date | undefined | null): string {
+    if (!value) return '-';
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) return '-';
+
+    return date.toLocaleDateString('es-ES');
+  }
+
+  private normalize(value: any): string {
+    return String(value || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
   }
 }

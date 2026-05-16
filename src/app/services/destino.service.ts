@@ -20,6 +20,7 @@ export interface DestinoDTO {
   imagenUrl: string;
   imagen: string;
   estrellas: number;
+  rating: number;
   precio: number;
   precioPorNoche: number;
 }
@@ -190,6 +191,23 @@ export class DestinoService {
   private fixBrokenText(value: any): string {
     // Normaliza textos heredados con mojibake antes de pintarlos o compararlos.
     return String(value || '')
+      .replaceAll('Ã¡', 'á')
+      .replaceAll('Ã©', 'é')
+      .replaceAll('Ã­', 'í')
+      .replaceAll('Ã³', 'ó')
+      .replaceAll('Ãº', 'ú')
+      .replaceAll('Ã', 'Á')
+      .replaceAll('Ã‰', 'É')
+      .replaceAll('Ã', 'Í')
+      .replaceAll('Ã“', 'Ó')
+      .replaceAll('Ãš', 'Ú')
+      .replaceAll('Ã±', 'ñ')
+      .replaceAll('Ã‘', 'Ñ')
+      .replaceAll('Ã¼', 'ü')
+      .replaceAll('Ãœ', 'Ü')
+      .replaceAll('Â¿', '¿')
+      .replaceAll('Â¡', '¡')
+      .replaceAll('â‚¬', '€')
       .replaceAll('B?lgica', 'Bélgica')
       .replaceAll('Espa?a', 'España')
       .replaceAll('M?xico', 'México')
@@ -243,6 +261,7 @@ export class DestinoService {
 
     const finalContinentId = continentFromCountry || Number(backendContinentId) || 1;
     const fullUrl = this.getFullImageUrl(path);
+    const rating = this.getStableRating(d.rating || d.estrellas, d.id);
 
     return {
       ...d,
@@ -253,6 +272,8 @@ export class DestinoService {
       continenteId: finalContinentId,
       imagen: fullUrl,
       imagenUrl: fullUrl,
+      rating,
+      estrellas: rating,
     };
   }
 
@@ -443,6 +464,8 @@ export class DestinoService {
               imagenUrl: this.getFullImageUrl(h.imagen || h.imagenUrl),
               image: this.getFullImageUrl(h.imagen || h.imagenUrl),
               name: this.fixBrokenText(h.nombre || h.name),
+              rating: this.getHotelRatingFromApi(h),
+              estrellas: this.getHotelRatingFromApi(h),
             }
           : (null as any),
       ),
@@ -462,6 +485,8 @@ export class DestinoService {
           imagenUrl: this.getFullImageUrl(a.imagen || a.imagenUrl),
           image: this.getFullImageUrl(a.imagen || a.imagenUrl),
           name: this.fixBrokenText(a.nombre || a.name),
+          rating: this.getHotelRatingFromApi(a),
+          estrellas: this.getHotelRatingFromApi(a),
         })),
       ),
     );
@@ -480,6 +505,8 @@ export class DestinoService {
           imagenUrl: this.getFullImageUrl(a.imagen || a.imagenUrl),
           image: this.getFullImageUrl(a.imagen || a.imagenUrl),
           name: this.fixBrokenText(a.nombre || a.name),
+          rating: this.getHotelRatingFromApi(a),
+          estrellas: this.getHotelRatingFromApi(a),
         })),
       ),
     );
@@ -535,5 +562,29 @@ export class DestinoService {
         });
       }),
     );
+  }
+
+  private getStableRating(value: any, id: any): number {
+    const current = Number(value);
+
+    if (current >= 3 && current < 5) {
+      return Math.round(current * 10) / 10;
+    }
+
+    const ratings = [3.5, 3.7, 3.8, 4.0, 4.1, 4.2, 4.3, 4.5, 4.6, 4.8];
+    const index = Math.abs(Number(id || 0)) % ratings.length;
+
+    return ratings[index];
+  }
+
+  private getHotelRatingFromApi(hotel: any): number | null {
+    const reviewCount = Number(hotel?.totalOpiniones ?? hotel?.reviewCount ?? 0);
+    const rating = Number(hotel?.rating ?? hotel?.estrellas);
+
+    if (!reviewCount || !Number.isFinite(rating) || rating <= 0) {
+      return null;
+    }
+
+    return Math.max(0, Math.min(5, Math.round(rating * 10) / 10));
   }
 }

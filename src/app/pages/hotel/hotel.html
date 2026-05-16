@@ -33,11 +33,17 @@
             {{ (hotel().tipo || 'HOTEL') | translate }}
           </span>
 
+          @if (hasHotelReviews(hotel())) {
           <div class="flex items-center gap-1">
             @for (_ of getArray(getHotelRating(hotel())); track $index) {
             <lucide-icon [name]="StarIcon" class="w-4 h-4 fill-yellow-500 text-yellow-500"></lucide-icon>
             }
           </div>
+          } @else {
+          <span class="text-xs font-bold uppercase tracking-widest text-gray-400">
+            {{ 'Este hotel todavía no tiene reseñas.' | translate }}
+          </span>
+          }
         </div>
 
         <h1 class="text-4xl md:text-6xl font-black text-white mb-4">
