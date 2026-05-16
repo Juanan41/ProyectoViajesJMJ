@@ -1,3 +1,7 @@
+// ProyectoViajesJMJ - com/viajes/app/alojamientos/AlojamientoRepository.java
+// Responsabilidad: catalogo de alojamientos, habitaciones y detalle hotelero.
+// Nota profesional: Representa el catalogo hotelero, sus habitaciones y las opciones que se pueden reservar.
+
 package com.viajes.app.alojamientos;
 
 import org.springframework.data.domain.Page;
@@ -8,6 +12,10 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
+/**
+ * Documento profesional: clase principal del archivo.
+ * Representa el catalogo hotelero, sus habitaciones y las opciones que se pueden reservar.
+ */
 public interface AlojamientoRepository extends JpaRepository<Alojamiento, Long> {
 
     List<Alojamiento> findByCiudad(String ciudad);

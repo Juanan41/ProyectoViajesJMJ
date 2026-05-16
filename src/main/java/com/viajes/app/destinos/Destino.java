@@ -1,8 +1,16 @@
+// ProyectoViajesJMJ - com/viajes/app/destinos/Destino.java
+// Responsabilidad: catalogo de destinos, navegacion geografica y busqueda.
+// Nota profesional: Soporta navegacion por destinos, paises, continentes y busqueda bilingue.
+
 package com.viajes.app.destinos;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Table;
 import jakarta.persistence.*;
+/**
+ * Documento profesional: clase principal del archivo.
+ * Soporta navegacion por destinos, paises, continentes y busqueda bilingue.
+ */
 
 
 

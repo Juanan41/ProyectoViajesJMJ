@@ -1,3 +1,7 @@
+// ProyectoViajesJMJ - com/viajes/app/config/SecurityConfig.java
+// Responsabilidad: autenticacion, autorizacion y control de sesion.
+// Nota profesional: Gestiona autenticacion y sesion; los cambios aqui afectan al acceso de usuarios.
+
 package com.viajes.app.config;
 
 import com.viajes.app.auth.JwtFilter;
@@ -20,6 +24,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 import java.util.List;
+/**
+ * Documento profesional: clase principal del archivo.
+ * Gestiona autenticacion y sesion; los cambios aqui afectan al acceso de usuarios.
+ */
 
 @Configuration
 public class SecurityConfig {

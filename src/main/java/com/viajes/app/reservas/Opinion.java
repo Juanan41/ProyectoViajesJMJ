@@ -1,9 +1,17 @@
+// ProyectoViajesJMJ - com/viajes/app/reservas/Opinion.java
+// Responsabilidad: flujo de reservas, viajes y estados asociados.
+// Nota profesional: Contiene reglas de reserva, estados de viaje y datos usados por tickets/recibos/perfil.
+
 package com.viajes.app.reservas;
 
 import com.viajes.app.alojamientos.Alojamiento;
 import com.viajes.app.users.Usuario;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+/**
+ * Documento profesional: clase principal del archivo.
+ * Contiene reglas de reserva, estados de viaje y datos usados por tickets/recibos/perfil.
+ */
 
 @Entity
 @Table(name = "opiniones")

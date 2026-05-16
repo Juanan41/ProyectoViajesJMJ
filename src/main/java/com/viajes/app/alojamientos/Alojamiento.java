@@ -1,3 +1,7 @@
+// ProyectoViajesJMJ - com/viajes/app/alojamientos/Alojamiento.java
+// Responsabilidad: catalogo de alojamientos, habitaciones y detalle hotelero.
+// Nota profesional: Representa el catalogo hotelero, sus habitaciones y las opciones que se pueden reservar.
+
 package com.viajes.app.alojamientos;
 
 import com.viajes.app.destinos.Destino;
@@ -8,6 +12,10 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+/**
+ * Documento profesional: clase principal del archivo.
+ * Representa el catalogo hotelero, sus habitaciones y las opciones que se pueden reservar.
+ */
 
 @Entity
 @Table(name = "alojamientos")
@@ -64,7 +72,6 @@ public class Alojamiento {
         updatedAt = LocalDateTime.now();
     }
 
-    // CONSTRUCTORES
     public Alojamiento() {
     }
 
@@ -75,8 +82,6 @@ public class Alojamiento {
         this.tipo = tipo;
         this.precioPorNoche = precioPorNoche;
     }
-
-    // GETTERS Y SETTERS
 
     public Long getId() {
         return id;

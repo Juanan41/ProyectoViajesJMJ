@@ -1,3 +1,7 @@
+// ProyectoViajesJMJ - com/viajes/app/reservas/ReservaRestController.java
+// Responsabilidad: flujo de reservas, viajes y estados asociados.
+// Nota profesional: Contiene reglas de reserva, estados de viaje y datos usados por tickets/recibos/perfil.
+
 package com.viajes.app.reservas;
 
 import com.viajes.app.reservas.dto.ReservaRequestDto;
@@ -9,6 +13,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+/**
+ * Documento profesional: clase principal del archivo.
+ * Contiene reglas de reserva, estados de viaje y datos usados por tickets/recibos/perfil.
+ */
 
 @RestController
 @RequestMapping("/api/reservas")

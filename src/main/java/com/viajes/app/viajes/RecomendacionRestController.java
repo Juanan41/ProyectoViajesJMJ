@@ -1,3 +1,7 @@
+// ProyectoViajesJMJ - com/viajes/app/viajes/RecomendacionRestController.java
+// Responsabilidad: integracion entre capas de API, persistencia y logica de negocio.
+// Nota profesional: Capa REST de entrada; valida identidad y delega reglas de negocio en servicios.
+
 package com.viajes.app.viajes;
 
 import com.viajes.app.alojamientos.Habitacion;
@@ -8,6 +12,10 @@ import com.viajes.app.viajes.dto.RecomendacionResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+/**
+ * Documento profesional: clase principal del archivo.
+ * Capa REST de entrada; valida identidad y delega reglas de negocio en servicios.
+ */
 
 @RestController
 @RequestMapping("/api")

@@ -1,9 +1,17 @@
+// ProyectoViajesJMJ - com/viajes/app/alojamientos/Habitacion.java
+// Responsabilidad: catalogo de alojamientos, habitaciones y detalle hotelero.
+// Nota profesional: Representa el catalogo hotelero, sus habitaciones y las opciones que se pueden reservar.
+
 package com.viajes.app.alojamientos;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
+/**
+ * Documento profesional: clase principal del archivo.
+ * Representa el catalogo hotelero, sus habitaciones y las opciones que se pueden reservar.
+ */
 
 @Entity
 public class Habitacion {

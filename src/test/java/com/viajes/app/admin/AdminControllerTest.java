@@ -1,3 +1,7 @@
+// ProyectoViajesJMJ - com/viajes/app/admin/AdminControllerTest.java
+// Responsabilidad: pruebas automatizadas que protegen el comportamiento esperado de este modulo.
+// Nota profesional: Define pruebas de regresion para que los cambios futuros mantengan el contrato del modulo.
+
 package com.viajes.app.admin;
 
 import com.viajes.app.alojamientos.Alojamiento;
@@ -152,7 +156,7 @@ class AdminControllerTest {
         Reserva reserva = new Reserva();
 
         when(usuarioRepository.findById(3L)).thenReturn(Optional.of(usuario));
-        when(cuentaBancariaRepository.findByUsuarioEmail("cliente@viajes.com")).thenReturn(Optional.of(cuenta));
+        when(cuentaBancariaRepository.findByUsuarioId(3L)).thenReturn(Optional.of(cuenta));
         when(opinionRepository.findByUsuarioId(3L)).thenReturn(List.of(opinion));
         when(reservaRepository.findByUsuarioId(3L)).thenReturn(List.of(reserva));
 

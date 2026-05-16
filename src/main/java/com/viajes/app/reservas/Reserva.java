@@ -1,3 +1,7 @@
+// ProyectoViajesJMJ - com/viajes/app/reservas/Reserva.java
+// Responsabilidad: flujo de reservas, viajes y estados asociados.
+// Nota profesional: Contiene reglas de reserva, estados de viaje y datos usados por tickets/recibos/perfil.
+
 package com.viajes.app.reservas;
 
 import com.viajes.app.alojamientos.Habitacion;
@@ -6,6 +10,10 @@ import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+/**
+ * Documento profesional: clase principal del archivo.
+ * Contiene reglas de reserva, estados de viaje y datos usados por tickets/recibos/perfil.
+ */
 
 @Entity
 @Table(name = "reservas")

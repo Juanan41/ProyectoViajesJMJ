@@ -1,3 +1,7 @@
+// ProyectoViajesJMJ - com/viajes/app/auth/JwtService.java
+// Responsabilidad: autenticacion, autorizacion y control de sesion.
+// Nota profesional: Gestiona autenticacion y sesion; los cambios aqui afectan al acceso de usuarios.
+
 package com.viajes.app.auth;
 
 import io.jsonwebtoken.*;
@@ -6,6 +10,10 @@ import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
+/**
+ * Documento profesional: clase principal del archivo.
+ * Gestiona autenticacion y sesion; los cambios aqui afectan al acceso de usuarios.
+ */
 
 @Service
 public class JwtService {

@@ -1,3 +1,7 @@
+// ProyectoViajesJMJ - com/viajes/app/users/Usuario.java
+// Responsabilidad: perfil de usuario, datos personales y metricas visibles.
+// Nota profesional: Expone informacion personal y metricas del usuario; preservar privacidad y consistencia.
+
 package com.viajes.app.users;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -6,6 +10,10 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+/**
+ * Documento profesional: clase principal del archivo.
+ * Expone informacion personal y metricas del usuario; preservar privacidad y consistencia.
+ */
 
 @Entity
 @Table(name = "usuarios")

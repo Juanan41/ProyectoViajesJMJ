@@ -1,9 +1,17 @@
+// ProyectoViajesJMJ - com/viajes/app/cuentas/CuentaBancaria.java
+// Responsabilidad: gestion de saldo y datos bancarios del usuario.
+// Nota profesional: Agrupa datos bancarios y saldo visible; mantener validaciones alineadas con backend.
+
 package com.viajes.app.cuentas;
 
 import com.viajes.app.users.Usuario;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+/**
+ * Documento profesional: clase principal del archivo.
+ * Agrupa datos bancarios y saldo visible; mantener validaciones alineadas con backend.
+ */
 
 @Entity
 @Table(name = "cuentas_bancarias")

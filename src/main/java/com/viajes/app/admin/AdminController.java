@@ -1,8 +1,14 @@
+// ProyectoViajesJMJ - com/viajes/app/admin/AdminController.java
+// Responsabilidad: funciones del panel de administracion y gestion operativa.
+// Nota profesional: Centraliza operaciones sensibles del panel admin; revisar permisos y borrados antes de modificar.
+
 package com.viajes.app.admin;
 
 import com.viajes.app.alojamientos.Alojamiento;
 import com.viajes.app.alojamientos.AlojamientoRepository;
+import com.viajes.app.alojamientos.Habitacion;
 import com.viajes.app.alojamientos.TipoAlojamiento;
+import com.viajes.app.cuentas.CuentaBancaria;
 import com.viajes.app.cuentas.CuentaBancariaRepository;
 import com.viajes.app.destinos.Continente;
 import com.viajes.app.destinos.ContinenteRepository;
@@ -11,8 +17,10 @@ import com.viajes.app.destinos.DestinoRepository;
 import com.viajes.app.destinos.dto.DestinoDTO;
 import com.viajes.app.reservas.Opinion;
 import com.viajes.app.reservas.OpinionRepository;
+import com.viajes.app.reservas.Reserva;
 import com.viajes.app.reservas.ReservaRepository;
 import com.viajes.app.reservas.ReservaService;
+import com.viajes.app.reservas.TransporteTipo;
 import com.viajes.app.reservas.dto.ReservaResponseDto;
 import com.viajes.app.users.Rol;
 import com.viajes.app.users.Usuario;
@@ -24,11 +32,15 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+/**
+ * Documento profesional: clase principal del archivo.
+ * Centraliza operaciones sensibles del panel admin; revisar permisos y borrados antes de modificar.
+ */
 
 @RestController
 @RequestMapping("/api/admin")
@@ -43,14 +55,16 @@ public class AdminController {
     private final CuentaBancariaRepository cuentaBancariaRepository;
     private final ReservaService reservaService;
 
-    public AdminController(UsuarioRepository usuarioRepository,
-                           DestinoRepository destinoRepository,
-                           ContinenteRepository continenteRepository,
-                           AlojamientoRepository alojamientoRepository,
-                           ReservaRepository reservaRepository,
-                           OpinionRepository opinionRepository,
-                           CuentaBancariaRepository cuentaBancariaRepository,
-                           ReservaService reservaService) {
+    public AdminController(
+            UsuarioRepository usuarioRepository,
+            DestinoRepository destinoRepository,
+            ContinenteRepository continenteRepository,
+            AlojamientoRepository alojamientoRepository,
+            ReservaRepository reservaRepository,
+            OpinionRepository opinionRepository,
+            CuentaBancariaRepository cuentaBancariaRepository,
+            ReservaService reservaService
+    ) {
         this.usuarioRepository = usuarioRepository;
         this.destinoRepository = destinoRepository;
         this.continenteRepository = continenteRepository;
@@ -71,13 +85,14 @@ public class AdminController {
     }
 
     @GetMapping("/usuarios/{id}/detalle")
+    @Transactional(readOnly = true)
     public Map<String, Object> obtenerDetalleUsuario(@PathVariable Long id) {
+        // La ficha admin agrupa datos dispersos para evitar varias llamadas desde el modal.
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
 
-        List<ReservaResponseDto> reservasUsuario = reservaService.obtenerTodasReservas()
+        List<Reserva> reservasUsuario = reservaRepository.findByUsuarioId(id)
                 .stream()
-                .filter(reserva -> Objects.equals(reserva.getUsuarioId(), usuario.getId()))
                 .sorted((a, b) -> {
                     if (a.getFechaReserva() == null && b.getFechaReserva() == null) return 0;
                     if (a.getFechaReserva() == null) return 1;
@@ -86,65 +101,78 @@ public class AdminController {
                 })
                 .toList();
 
-        List<Opinion> opinionesUsuario = opinionRepository.findByUsuarioId(id);
-
-        long viajesPendientes = reservasUsuario.stream()
+        List<Reserva> reservasPendientes = reservasUsuario.stream()
                 .filter(reserva -> getReservaStatus(reserva).equals("CONFIRMADA"))
-                .count();
+                .toList();
 
-        long viajesRealizados = reservasUsuario.stream()
+        List<Reserva> reservasRealizadas = reservasUsuario.stream()
                 .filter(reserva -> getReservaStatus(reserva).equals("COMPLETADA"))
-                .count();
+                .toList();
 
-        long viajesCancelados = reservasUsuario.stream()
+        List<Reserva> reservasCanceladas = reservasUsuario.stream()
                 .filter(reserva -> getReservaStatus(reserva).equals("CANCELADA"))
-                .count();
+                .toList();
 
-        long destinosUnicos = reservasUsuario.stream()
-                .filter(reserva -> getReservaStatus(reserva).equals("COMPLETADA"))
-                .map(ReservaResponseDto::getDestinoNombre)
-                .filter(nombre -> nombre != null && !nombre.isBlank())
-                .distinct()
-                .count();
-
-        Map<String, Object> response = new LinkedHashMap<>();
-        response.put("usuario", toUsuarioResponse(usuario));
-
-        cuentaBancariaRepository.findByUsuarioEmail(usuario.getEmail()).ifPresentOrElse(cuenta -> {
-            Map<String, Object> cuentaResponse = new LinkedHashMap<>();
-            cuentaResponse.put("id", cuenta.getId());
-            cuentaResponse.put("iban", cuenta.getIban());
-            cuentaResponse.put("titular", cuenta.getTitular());
-            cuentaResponse.put("entidad", cuenta.getEntidad());
-            cuentaResponse.put("last4", cuenta.getIban() != null && cuenta.getIban().length() >= 4
-                    ? cuenta.getIban().substring(cuenta.getIban().length() - 4)
-                    : "");
-            response.put("cuenta", cuentaResponse);
-        }, () -> response.put("cuenta", null));
-
-        Map<String, Object> resumen = new LinkedHashMap<>();
-        resumen.put("viajesPendientes", viajesPendientes);
-        resumen.put("viajesRealizados", viajesRealizados);
-        resumen.put("viajesCancelados", viajesCancelados);
-        resumen.put("destinosUnicos", destinosUnicos);
-        resumen.put("resenas", opinionesUsuario.size());
-        resumen.put("saldo", usuario.getSaldo());
-
-        response.put("resumen", resumen);
-
-        response.put("reservas", reservasUsuario.stream()
-                .map(this::toReservaDetalleResponse)
-                .toList());
-
-        response.put("opiniones", opinionesUsuario.stream()
+        List<Opinion> opinionesUsuario = opinionRepository.findByUsuarioId(id)
+                .stream()
                 .sorted((a, b) -> {
                     if (a.getFechaOpinion() == null && b.getFechaOpinion() == null) return 0;
                     if (a.getFechaOpinion() == null) return 1;
                     if (b.getFechaOpinion() == null) return -1;
                     return b.getFechaOpinion().compareTo(a.getFechaOpinion());
                 })
-                .map(this::toOpinionDetalleResponse)
+                .toList();
+
+        long destinosUnicos = reservasRealizadas.stream()
+                .map(this::getDestinoIdFromReserva)
+                .filter(destinoId -> destinoId != null)
+                .distinct()
+                .count();
+
+        Map<String, Object> tarjetaResponse = cuentaBancariaRepository.findByUsuarioId(usuario.getId())
+                .map(this::toCuentaResponse)
+                .orElseGet(() -> cuentaBancariaRepository.findByUsuarioEmail(usuario.getEmail())
+                        .map(this::toCuentaResponse)
+                        .orElse(null));
+
+        Map<String, Object> resumen = new LinkedHashMap<>();
+        resumen.put("viajesPendientes", reservasPendientes.size());
+        resumen.put("viajesRealizados", reservasRealizadas.size());
+        resumen.put("viajesCancelados", reservasCanceladas.size());
+        resumen.put("destinosUnicos", destinosUnicos);
+        resumen.put("totalResenias", opinionesUsuario.size());
+        resumen.put("resenias", opinionesUsuario.size());
+        resumen.put("resenas", opinionesUsuario.size());
+        resumen.put("saldo", usuario.getSaldo());
+
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("usuario", toUsuarioResponse(usuario));
+        response.put("tarjeta", tarjetaResponse);
+        response.put("cuenta", tarjetaResponse);
+        response.put("resumen", resumen);
+
+        response.put("reservas", reservasUsuario.stream()
+                .map(this::toReservaDetalleResponse)
                 .toList());
+
+        response.put("reservasPendientes", reservasPendientes.stream()
+                .map(this::toReservaDetalleResponse)
+                .toList());
+
+        response.put("reservasRealizadas", reservasRealizadas.stream()
+                .map(this::toReservaDetalleResponse)
+                .toList());
+
+        response.put("reservasCanceladas", reservasCanceladas.stream()
+                .map(this::toReservaDetalleResponse)
+                .toList());
+
+        List<Map<String, Object>> opinionesResponse = opinionesUsuario.stream()
+                .map(this::toOpinionDetalleResponse)
+                .toList();
+
+        response.put("resenias", opinionesResponse);
+        response.put("opiniones", opinionesResponse);
 
         return response;
     }
@@ -165,8 +193,7 @@ public class AdminController {
 
     @PutMapping("/usuarios/{id}")
     @Transactional
-    public Map<String, Object> actualizarUsuario(@PathVariable Long id,
-                                                 @RequestBody Map<String, Object> request) {
+    public Map<String, Object> actualizarUsuario(@PathVariable Long id, @RequestBody Map<String, Object> request) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
 
@@ -217,6 +244,7 @@ public class AdminController {
     @DeleteMapping("/usuarios/{id}")
     @Transactional
     public Map<String, Object> eliminarUsuario(@PathVariable Long id) {
+        // Borrado físico controlado: primero dependencias directas, después el usuario.
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
 
@@ -224,11 +252,12 @@ public class AdminController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede borrar un administrador");
         }
 
-        cuentaBancariaRepository.findByUsuarioEmail(usuario.getEmail())
+        cuentaBancariaRepository.findByUsuarioId(usuario.getId())
                 .ifPresent(cuentaBancariaRepository::delete);
 
         opinionRepository.deleteAll(opinionRepository.findByUsuarioId(id));
         reservaRepository.deleteAll(reservaRepository.findByUsuarioId(id));
+
         usuarioRepository.delete(usuario);
 
         Map<String, Object> response = new LinkedHashMap<>();
@@ -248,8 +277,7 @@ public class AdminController {
 
     @PutMapping("/destinos/{id}")
     @Transactional
-    public DestinoDTO actualizarDestino(@PathVariable Long id,
-                                        @RequestBody Map<String, Object> request) {
+    public DestinoDTO actualizarDestino(@PathVariable Long id, @RequestBody Map<String, Object> request) {
         Destino destino = destinoRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Destino no encontrado"));
 
@@ -291,8 +319,7 @@ public class AdminController {
 
     @PutMapping("/alojamientos/{id}")
     @Transactional
-    public Map<String, Object> actualizarAlojamiento(@PathVariable Long id,
-                                                     @RequestBody Map<String, Object> request) {
+    public Map<String, Object> actualizarAlojamiento(@PathVariable Long id, @RequestBody Map<String, Object> request) {
         Alojamiento alojamiento = alojamientoRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Alojamiento no encontrado"));
 
@@ -323,6 +350,7 @@ public class AdminController {
     }
 
     private void rellenarDestino(Destino destino, Map<String, Object> request, boolean creando) {
+        // Centraliza la validación para que crear y editar destino mantengan el mismo contrato.
         String nombre = getString(request, "nombre");
         String descripcion = getString(request, "descripcion");
         String pais = getString(request, "pais");
@@ -396,43 +424,88 @@ public class AdminController {
         alojamiento.setPais(pais.trim());
         alojamiento.setPrecioPorNoche(precioPorNoche);
         alojamiento.setDestino(destino);
-
         alojamiento.setTipo(TipoAlojamiento.HOTEL);
     }
 
     private Map<String, Object> toUsuarioResponse(Usuario usuario) {
         Map<String, Object> response = new LinkedHashMap<>();
+
         response.put("id", usuario.getId());
         response.put("username", usuario.getUsername());
         response.put("email", usuario.getEmail());
-        response.put("role", usuario.getRole().name());
+        response.put("avatarUrl", usuario.getAvatarUrl());
+        response.put("role", usuario.getRole() != null ? usuario.getRole().name() : "USER");
         response.put("saldo", usuario.getSaldo());
+
         return response;
     }
 
-    private Map<String, Object> toReservaDetalleResponse(ReservaResponseDto reserva) {
+    private Map<String, Object> toCuentaResponse(CuentaBancaria cuenta) {
         Map<String, Object> response = new LinkedHashMap<>();
 
+        response.put("id", cuenta.getId());
+        response.put("iban", cuenta.getIban());
+        response.put("titular", cuenta.getTitular());
+        response.put("entidad", cuenta.getEntidad());
+        response.put("swiftBic", cuenta.getSwiftBic());
+        response.put("activa", cuenta.getActiva());
+        response.put("fechaRegistro", cuenta.getFechaRegistro());
+
+        if (cuenta.getUsuario() != null) {
+            response.put("usuarioId", cuenta.getUsuario().getId());
+            response.put("usuarioEmail", cuenta.getUsuario().getEmail());
+        }
+
+        String iban = cuenta.getIban();
+        String last4 = iban != null && iban.length() >= 4 ? iban.substring(iban.length() - 4) : "";
+
+        response.put("last4", last4);
+        response.put("numeroEnmascarado", "**** " + last4);
+
+        return response;
+    }
+
+    private Map<String, Object> toReservaDetalleResponse(Reserva reserva) {
+        Map<String, Object> response = new LinkedHashMap<>();
+
+        Habitacion habitacion = reserva.getHabitacion();
+        Alojamiento alojamiento = habitacion != null ? habitacion.getAlojamiento() : null;
+        Destino destino = alojamiento != null ? alojamiento.getDestino() : null;
+        Usuario usuario = reserva.getUsuario();
+
+        Long noches = 0L;
+        if (reserva.getFechaInicio() != null && reserva.getFechaFin() != null) {
+            noches = ChronoUnit.DAYS.between(reserva.getFechaInicio(), reserva.getFechaFin());
+        }
+
+        TransporteTipo transporte = reserva.getTransporte();
+
         response.put("id", reserva.getId());
-        response.put("destinoId", reserva.getDestinoId());
-        response.put("alojamientoId", reserva.getAlojamientoId());
-        response.put("habitacionId", reserva.getHabitacionId());
-        response.put("destinoNombre", reserva.getDestinoNombre());
-        response.put("alojamientoNombre", reserva.getAlojamientoNombre());
-        response.put("imagenUrl", reserva.getImagenUrl());
-        response.put("checkIn", reserva.getCheckIn());
-        response.put("checkOut", reserva.getCheckOut());
-        response.put("noches", reserva.getNoches());
+        response.put("destinoId", destino != null ? destino.getId() : null);
+        response.put("alojamientoId", alojamiento != null ? alojamiento.getId() : null);
+        response.put("habitacionId", habitacion != null ? habitacion.getId() : null);
+        response.put("usuarioId", usuario != null ? usuario.getId() : null);
+        response.put("usuarioUsername", usuario != null ? usuario.getUsername() : "");
+        response.put("usuarioEmail", usuario != null ? usuario.getEmail() : "");
+        response.put("destinoNombre", destino != null ? destino.getNombre() : "");
+        response.put("destinoPais", destino != null ? destino.getPais() : "");
+        response.put("alojamientoNombre", alojamiento != null ? alojamiento.getNombre() : "");
+        response.put("imagenUrl", destino != null ? destino.getImagen() : "");
+        response.put("checkIn", reserva.getFechaInicio());
+        response.put("checkOut", reserva.getFechaFin());
+        response.put("fechaInicio", reserva.getFechaInicio());
+        response.put("fechaFin", reserva.getFechaFin());
+        response.put("noches", noches);
         response.put("huespedes", reserva.getHuespedes());
         response.put("precioTotal", reserva.getPrecioTotal());
         response.put("estado", getReservaStatus(reserva));
         response.put("estadoOriginal", reserva.getEstado());
         response.put("fechaReserva", reserva.getFechaReserva());
-        response.put("transporteTipo", reserva.getTransporteTipo());
-        response.put("transporteNombre", reserva.getTransporteNombre());
-        response.put("transporteHora", reserva.getTransporteHora());
-        response.put("transporteAsiento", reserva.getTransporteAsiento());
-        response.put("transportePuerta", reserva.getTransportePuerta());
+        response.put("transporteTipo", transporte != null ? transporte.name() : null);
+        response.put("transporteNombre", getTransporteNombre(transporte));
+        response.put("transporteHora", getTransporteHora(reserva.getId()));
+        response.put("transporteAsiento", getTransporteAsiento(reserva.getId()));
+        response.put("transportePuerta", getTransportePuerta(reserva.getId(), transporte));
 
         return response;
     }
@@ -444,6 +517,12 @@ public class AdminController {
         response.put("puntuacion", opinion.getPuntuacion());
         response.put("comentario", opinion.getComentario());
         response.put("fechaOpinion", opinion.getFechaOpinion());
+
+        if (opinion.getUsuario() != null) {
+            response.put("usuarioId", opinion.getUsuario().getId());
+            response.put("usuarioUsername", opinion.getUsuario().getUsername());
+            response.put("usuarioEmail", opinion.getUsuario().getEmail());
+        }
 
         if (opinion.getAlojamiento() != null) {
             Alojamiento alojamiento = opinion.getAlojamiento();
@@ -468,7 +547,7 @@ public class AdminController {
         return response;
     }
 
-    private String getReservaStatus(ReservaResponseDto reserva) {
+    private String getReservaStatus(Reserva reserva) {
         String estado = reserva.getEstado() != null ? reserva.getEstado().toUpperCase() : "";
 
         if (estado.equals("CANCELADA")) {
@@ -479,13 +558,60 @@ public class AdminController {
             return "COMPLETADA";
         }
 
-        LocalDate checkOut = reserva.getCheckOut();
+        LocalDate fechaFin = reserva.getFechaFin();
 
-        if (checkOut != null && checkOut.isBefore(LocalDate.now())) {
+        if (fechaFin != null && fechaFin.isBefore(LocalDate.now())) {
             return "COMPLETADA";
         }
 
         return "CONFIRMADA";
+    }
+
+    private Long getDestinoIdFromReserva(Reserva reserva) {
+        if (reserva.getHabitacion() == null) return null;
+        if (reserva.getHabitacion().getAlojamiento() == null) return null;
+        if (reserva.getHabitacion().getAlojamiento().getDestino() == null) return null;
+
+        return reserva.getHabitacion().getAlojamiento().getDestino().getId();
+    }
+
+    private String getTransporteNombre(TransporteTipo transporte) {
+        if (transporte == null) return null;
+
+        return switch (transporte) {
+            case AVION -> "JMJ Airlines";
+            case TREN -> "JMJ Rail";
+            case BARCO -> "JMJ Cruises";
+        };
+    }
+
+    private String getTransporteHora(Long id) {
+        String[] horas = {"08:30", "10:15", "12:00", "16:45", "20:30", "22:10"};
+        return horas[Math.floorMod(id != null ? id.intValue() : 0, horas.length)];
+    }
+
+    private String getTransporteAsiento(Long id) {
+        String[] letras = {"A", "B", "C", "D", "E", "F"};
+        int safeId = id != null ? id.intValue() : 0;
+        int fila = Math.floorMod(safeId, 28) + 1;
+
+        return fila + letras[Math.floorMod(safeId, letras.length)];
+    }
+
+    private String getTransportePuerta(Long id, TransporteTipo transporte) {
+        int safeId = id != null ? id.intValue() : 0;
+        int numero = Math.floorMod(safeId, 18) + 1;
+
+        if (transporte == TransporteTipo.TREN) {
+            return "Vía " + numero;
+        }
+
+        if (transporte == TransporteTipo.BARCO) {
+            return "Muelle " + numero;
+        }
+
+        String[] letras = {"A", "B", "C", "D", "E", "F", "G"};
+        return letras[Math.floorMod(safeId, letras.length)] + numero;
     }
 
     private DestinoDTO toDestinoResponse(Destino destino) {
@@ -510,11 +636,12 @@ public class AdminController {
         response.put("nombre", alojamiento.getNombre());
         response.put("ciudad", alojamiento.getCiudad());
         response.put("pais", alojamiento.getPais());
-        response.put("tipo", alojamiento.getTipo().name());
+        response.put("tipo", alojamiento.getTipo() != null ? alojamiento.getTipo().name() : "HOTEL");
         response.put("precioPorNoche", alojamiento.getPrecioPorNoche());
         response.put("destinoId", destino != null ? destino.getId() : null);
         response.put("destinoNombre", destino != null ? destino.getNombre() : "");
         response.put("reservas", reservaRepository.countByHabitacionAlojamientoId(alojamiento.getId()));
+
         return response;
     }
 

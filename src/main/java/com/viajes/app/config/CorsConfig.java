@@ -1,9 +1,17 @@
+// ProyectoViajesJMJ - com/viajes/app/config/CorsConfig.java
+// Responsabilidad: pieza de soporte usada por la aplicacion ProyectoViajesJMJ.
+// Nota profesional: Modulo de soporte del proyecto; revisar dependencias antes de cambiar su contrato publico.
+
 package com.viajes.app.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+/**
+ * Documento profesional: clase principal del archivo.
+ * Modulo de soporte del proyecto; revisar dependencias antes de cambiar su contrato publico.
+ */
 
 @Configuration
 public class CorsConfig {

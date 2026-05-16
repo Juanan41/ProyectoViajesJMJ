@@ -1,3 +1,7 @@
+// ProyectoViajesJMJ - com/viajes/app/auth/JwtFilter.java
+// Responsabilidad: autenticacion, autorizacion y control de sesion.
+// Nota profesional: Gestiona autenticacion y sesion; los cambios aqui afectan al acceso de usuarios.
+
 package com.viajes.app.auth;
 
 import jakarta.servlet.FilterChain;
@@ -12,6 +16,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+/**
+ * Documento profesional: clase principal del archivo.
+ * Gestiona autenticacion y sesion; los cambios aqui afectan al acceso de usuarios.
+ */
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {

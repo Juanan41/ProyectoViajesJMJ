@@ -1,3 +1,7 @@
+// ProyectoViajesJMJ - com/viajes/app/alojamientos/AlojamientoController.java
+// Responsabilidad: catalogo de alojamientos, habitaciones y detalle hotelero.
+// Nota profesional: Representa el catalogo hotelero, sus habitaciones y las opciones que se pueden reservar.
+
 package com.viajes.app.alojamientos;
 
 import org.springframework.data.domain.Page;
@@ -6,6 +10,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+/**
+ * Documento profesional: clase principal del archivo.
+ * Representa el catalogo hotelero, sus habitaciones y las opciones que se pueden reservar.
+ */
 
 @RestController
 @RequestMapping("/api/alojamientos")

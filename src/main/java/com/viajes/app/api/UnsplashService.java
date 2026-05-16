@@ -1,3 +1,7 @@
+// ProyectoViajesJMJ - com/viajes/app/api/UnsplashService.java
+// Responsabilidad: integracion entre capas de API, persistencia y logica de negocio.
+// Nota profesional: Capa de negocio o integracion; concentra reglas que no deben duplicarse en la vista.
+
 package com.viajes.app.api;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -5,6 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+/**
+ * Documento profesional: clase principal del archivo.
+ * Capa de negocio o integracion; concentra reglas que no deben duplicarse en la vista.
+ */
 
 @Service
 public class UnsplashService {

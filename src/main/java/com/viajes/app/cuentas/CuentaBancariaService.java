@@ -1,3 +1,7 @@
+// ProyectoViajesJMJ - com/viajes/app/cuentas/CuentaBancariaService.java
+// Responsabilidad: gestion de saldo y datos bancarios del usuario.
+// Nota profesional: Agrupa datos bancarios y saldo visible; mantener validaciones alineadas con backend.
+
 package com.viajes.app.cuentas;
 
 import com.viajes.app.cuentas.dto.CuentaBancariaRequestDto;
@@ -11,6 +15,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+/**
+ * Documento profesional: clase principal del archivo.
+ * Agrupa datos bancarios y saldo visible; mantener validaciones alineadas con backend.
+ */
 
 @Service
 public class CuentaBancariaService {

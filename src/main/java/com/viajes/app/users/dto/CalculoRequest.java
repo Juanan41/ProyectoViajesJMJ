@@ -1,7 +1,15 @@
+// ProyectoViajesJMJ - com/viajes/app/users/dto/CalculoRequest.java
+// Responsabilidad: perfil de usuario, datos personales y metricas visibles.
+// Nota profesional: Expone informacion personal y metricas del usuario; preservar privacidad y consistencia.
+
 package com.viajes.app.users.dto;
 
 import java.math.BigDecimal;
 
+/**
+ * Documento profesional: clase principal del archivo.
+ * Expone informacion personal y metricas del usuario; preservar privacidad y consistencia.
+ */
 public class CalculoRequest {
 
     private BigDecimal valor1;

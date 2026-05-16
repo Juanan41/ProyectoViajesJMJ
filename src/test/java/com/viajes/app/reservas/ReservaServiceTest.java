@@ -1,3 +1,7 @@
+// ProyectoViajesJMJ - com/viajes/app/reservas/ReservaServiceTest.java
+// Responsabilidad: pruebas automatizadas que protegen el comportamiento esperado de este modulo.
+// Nota profesional: Define pruebas de regresion para que los cambios futuros mantengan el contrato del modulo.
+
 package com.viajes.app.reservas;
 
 import com.viajes.app.alojamientos.Alojamiento;
@@ -54,8 +58,8 @@ class ReservaServiceTest {
 
         ReservaRequestDto dto = new ReservaRequestDto();
         dto.setHabitacionId(1L);
-        dto.setFechaInicio(LocalDate.of(2026, 5, 10));
-        dto.setFechaFin(LocalDate.of(2026, 5, 15));
+        dto.setFechaInicio(futureStart());
+        dto.setFechaFin(futureEnd());
         dto.setTransporte("AVION");
 
         when(usuarioRepository.findByEmail(emailUsuario)).thenReturn(Optional.of(usuario));
@@ -76,8 +80,8 @@ class ReservaServiceTest {
         assertEquals("Hotel Central", response.getAlojamientoNombre());
         assertEquals("AVION", response.getTransporteTipo());
         assertEquals(1L, response.getHabitacionId());
-        assertEquals(LocalDate.of(2026, 5, 10), response.getCheckIn());
-        assertEquals(LocalDate.of(2026, 5, 15), response.getCheckOut());
+        assertEquals(futureStart(), response.getCheckIn());
+        assertEquals(futureEnd(), response.getCheckOut());
         assertEquals(650.0, response.getPrecioTotal());
         assertEquals("CONFIRMADA", response.getEstado());
         assertNotNull(response.getFechaReserva());
@@ -89,8 +93,8 @@ class ReservaServiceTest {
     void debeLanzarErrorSiUsuarioNoExisteAlCrearReserva() {
         ReservaRequestDto dto = new ReservaRequestDto();
         dto.setHabitacionId(1L);
-        dto.setFechaInicio(LocalDate.of(2026, 5, 10));
-        dto.setFechaFin(LocalDate.of(2026, 5, 15));
+        dto.setFechaInicio(futureStart());
+        dto.setFechaFin(futureEnd());
         dto.setTransporte("AVION");
 
         when(usuarioRepository.findByEmail("noexiste@viajes.com")).thenReturn(Optional.empty());
@@ -108,8 +112,8 @@ class ReservaServiceTest {
 
         ReservaRequestDto dto = new ReservaRequestDto();
         dto.setHabitacionId(99L);
-        dto.setFechaInicio(LocalDate.of(2026, 5, 10));
-        dto.setFechaFin(LocalDate.of(2026, 5, 15));
+        dto.setFechaInicio(futureStart());
+        dto.setFechaFin(futureEnd());
         dto.setTransporte("AVION");
 
         when(usuarioRepository.findByEmail(emailUsuario)).thenReturn(Optional.of(usuario));
@@ -130,7 +134,7 @@ class ReservaServiceTest {
         ReservaRequestDto dto = new ReservaRequestDto();
         dto.setHabitacionId(1L);
         dto.setFechaInicio(null);
-        dto.setFechaFin(LocalDate.of(2026, 5, 15));
+        dto.setFechaFin(futureEnd());
         dto.setTransporte("AVION");
 
         when(usuarioRepository.findByEmail(emailUsuario)).thenReturn(Optional.of(usuario));
@@ -150,7 +154,7 @@ class ReservaServiceTest {
 
         ReservaRequestDto dto = new ReservaRequestDto();
         dto.setHabitacionId(1L);
-        dto.setFechaInicio(LocalDate.of(2026, 5, 10));
+        dto.setFechaInicio(futureStart());
         dto.setFechaFin(null);
         dto.setTransporte("AVION");
 
@@ -171,8 +175,8 @@ class ReservaServiceTest {
 
         ReservaRequestDto dto = new ReservaRequestDto();
         dto.setHabitacionId(1L);
-        dto.setFechaInicio(LocalDate.of(2026, 5, 10));
-        dto.setFechaFin(LocalDate.of(2026, 5, 10));
+        dto.setFechaInicio(futureStart());
+        dto.setFechaFin(futureStart());
         dto.setTransporte("AVION");
 
         when(usuarioRepository.findByEmail(emailUsuario)).thenReturn(Optional.of(usuario));
@@ -192,8 +196,8 @@ class ReservaServiceTest {
 
         ReservaRequestDto dto = new ReservaRequestDto();
         dto.setHabitacionId(1L);
-        dto.setFechaInicio(LocalDate.of(2026, 5, 10));
-        dto.setFechaFin(LocalDate.of(2026, 5, 15));
+        dto.setFechaInicio(futureStart());
+        dto.setFechaFin(futureEnd());
         dto.setTransporte("COCHE");
 
         when(usuarioRepository.findByEmail(emailUsuario)).thenReturn(Optional.of(usuario));
@@ -320,7 +324,7 @@ class ReservaServiceTest {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> reservaService.cancelarReserva(1L, emailUsuario));
 
-        assertEquals("400 BAD_REQUEST \"La reserva ya esta cancelada\"", exception.getMessage());
+        assertEquals("400 BAD_REQUEST \"La reserva ya está cancelada\"", exception.getMessage());
     }
 
     private Usuario crearUsuario(Long id, String username, String email, Rol rol) {
@@ -332,6 +336,14 @@ class ReservaServiceTest {
         usuario.setRole(rol);
         usuario.setSaldo(BigDecimal.valueOf(5000.0));
         return usuario;
+    }
+
+    private LocalDate futureStart() {
+        return LocalDate.now().plusDays(30);
+    }
+
+    private LocalDate futureEnd() {
+        return futureStart().plusDays(5);
     }
 
     private Habitacion crearHabitacionCompleta(Long id, String tipoHabitacion, Double precioPorNoche, String nombreDestino, String nombreHotel) {

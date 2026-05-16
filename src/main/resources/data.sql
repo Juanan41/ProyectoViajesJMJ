@@ -1,4 +1,4 @@
-﻿-- =====================================================
+-- =====================================================
 -- SEED PRINCIPAL - VIAJES JMJ
 -- 360 destinos, 1440 hoteles y 4320 habitaciones
 -- Ejecutar solo para inicializar/reiniciar datos de catálogo.
@@ -6664,3 +6664,171 @@ SELECT setval('habitacion_id_seq', COALESCE((SELECT MAX(id) FROM habitacion), 1)
 
 
 
+-- =====================================================
+-- AMPLIACION CONTROLADA PARA DEMO Y PRUEBAS FUNCIONALES
+-- Estos datos permiten validar habitaciones grupales, perfil,
+-- reservas pendientes/canceladas/realizadas, tarjetas y reseñas.
+-- No sustituyen los datos base: se insertan de forma idempotente.
+-- =====================================================
+
+-- Habitacion grupal por alojamiento para probar reservas de 5 a 8 huespedes.
+INSERT INTO habitacion (tipo, regimen, precio_por_noche, capacidad, alojamiento_id)
+SELECT 'Grupal', 'MEDIA_PENSION', ROUND((a.precio_por_noche * 1.45)::numeric, 2)::double precision, 8, a.id
+FROM alojamientos a
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM habitacion h
+  WHERE h.alojamiento_id = a.id
+    AND LOWER(h.tipo) LIKE '%grupal%'
+);
+
+SELECT setval('habitacion_id_seq', COALESCE((SELECT MAX(id) FROM habitacion), 1), true);
+
+-- Usuarios ficticios estables para comprobar panel admin, perfil y actividad historica.
+WITH demo_users(nombre, email, saldo, iban, entidad) AS (
+  VALUES
+    ('Lucia Martin', 'lucia.martin.demo@viajesjmj.test', 8420.50, 'ES9100010001000000000001', 'Banco JMJ'),
+    ('Mateo Garcia', 'mateo.garcia.demo@viajesjmj.test', 1260.75, 'ES9100010001000000000002', 'Banco Atlantico'),
+    ('Sofia Lopez', 'sofia.lopez.demo@viajesjmj.test', 6795.20, 'ES9100010001000000000003', 'Iberia Bank'),
+    ('Daniel Ruiz', 'daniel.ruiz.demo@viajesjmj.test', 3180.00, 'ES9100010001000000000004', 'Caja Horizonte'),
+    ('Valeria Torres', 'valeria.torres.demo@viajesjmj.test', 9540.10, 'ES9100010001000000000005', 'Banco JMJ'),
+    ('Hugo Sanchez', 'hugo.sanchez.demo@viajesjmj.test', 4725.35, 'ES9100010001000000000006', 'Banco Atlantico'),
+    ('Elena Romero', 'elena.romero.demo@viajesjmj.test', 210.90, 'ES9100010001000000000007', 'Iberia Bank'),
+    ('Pablo Navarro', 'pablo.navarro.demo@viajesjmj.test', 5870.65, 'ES9100010001000000000008', 'Caja Horizonte'),
+    ('Carmen Diaz', 'carmen.diaz.demo@viajesjmj.test', 2890.45, 'ES9100010001000000000009', 'Banco JMJ'),
+    ('Adrian Molina', 'adrian.molina.demo@viajesjmj.test', 9980.00, 'ES9100010001000000000010', 'Banco Atlantico'),
+    ('Marta Ortega', 'marta.ortega.demo@viajesjmj.test', 1500.25, 'ES9100010001000000000011', 'Iberia Bank'),
+    ('Ivan Castro', 'ivan.castro.demo@viajesjmj.test', 6230.80, 'ES9100010001000000000012', 'Caja Horizonte'),
+    ('Claudia Reyes', 'claudia.reyes.demo@viajesjmj.test', 4320.40, 'ES9100010001000000000013', 'Banco JMJ'),
+    ('Marcos Vega', 'marcos.vega.demo@viajesjmj.test', 785.95, 'ES9100010001000000000014', 'Banco Atlantico'),
+    ('Nora Santos', 'nora.santos.demo@viajesjmj.test', 3660.15, 'ES9100010001000000000015', 'Iberia Bank'),
+    ('Javier Leon', 'javier.leon.demo@viajesjmj.test', 5140.70, 'ES9100010001000000000016', 'Caja Horizonte'),
+    ('Alba Nieto', 'alba.nieto.demo@viajesjmj.test', 9305.00, 'ES9100010001000000000017', 'Banco JMJ'),
+    ('Diego Prieto', 'diego.prieto.demo@viajesjmj.test', 6925.40, 'ES9100010001000000000018', 'Banco Atlantico'),
+    ('Irene Mora', 'irene.mora.demo@viajesjmj.test', 2480.60, 'ES9100010001000000000019', 'Iberia Bank'),
+    ('Alvaro Rojas', 'alvaro.rojas.demo@viajesjmj.test', 8040.55, 'ES9100010001000000000020', 'Caja Horizonte'),
+    ('Emma Gil', 'emma.gil.demo@viajesjmj.test', 175.35, 'ES9100010001000000000021', 'Banco JMJ'),
+    ('Gonzalo Marin', 'gonzalo.marin.demo@viajesjmj.test', 1125.85, 'ES9100010001000000000022', 'Banco Atlantico'),
+    ('Paula Campos', 'paula.campos.demo@viajesjmj.test', 7390.20, 'ES9100010001000000000023', 'Iberia Bank'),
+    ('Sergio Arias', 'sergio.arias.demo@viajesjmj.test', 4555.10, 'ES9100010001000000000024', 'Caja Horizonte'),
+    ('Julia Crespo', 'julia.crespo.demo@viajesjmj.test', 8800.00, 'ES9100010001000000000025', 'Banco JMJ'),
+    ('Leo Pascual', 'leo.pascual.demo@viajesjmj.test', 7215.95, 'ES9100010001000000000026', 'Banco Atlantico'),
+    ('Sara Soler', 'sara.soler.demo@viajesjmj.test', 3040.50, 'ES9100010001000000000027', 'Iberia Bank'),
+    ('Mario Cortes', 'mario.cortes.demo@viajesjmj.test', 2510.75, 'ES9100010001000000000028', 'Caja Horizonte'),
+    ('Noa Medina', 'noa.medina.demo@viajesjmj.test', 9180.30, 'ES9100010001000000000029', 'Banco JMJ'),
+    ('Enzo Vidal', 'enzo.vidal.demo@viajesjmj.test', 1345.60, 'ES9100010001000000000030', 'Banco Atlantico'),
+    ('Aitana Pons', 'aitana.pons.demo@viajesjmj.test', 615.45, 'ES9100010001000000000031', 'Iberia Bank'),
+    ('Nicolas Fuentes', 'nicolas.fuentes.demo@viajesjmj.test', 7560.45, 'ES9100010001000000000032', 'Caja Horizonte'),
+    ('Vera Costa', 'vera.costa.demo@viajesjmj.test', 5235.75, 'ES9100010001000000000033', 'Banco JMJ'),
+    ('Oscar Pena', 'oscar.pena.demo@viajesjmj.test', 9740.15, 'ES9100010001000000000034', 'Banco Atlantico'),
+    ('Lara Blasco', 'lara.blasco.demo@viajesjmj.test', 3985.85, 'ES9100010001000000000035', 'Iberia Bank'),
+    ('Bruno Cano', 'bruno.cano.demo@viajesjmj.test', 6650.00, 'ES9100010001000000000036', 'Caja Horizonte'),
+    ('Rocio Paredes', 'rocio.paredes.demo@viajesjmj.test', 3925.25, 'ES9100010001000000000037', 'Banco JMJ'),
+    ('Thiago Rubio', 'thiago.rubio.demo@viajesjmj.test', 850.00, 'ES9100010001000000000038', 'Banco Atlantico'),
+    ('Nerea Moya', 'nerea.moya.demo@viajesjmj.test', 4880.90, 'ES9100010001000000000039', 'Iberia Bank'),
+    ('Eric Benitez', 'eric.benitez.demo@viajesjmj.test', 5795.30, 'ES9100010001000000000040', 'Caja Horizonte')
+), upsert_users AS (
+  INSERT INTO usuarios (username, email, password, role, saldo)
+  SELECT nombre, email, '$2a$10$cNbNdxo49Ei00ifujZ5nH.JzUrhhH5J.jpOxrrcEy1TaeY1i/vz3q', 'USER', saldo
+  FROM demo_users
+  ON CONFLICT (email) DO UPDATE
+  SET username = EXCLUDED.username,
+      password = EXCLUDED.password,
+      role = EXCLUDED.role,
+      saldo = EXCLUDED.saldo
+  RETURNING id, username, email
+)
+INSERT INTO cuentas_bancarias (titular, iban, swift_bic, entidad, fecha_registro, activa, usuario_id)
+SELECT du.nombre, du.iban, 'JMJDESMMXXX', du.entidad, NOW(), true, u.id
+FROM demo_users du
+JOIN usuarios u ON u.email = du.email
+ON CONFLICT (usuario_id) DO UPDATE
+SET titular = EXCLUDED.titular,
+    iban = EXCLUDED.iban,
+    swift_bic = EXCLUDED.swift_bic,
+    entidad = EXCLUDED.entidad,
+    activa = EXCLUDED.activa;
+
+-- Tres reservas por usuario demo: una realizada, una futura y una cancelada.
+WITH demo AS (
+  SELECT u.id AS usuario_id,
+         ROW_NUMBER() OVER (ORDER BY u.email) AS idx
+  FROM usuarios u
+  WHERE u.email LIKE '%.demo@viajesjmj.test'
+), reserva_base AS (
+  SELECT d.usuario_id,
+         d.idx,
+         gs.r,
+         CASE gs.r WHEN 1 THEN 2 WHEN 2 THEN 5 ELSE 3 END AS huespedes,
+         CASE gs.r WHEN 1 THEN 'AVION' WHEN 2 THEN 'TREN' ELSE 'BARCO' END AS transporte,
+         CASE gs.r WHEN 3 THEN 'CANCELADA' ELSE 'CONFIRMADA' END AS estado,
+         CASE gs.r
+           WHEN 1 THEN (CURRENT_DATE - ((80 + d.idx) || ' days')::interval)::date
+           WHEN 2 THEN (CURRENT_DATE + ((20 + d.idx) || ' days')::interval)::date
+           ELSE (CURRENT_DATE - ((35 + d.idx) || ' days')::interval)::date
+         END AS fecha_inicio
+  FROM demo d
+  CROSS JOIN generate_series(1, 3) AS gs(r)
+), reservas_preparadas AS (
+  SELECT rb.*, h.id AS habitacion_id, h.precio_por_noche
+  FROM reserva_base rb
+  JOIN LATERAL (
+    SELECT h.id, h.precio_por_noche
+    FROM habitacion h
+    WHERE h.capacidad >= rb.huespedes
+      AND (
+        rb.huespedes = 1
+        OR (rb.huespedes = 2 AND (LOWER(h.tipo) LIKE '%doble%' OR LOWER(h.tipo) LIKE '%suite%' OR LOWER(h.tipo) LIKE '%grupal%' OR LOWER(h.tipo) LIKE '%standard%' OR LOWER(h.tipo) LIKE '%estandar%' OR LOWER(h.tipo) LIKE '%deluxe%'))
+        OR (rb.huespedes BETWEEN 3 AND 4 AND (LOWER(h.tipo) LIKE '%suite%' OR LOWER(h.tipo) LIKE '%grupal%'))
+        OR (rb.huespedes BETWEEN 5 AND 8 AND LOWER(h.tipo) LIKE '%grupal%')
+      )
+    ORDER BY ((h.id + rb.idx * 17 + rb.r * 31) % 1000)
+    LIMIT 1
+  ) h ON true
+)
+INSERT INTO reservas (transporte, habitacion_id, usuario_id, fecha_inicio, fecha_fin, huespedes, precio_total, estado, fecha_reserva)
+SELECT transporte,
+       habitacion_id,
+       usuario_id,
+       fecha_inicio,
+       fecha_inicio + INTERVAL '4 days',
+       huespedes,
+       ROUND(((precio_por_noche * 4 * huespedes) + CASE transporte WHEN 'AVION' THEN 180 WHEN 'TREN' THEN 70 ELSE 120 END)::numeric, 2),
+       estado,
+       NOW() - ((idx + r) || ' days')::interval
+FROM reservas_preparadas;
+
+-- Reseñas de ejemplo asociadas a usuarios y alojamientos reales.
+WITH demo AS (
+  SELECT u.id AS usuario_id,
+         ROW_NUMBER() OVER (ORDER BY u.email) AS idx
+  FROM usuarios u
+  WHERE u.email LIKE '%.demo@viajesjmj.test'
+), review_base AS (
+  SELECT d.usuario_id, d.idx, gs.r
+  FROM demo d
+  CROSS JOIN generate_series(1, 2) AS gs(r)
+), review_target AS (
+  SELECT rb.*, a.id AS alojamiento_id
+  FROM review_base rb
+  JOIN LATERAL (
+    SELECT a.id
+    FROM alojamientos a
+    ORDER BY ((a.id + rb.idx * 13 + rb.r * 29) % 1000)
+    LIMIT 1
+  ) a ON true
+)
+INSERT INTO opiniones (usuario_id, alojamiento_id, puntuacion, comentario, fecha_opinion)
+SELECT usuario_id,
+       alojamiento_id,
+       3 + ((idx + r) % 3),
+       CASE ((idx + r) % 6)
+         WHEN 0 THEN 'Habitacion comoda, buena ubicacion y personal atento durante toda la estancia.'
+         WHEN 1 THEN 'El hotel estaba limpio y bien comunicado; repetiria para una escapada corta.'
+         WHEN 2 THEN 'Buena relacion calidad-precio, desayuno correcto y check-in rapido.'
+         WHEN 3 THEN 'La ubicacion fue lo mejor. La habitacion era sencilla, pero suficiente.'
+         WHEN 4 THEN 'Instalaciones cuidadas y ambiente tranquilo para descansar despues de visitar la ciudad.'
+         ELSE 'Experiencia positiva en general, con servicio amable y camas comodas.'
+       END,
+       NOW() - ((idx + r * 3) || ' days')::interval
+FROM review_target;

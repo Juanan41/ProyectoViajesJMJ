@@ -1,3 +1,7 @@
+// ProyectoViajesJMJ - com/viajes/app/viajes/dto/RecomendacionResponse.java
+// Responsabilidad: pieza de soporte usada por la aplicacion ProyectoViajesJMJ.
+// Nota profesional: Objeto de transporte entre capas/API; mantener nombres estables para no romper el contrato JSON.
+
 package com.viajes.app.viajes.dto;
 
 import com.viajes.app.alojamientos.Habitacion;
@@ -5,6 +9,10 @@ import com.viajes.app.alojamientos.Habitacion;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Documento profesional: clase principal del archivo.
+ * Objeto de transporte entre capas/API; mantener nombres estables para no romper el contrato JSON.
+ */
 public class RecomendacionResponse {
 
     private String destino;

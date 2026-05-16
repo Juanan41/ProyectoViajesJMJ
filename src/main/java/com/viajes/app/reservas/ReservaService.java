@@ -1,9 +1,13 @@
+// ProyectoViajesJMJ - com/viajes/app/reservas/ReservaService.java
+// Responsabilidad: flujo de reservas, viajes y estados asociados.
+// Nota profesional: Contiene reglas de reserva, estados de viaje y datos usados por tickets/recibos/perfil.
+
 package com.viajes.app.reservas;
 
+import com.viajes.app.alojamientos.Alojamiento;
 import com.viajes.app.alojamientos.Habitacion;
 import com.viajes.app.alojamientos.HabitacionRepository;
 import com.viajes.app.api.UnsplashService;
-import com.viajes.app.alojamientos.Alojamiento;
 import com.viajes.app.destinos.Destino;
 import com.viajes.app.reservas.dto.ReservaRequestDto;
 import com.viajes.app.reservas.dto.ReservaResponseDto;
@@ -15,10 +19,16 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
+import java.text.Normalizer;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
+/**
+ * Documento profesional: clase principal del archivo.
+ * Contiene reglas de reserva, estados de viaje y datos usados por tickets/recibos/perfil.
+ */
 
 @Service
 public class ReservaService {
@@ -28,10 +38,12 @@ public class ReservaService {
     private final HabitacionRepository habitacionRepository;
     private final UnsplashService unsplashService;
 
-    public ReservaService(ReservaRepository reservaRepository,
-                          UsuarioRepository usuarioRepository,
-                          HabitacionRepository habitacionRepository,
-                          UnsplashService unsplashService) {
+    public ReservaService(
+            ReservaRepository reservaRepository,
+            UsuarioRepository usuarioRepository,
+            HabitacionRepository habitacionRepository,
+            UnsplashService unsplashService
+    ) {
         this.reservaRepository = reservaRepository;
         this.usuarioRepository = usuarioRepository;
         this.habitacionRepository = habitacionRepository;
@@ -41,6 +53,7 @@ public class ReservaService {
     @Transactional
     public ReservaResponseDto crearReserva(ReservaRequestDto dto, String emailUsuario) {
 
+        // La reserva se valida de nuevo en servidor aunque el frontend ya filtre opciones.
         Usuario usuario = usuarioRepository.findByEmail(emailUsuario)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
 
@@ -51,6 +64,10 @@ public class ReservaService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Las fechas son obligatorias");
         }
 
+        if (dto.getFechaInicio().isBefore(LocalDate.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La fecha de inicio no puede ser anterior a hoy");
+        }
+
         long noches = ChronoUnit.DAYS.between(dto.getFechaInicio(), dto.getFechaFin());
 
         if (noches <= 0) {
@@ -58,6 +75,7 @@ public class ReservaService {
         }
 
         TransporteTipo transporte;
+
         try {
             transporte = TransporteTipo.valueOf(dto.getTransporte().toUpperCase());
         } catch (Exception e) {
@@ -66,10 +84,22 @@ public class ReservaService {
 
         int huespedes = dto.getHuespedes() != null && dto.getHuespedes() > 0 ? dto.getHuespedes() : 1;
 
+        if (huespedes > 8) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El máximo permitido es de 8 huéspedes");
+        }
+
         if (habitacion.getCapacidad() < huespedes) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La habitación no tiene capacidad suficiente");
         }
 
+        if (!esHabitacionCompatible(habitacion, huespedes)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "La habitación seleccionada no es compatible con el número de huéspedes"
+            );
+        }
+
+        // Precio canónico: habitación por noche y huésped, más el coste fijo del transporte elegido.
         double transporteCoste = getTransporteCoste(transporte);
         double precioTotal = (habitacion.getPrecioPorNoche() * noches * huespedes) + transporteCoste;
         BigDecimal precioTotalSaldo = BigDecimal.valueOf(precioTotal);
@@ -90,6 +120,8 @@ public class ReservaService {
         reserva.setFechaReserva(LocalDateTime.now());
 
         Reserva guardada = reservaRepository.save(reserva);
+
+        // El saldo se descuenta dentro de la misma transacción que crea la reserva confirmada.
         usuario.setSaldo(usuario.getSaldo().subtract(precioTotalSaldo));
         usuarioRepository.save(usuario);
 
@@ -126,7 +158,7 @@ public class ReservaService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reserva no encontrada"));
 
         if ("CANCELADA".equalsIgnoreCase(reserva.getEstado())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La reserva ya esta cancelada");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La reserva ya está cancelada");
         }
 
         reserva.setEstado("CANCELADA");
@@ -141,16 +173,19 @@ public class ReservaService {
 
         String destinoNombre = destino.getNombre();
         String destinoPais = destino.getPais();
+
         String destinoLabel = destinoPais != null && !destinoPais.isBlank()
                 ? destinoNombre + ", " + destinoPais
                 : destinoNombre;
 
         String imagenUrl = destino.getImagen();
+
         if (imagenUrl == null || imagenUrl.isBlank()) {
             imagenUrl = unsplashService.obtenerImagen(destinoLabel);
         }
 
         long noches = ChronoUnit.DAYS.between(reserva.getFechaInicio(), reserva.getFechaFin());
+
         int huespedes = reserva.getHuespedes() != null && reserva.getHuespedes() > 0
                 ? reserva.getHuespedes()
                 : 1;
@@ -186,6 +221,7 @@ public class ReservaService {
 
     private double getTransporteCoste(TransporteTipo transporte) {
         if (transporte == null) return 0;
+
         return switch (transporte) {
             case AVION -> 150;
             case TREN -> 50;
@@ -195,6 +231,7 @@ public class ReservaService {
 
     private String getTransporteNombre(TransporteTipo transporte) {
         if (transporte == null) return null;
+
         return switch (transporte) {
             case AVION -> "JMJ Airlines";
             case TREN -> "JMJ Rail";
@@ -203,14 +240,17 @@ public class ReservaService {
     }
 
     private String getTransporteHora(Long id) {
+        // Datos deterministas de ticket: evitan guardar campos derivados y mantienen recibos estables.
         String[] horas = {"08:30", "10:15", "12:00", "16:45", "20:30", "22:10"};
         return horas[Math.floorMod(id != null ? id.intValue() : 0, horas.length)];
     }
 
     private String getTransporteAsiento(Long id) {
         String[] letras = {"A", "B", "C", "D", "E", "F"};
+
         int safeId = id != null ? id.intValue() : 0;
         int fila = Math.floorMod(safeId, 28) + 1;
+
         return fila + letras[Math.floorMod(safeId, letras.length)];
     }
 
@@ -228,5 +268,77 @@ public class ReservaService {
 
         String[] letras = {"A", "B", "C", "D", "E", "F", "G"};
         return letras[Math.floorMod(safeId, letras.length)] + numero;
+    }
+
+    private boolean esHabitacionCompatible(Habitacion habitacion, int huespedes) {
+        // Regla de negocio: 1 cualquier capacidad suficiente; 2 doble/estándar-deluxe/suite/grupal;
+        // 3-4 suite o grupal; 5-8 solo grupal. La capacidad real se comprueba antes y aquí.
+        int capacidad = habitacion.getCapacidad();
+        String categoria = getCategoriaHabitacion(habitacion);
+
+        if (capacidad < huespedes) {
+            return false;
+        }
+
+        if (huespedes <= 1) {
+            return capacidad >= 1;
+        }
+
+        if (huespedes == 2) {
+            return categoria.equals("double") || categoria.equals("suite") || categoria.equals("group");
+        }
+
+        if (huespedes >= 3 && huespedes <= 4) {
+            return categoria.equals("suite") || categoria.equals("group");
+        }
+
+        return categoria.equals("group");
+    }
+
+    private String getCategoriaHabitacion(Habitacion habitacion) {
+        String nombre = normalizarTexto(habitacion.getTipo());
+        int capacidad = habitacion.getCapacidad();
+
+        if (
+                nombre.contains("grupal") ||
+                nombre.contains("grupo") ||
+                nombre.contains("familiar") ||
+                nombre.contains("family")
+        ) {
+            return "group";
+        }
+
+        if (nombre.contains("suite")) {
+            return "suite";
+        }
+
+        if (nombre.contains("individual") || nombre.contains("single")) {
+            return "single";
+        }
+
+        if (
+                nombre.contains("doble") ||
+                nombre.contains("deluxe") ||
+                nombre.contains("estandar") ||
+                nombre.contains("standard")
+        ) {
+            return "double";
+        }
+
+        if (capacidad >= 8) return "group";
+        if (capacidad >= 4) return "suite";
+        if (capacidad >= 2) return "double";
+
+        return "single";
+    }
+
+    private String normalizarTexto(String value) {
+        if (value == null) {
+            return "";
+        }
+
+        return Normalizer.normalize(value.toLowerCase(), Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .trim();
     }
 }
