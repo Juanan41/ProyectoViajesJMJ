@@ -6891,3 +6891,539 @@ SELECT usuario_id,
        END,
        NOW() - ((hotel_idx % 60 + r * 3) || ' days')::interval
 FROM review_target;
+
+
+-- =====================================================
+-- CORRECCION GEOGRAFICA - PAISES / CONTINENTES / DESTINOS
+-- No modifica imagenes.
+-- Reubica destinos mal asignados y sincroniza hoteles.
+-- Se ejecuta al final para corregir tambien datos heredados del seed base.
+-- =====================================================
+
+BEGIN;
+
+CREATE OR REPLACE FUNCTION pg_temp.jmj_geo_norm(value text)
+RETURNS text
+LANGUAGE sql
+IMMUTABLE
+AS $$
+  WITH normalized AS (
+    SELECT lower(coalesce(value, '')) AS v
+  ), repaired AS (
+    SELECT replace(
+             replace(
+             replace(
+             replace(
+             replace(
+             replace(
+             replace(
+             replace(
+             replace(
+             replace(
+             replace(
+             replace(v, U&'\00E3\00B1', 'n'),
+                        U&'\00E3\00A1', 'a'),
+                        U&'\00E3\00A9', 'e'),
+                        U&'\00E3\00AD', 'i'),
+                        U&'\00E3\00B3', 'o'),
+                        U&'\00E3\00BA', 'u'),
+                        U&'\00E3\00BC', 'u'),
+                        U&'\00E3\00A5', 'a'),
+                        U&'\00E3\0081', 'a'),
+                        U&'medell\00E3n', 'medellin'),
+                        U&'\00E3', 'a'),
+                        U&'\00A0', '') AS v
+    FROM normalized
+  )
+  SELECT regexp_replace(
+           translate(v, 'áàäâéèëêíìïîóòöôúùüûñç', 'aaaaeeeeiiiioooouuuunc'),
+           '[^a-z0-9]+',
+           '',
+           'g'
+         )
+  FROM repaired;
+$$;
+
+-- 1) Corrige continente segun el pais actual del destino.
+WITH pais_continente(pais, continente) AS (
+    VALUES
+    -- Europa
+    ('España', 'Europa'),
+    ('Francia', 'Europa'),
+    ('Italia', 'Europa'),
+    ('Alemania', 'Europa'),
+    ('Austria', 'Europa'),
+    ('Portugal', 'Europa'),
+    ('Reino Unido', 'Europa'),
+    ('Irlanda', 'Europa'),
+    ('Países Bajos', 'Europa'),
+    ('Paises Bajos', 'Europa'),
+    ('Bélgica', 'Europa'),
+    ('Belgica', 'Europa'),
+    ('Suiza', 'Europa'),
+    ('Polonia', 'Europa'),
+    ('República Checa', 'Europa'),
+    ('Republica Checa', 'Europa'),
+    ('Hungría', 'Europa'),
+    ('Hungria', 'Europa'),
+    ('Grecia', 'Europa'),
+    ('Croacia', 'Europa'),
+    ('Noruega', 'Europa'),
+    ('Suecia', 'Europa'),
+    ('Dinamarca', 'Europa'),
+    ('Islandia', 'Europa'),
+
+    -- Asia
+    ('Japón', 'Asia'),
+    ('Japon', 'Asia'),
+    ('China', 'Asia'),
+    ('Corea del Sur', 'Asia'),
+    ('Tailandia', 'Asia'),
+    ('Vietnam', 'Asia'),
+    ('Indonesia', 'Asia'),
+    ('Nepal', 'Asia'),
+    ('India', 'Asia'),
+    ('Qatar', 'Asia'),
+    ('Catar', 'Asia'),
+    ('Emiratos Árabes Unidos', 'Asia'),
+    ('Emiratos Arabes Unidos', 'Asia'),
+    ('Filipinas', 'Asia'),
+    ('Israel', 'Asia'),
+    ('Malasia', 'Asia'),
+    ('Singapur', 'Asia'),
+    ('Turquía', 'Asia'),
+    ('Turquia', 'Asia'),
+
+    -- Africa
+    ('Egipto', 'África'),
+    ('Marruecos', 'África'),
+    ('Sudáfrica', 'África'),
+    ('Sudafrica', 'África'),
+    ('Nigeria', 'África'),
+    ('Ruanda', 'África'),
+    ('Senegal', 'África'),
+    ('Mauricio', 'África'),
+    ('Namibia', 'África'),
+    ('Túnez', 'África'),
+    ('Tunez', 'África'),
+    ('Argelia', 'África'),
+    ('Etiopía', 'África'),
+    ('Etiopia', 'África'),
+    ('Ghana', 'África'),
+    ('Kenia', 'África'),
+    ('Seychelles', 'África'),
+    ('Tanzania', 'África'),
+
+    -- America del Norte / Caribe
+    ('Estados Unidos', 'América del Norte'),
+    ('EEUU', 'América del Norte'),
+    ('USA', 'América del Norte'),
+    ('Canadá', 'América del Norte'),
+    ('Canada', 'América del Norte'),
+    ('México', 'América del Norte'),
+    ('Mexico', 'América del Norte'),
+    ('Costa Rica', 'América del Norte'),
+    ('Bahamas', 'América del Norte'),
+    ('Belice', 'América del Norte'),
+    ('Cuba', 'América del Norte'),
+    ('El Salvador', 'América del Norte'),
+    ('Guatemala', 'América del Norte'),
+    ('Honduras', 'América del Norte'),
+    ('Jamaica', 'América del Norte'),
+    ('Nicaragua', 'América del Norte'),
+    ('Panamá', 'América del Norte'),
+    ('Panama', 'América del Norte'),
+    ('Puerto Rico', 'América del Norte'),
+    ('República Dominicana', 'América del Norte'),
+    ('Republica Dominicana', 'América del Norte'),
+    ('Curazao', 'América del Norte'),
+    ('Curaçao', 'América del Norte'),
+
+    -- America del Sur
+    ('Argentina', 'América del Sur'),
+    ('Aruba', 'América del Sur'),
+    ('Brasil', 'América del Sur'),
+    ('Chile', 'América del Sur'),
+    ('Colombia', 'América del Sur'),
+    ('Perú', 'América del Sur'),
+    ('Peru', 'América del Sur'),
+    ('Ecuador', 'América del Sur'),
+    ('Uruguay', 'América del Sur'),
+    ('Paraguay', 'América del Sur'),
+    ('Bolivia', 'América del Sur'),
+    ('Venezuela', 'América del Sur'),
+    ('Guyana', 'América del Sur'),
+    ('Guayana Francesa', 'América del Sur'),
+    ('Surinam', 'América del Sur'),
+    ('Suriname', 'América del Sur'),
+
+    -- Oceania
+    ('Australia', 'Oceanía'),
+    ('Nueva Zelanda', 'Oceanía'),
+    ('Fiyi', 'Oceanía'),
+    ('Fiji', 'Oceanía'),
+    ('Samoa', 'Oceanía'),
+    ('Tonga', 'Oceanía'),
+    ('Vanuatu', 'Oceanía'),
+    ('Kiribati', 'Oceanía'),
+    ('Micronesia', 'Oceanía'),
+    ('Guam', 'Oceanía'),
+    ('Islas Cook', 'Oceanía'),
+    ('Islas Salomón', 'Oceanía'),
+    ('Islas Salomon', 'Oceanía'),
+    ('Polinesia Francesa', 'Oceanía'),
+    ('Papúa Nueva Guinea', 'Oceanía'),
+    ('Papua Nueva Guinea', 'Oceanía'),
+    ('Nueva Caledonia', 'Oceanía'),
+    ('Palaos', 'Oceanía')
+)
+UPDATE destinos d
+SET continente_id = c.id
+FROM pais_continente pc
+JOIN continente c
+  ON pg_temp.jmj_geo_norm(c.nombre) = pg_temp.jmj_geo_norm(pc.continente)
+WHERE pg_temp.jmj_geo_norm(d.pais) = pg_temp.jmj_geo_norm(pc.pais);
+
+-- 1b) Canonicaliza el nombre del pais guardado en destino.
+-- Esto corrige valores con mojibake heredado como EspaÃ±a, PanamÃ¡ o PapÃºa Nueva Guinea.
+WITH pais_canonico(alias_pais, pais_correcto) AS (
+    VALUES
+    ('España', 'España'),
+    ('Francia', 'Francia'),
+    ('Italia', 'Italia'),
+    ('Alemania', 'Alemania'),
+    ('Austria', 'Austria'),
+    ('Portugal', 'Portugal'),
+    ('Reino Unido', 'Reino Unido'),
+    ('Irlanda', 'Irlanda'),
+    ('Países Bajos', 'Países Bajos'),
+    ('Paises Bajos', 'Países Bajos'),
+    ('Bélgica', 'Bélgica'),
+    ('Belgica', 'Bélgica'),
+    ('Suiza', 'Suiza'),
+    ('Polonia', 'Polonia'),
+    ('República Checa', 'República Checa'),
+    ('Republica Checa', 'República Checa'),
+    ('Hungría', 'Hungría'),
+    ('Hungria', 'Hungría'),
+    ('Grecia', 'Grecia'),
+    ('Croacia', 'Croacia'),
+    ('Noruega', 'Noruega'),
+    ('Suecia', 'Suecia'),
+    ('Dinamarca', 'Dinamarca'),
+    ('Islandia', 'Islandia'),
+    ('Japón', 'Japón'),
+    ('Japon', 'Japón'),
+    ('China', 'China'),
+    ('Corea del Sur', 'Corea del Sur'),
+    ('Tailandia', 'Tailandia'),
+    ('Vietnam', 'Vietnam'),
+    ('Indonesia', 'Indonesia'),
+    ('Nepal', 'Nepal'),
+    ('India', 'India'),
+    ('Qatar', 'Qatar'),
+    ('Catar', 'Qatar'),
+    ('Emiratos Árabes Unidos', 'Emiratos Árabes Unidos'),
+    ('Emiratos Arabes Unidos', 'Emiratos Árabes Unidos'),
+    ('Filipinas', 'Filipinas'),
+    ('Israel', 'Israel'),
+    ('Malasia', 'Malasia'),
+    ('Singapur', 'Singapur'),
+    ('Turquía', 'Turquía'),
+    ('Turquia', 'Turquía'),
+    ('Egipto', 'Egipto'),
+    ('Marruecos', 'Marruecos'),
+    ('Sudáfrica', 'Sudáfrica'),
+    ('Sudafrica', 'Sudáfrica'),
+    ('Nigeria', 'Nigeria'),
+    ('Ruanda', 'Ruanda'),
+    ('Senegal', 'Senegal'),
+    ('Mauricio', 'Mauricio'),
+    ('Namibia', 'Namibia'),
+    ('Túnez', 'Túnez'),
+    ('Tunez', 'Túnez'),
+    ('Argelia', 'Argelia'),
+    ('Etiopía', 'Etiopía'),
+    ('Etiopia', 'Etiopía'),
+    ('Ghana', 'Ghana'),
+    ('Kenia', 'Kenia'),
+    ('Seychelles', 'Seychelles'),
+    ('Tanzania', 'Tanzania'),
+    ('Estados Unidos', 'Estados Unidos'),
+    ('EEUU', 'Estados Unidos'),
+    ('USA', 'Estados Unidos'),
+    ('Canadá', 'Canadá'),
+    ('Canada', 'Canadá'),
+    ('México', 'México'),
+    ('Mexico', 'México'),
+    ('Costa Rica', 'Costa Rica'),
+    ('Bahamas', 'Bahamas'),
+    ('Belice', 'Belice'),
+    ('Cuba', 'Cuba'),
+    ('El Salvador', 'El Salvador'),
+    ('Guatemala', 'Guatemala'),
+    ('Honduras', 'Honduras'),
+    ('Jamaica', 'Jamaica'),
+    ('Nicaragua', 'Nicaragua'),
+    ('Panamá', 'Panamá'),
+    ('Panama', 'Panamá'),
+    ('Puerto Rico', 'Puerto Rico'),
+    ('República Dominicana', 'República Dominicana'),
+    ('Republica Dominicana', 'República Dominicana'),
+    ('Curazao', 'Curazao'),
+    ('Curaçao', 'Curazao'),
+    ('Argentina', 'Argentina'),
+    ('Aruba', 'Aruba'),
+    ('Brasil', 'Brasil'),
+    ('Chile', 'Chile'),
+    ('Colombia', 'Colombia'),
+    ('Perú', 'Perú'),
+    ('Peru', 'Perú'),
+    ('Ecuador', 'Ecuador'),
+    ('Uruguay', 'Uruguay'),
+    ('Paraguay', 'Paraguay'),
+    ('Bolivia', 'Bolivia'),
+    ('Venezuela', 'Venezuela'),
+    ('Guyana', 'Guyana'),
+    ('Guayana Francesa', 'Guayana Francesa'),
+    ('Surinam', 'Surinam'),
+    ('Suriname', 'Surinam'),
+    ('Australia', 'Australia'),
+    ('Nueva Zelanda', 'Nueva Zelanda'),
+    ('Fiyi', 'Fiyi'),
+    ('Fiji', 'Fiyi'),
+    ('Samoa', 'Samoa'),
+    ('Tonga', 'Tonga'),
+    ('Vanuatu', 'Vanuatu'),
+    ('Kiribati', 'Kiribati'),
+    ('Micronesia', 'Micronesia'),
+    ('Guam', 'Guam'),
+    ('Islas Cook', 'Islas Cook'),
+    ('Islas Salomón', 'Islas Salomón'),
+    ('Islas Salomon', 'Islas Salomón'),
+    ('Polinesia Francesa', 'Polinesia Francesa'),
+    ('Papúa Nueva Guinea', 'Papúa Nueva Guinea'),
+    ('Papua Nueva Guinea', 'Papúa Nueva Guinea'),
+    ('Nueva Caledonia', 'Nueva Caledonia'),
+    ('Palaos', 'Palaos')
+)
+UPDATE destinos d
+SET pais = pc.pais_correcto
+FROM pais_canonico pc
+WHERE pg_temp.jmj_geo_norm(d.pais) = pg_temp.jmj_geo_norm(pc.alias_pais)
+  AND d.pais IS DISTINCT FROM pc.pais_correcto;
+
+-- 2) Corrige destinos concretos que estaban metidos en paises incorrectos.
+WITH correccion_destinos(nombre_destino, pais_correcto, continente_correcto) AS (
+    VALUES
+    -- Estados Unidos: salian en Austria/Australia u otros paises
+    ('Nueva York', 'Estados Unidos', 'América del Norte'),
+    ('New York', 'Estados Unidos', 'América del Norte'),
+    ('Los Ángeles', 'Estados Unidos', 'América del Norte'),
+    ('Los Angeles', 'Estados Unidos', 'América del Norte'),
+    ('Miami', 'Estados Unidos', 'América del Norte'),
+    ('San Francisco', 'Estados Unidos', 'América del Norte'),
+
+    -- Francia: salian en Guayana Francesa / Polinesia Francesa
+    ('París', 'Francia', 'Europa'),
+    ('Paris', 'Francia', 'Europa'),
+    ('Lyon', 'Francia', 'Europa'),
+    ('Niza', 'Francia', 'Europa'),
+    ('Nice', 'Francia', 'Europa'),
+    ('Burdeos', 'Francia', 'Europa'),
+    ('Bordeaux', 'Francia', 'Europa'),
+
+    -- Austria real
+    ('Viena', 'Austria', 'Europa'),
+    ('Vienna', 'Austria', 'Europa'),
+    ('Salzburgo', 'Austria', 'Europa'),
+    ('Salzburg', 'Austria', 'Europa'),
+    ('Innsbruck', 'Austria', 'Europa'),
+    ('Graz', 'Austria', 'Europa'),
+
+    -- Europa especifica
+    ('Cracovia', 'Polonia', 'Europa'),
+    ('Krakow', 'Polonia', 'Europa'),
+    ('Wroclaw', 'Polonia', 'Europa'),
+    ('Varsovia', 'Polonia', 'Europa'),
+    ('Warsaw', 'Polonia', 'Europa'),
+    ('Debrecen', 'Hungría', 'Europa'),
+
+    -- Asia
+    ('Al Wakrah', 'Qatar', 'Asia'),
+    ('Al Khor', 'Qatar', 'Asia'),
+    ('Doha', 'Qatar', 'Asia'),
+    ('Dubái', 'Emiratos Árabes Unidos', 'Asia'),
+    ('Dubai', 'Emiratos Árabes Unidos', 'Asia'),
+    ('Ras al-Khaimah', 'Emiratos Árabes Unidos', 'Asia'),
+    ('Abu Dhabi', 'Emiratos Árabes Unidos', 'Asia'),
+    ('Katmandú', 'Nepal', 'Asia'),
+    ('Kathmandu', 'Nepal', 'Asia'),
+    ('Bhaktapur', 'Nepal', 'Asia'),
+    ('Pokhara', 'Nepal', 'Asia'),
+    ('Hanoi', 'Vietnam', 'Asia'),
+    ('Hanói', 'Vietnam', 'Asia'),
+    ('Hoi An', 'Vietnam', 'Asia'),
+    ('Da Nang', 'Vietnam', 'Asia'),
+    ('Ho Chi Minh', 'Vietnam', 'Asia'),
+    ('Yogyakarta', 'Indonesia', 'Asia'),
+
+    -- Africa
+    ('El Cairo', 'Egipto', 'África'),
+    ('Cairo', 'Egipto', 'África'),
+    ('Alejandría', 'Egipto', 'África'),
+    ('Alejandria', 'Egipto', 'África'),
+    ('Asuán', 'Egipto', 'África'),
+    ('Asuan', 'Egipto', 'África'),
+    ('Luxor', 'Egipto', 'África'),
+    ('Port Harcourt', 'Nigeria', 'África'),
+    ('Lagos', 'Nigeria', 'África'),
+    ('Abuja', 'Nigeria', 'África'),
+    ('Abuya', 'Nigeria', 'África'),
+    ('Kano', 'Nigeria', 'África'),
+    ('Musanze', 'Ruanda', 'África'),
+    ('Kigali', 'Ruanda', 'África'),
+    ('Dakar', 'Senegal', 'África'),
+    ('Saly', 'Senegal', 'África'),
+    ('Ziguinchor', 'Senegal', 'África'),
+    ('Flic en Flac', 'Mauricio', 'África'),
+    ('Le Morne', 'Mauricio', 'África'),
+    ('Port Louis', 'Mauricio', 'África'),
+    ('Grand Baie', 'Mauricio', 'África'),
+    ('Walvis Bay', 'Namibia', 'África'),
+    ('Sossusvlei', 'Namibia', 'África'),
+    ('Windhoek', 'Namibia', 'África'),
+    ('Swakopmund', 'Namibia', 'África'),
+    ('Susa', 'Túnez', 'África'),
+    ('Hammamet', 'Túnez', 'África'),
+    ('Djerba', 'Túnez', 'África'),
+    ('Túnez', 'Túnez', 'África'),
+
+    -- America del Norte / Caribe
+    ('Nassau', 'Bahamas', 'América del Norte'),
+    ('Freeport', 'Bahamas', 'América del Norte'),
+    ('Exuma', 'Bahamas', 'América del Norte'),
+    ('Belmopan', 'Belice', 'América del Norte'),
+    ('Belmopán', 'Belice', 'América del Norte'),
+    ('Ciudad de Belice', 'Belice', 'América del Norte'),
+    ('Cayo Caulker', 'Belice', 'América del Norte'),
+    ('San Pedro', 'Belice', 'América del Norte'),
+    ('La Habana', 'Cuba', 'América del Norte'),
+    ('Varadero', 'Cuba', 'América del Norte'),
+    ('San Salvador', 'El Salvador', 'América del Norte'),
+    ('La Libertad', 'El Salvador', 'América del Norte'),
+    ('Ciudad de Guatemala', 'Guatemala', 'América del Norte'),
+    ('Antigua Guatemala', 'Guatemala', 'América del Norte'),
+    ('Tegucigalpa', 'Honduras', 'América del Norte'),
+    ('Copán', 'Honduras', 'América del Norte'),
+    ('Copan', 'Honduras', 'América del Norte'),
+    ('Ciudad de Panamá', 'Panamá', 'América del Norte'),
+    ('Ciudad de Panama', 'Panamá', 'América del Norte'),
+    ('Boquete', 'Panamá', 'América del Norte'),
+    ('Colón', 'Panamá', 'América del Norte'),
+    ('Colon', 'Panamá', 'América del Norte'),
+    ('San Juan', 'Puerto Rico', 'América del Norte'),
+    ('Culebra', 'Puerto Rico', 'América del Norte'),
+    ('Ponce', 'Puerto Rico', 'América del Norte'),
+    ('Santo Domingo', 'República Dominicana', 'América del Norte'),
+    ('La Romana', 'República Dominicana', 'América del Norte'),
+    ('Punta Cana', 'República Dominicana', 'América del Norte'),
+    ('Westpunt', 'Curazao', 'América del Norte'),
+    ('Willemstad', 'Curazao', 'América del Norte'),
+
+    -- America del Sur
+    ('Bogotá', 'Colombia', 'América del Sur'),
+    ('Bogota', 'Colombia', 'América del Sur'),
+    ('Medellín', 'Colombia', 'América del Sur'),
+    ('Medellin', 'Colombia', 'América del Sur'),
+    ('Cartagena', 'Colombia', 'América del Sur'),
+    ('Cali', 'Colombia', 'América del Sur'),
+    ('Buenos Aires', 'Argentina', 'América del Sur'),
+    ('Córdoba', 'Argentina', 'América del Sur'),
+    ('Cordoba', 'Argentina', 'América del Sur'),
+    ('Mendoza', 'Argentina', 'América del Sur'),
+    ('Ushuaia', 'Argentina', 'América del Sur'),
+    ('Cayena', 'Guayana Francesa', 'América del Sur'),
+    ('Kourou', 'Guayana Francesa', 'América del Sur'),
+    ('Sinnamary', 'Guayana Francesa', 'América del Sur'),
+    ('Saint-Laurent-du-Maroni', 'Guayana Francesa', 'América del Sur'),
+    ('Georgetown', 'Guyana', 'América del Sur'),
+    ('Lethem', 'Guyana', 'América del Sur'),
+    ('Linden', 'Guyana', 'América del Sur'),
+    ('Bartica', 'Guyana', 'América del Sur'),
+    ('Asunción', 'Paraguay', 'América del Sur'),
+    ('Asuncion', 'Paraguay', 'América del Sur'),
+    ('Encarnación', 'Paraguay', 'América del Sur'),
+    ('Encarnacion', 'Paraguay', 'América del Sur'),
+    ('San Bernardino', 'Paraguay', 'América del Sur'),
+    ('Paramaribo', 'Surinam', 'América del Sur'),
+    ('Lelydorp', 'Surinam', 'América del Sur'),
+    ('Nieuw Nickerie', 'Surinam', 'América del Sur'),
+    ('Albina', 'Surinam', 'América del Sur'),
+    ('Montevideo', 'Uruguay', 'América del Sur'),
+
+    -- Oceania
+    ('Sídney', 'Australia', 'Oceanía'),
+    ('Sidney', 'Australia', 'Oceanía'),
+    ('Sydney', 'Australia', 'Oceanía'),
+    ('Melbourne', 'Australia', 'Oceanía'),
+    ('Brisbane', 'Australia', 'Oceanía'),
+    ('Perth', 'Australia', 'Oceanía'),
+    ('Avarua', 'Islas Cook', 'Oceanía'),
+    ('Rarotonga', 'Islas Cook', 'Oceanía'),
+    ('Aitutaki', 'Islas Cook', 'Oceanía'),
+    ('Muri Beach', 'Islas Cook', 'Oceanía'),
+    ('Honiara', 'Islas Salomón', 'Oceanía'),
+    ('Gizo', 'Islas Salomón', 'Oceanía'),
+    ('Auki', 'Islas Salomón', 'Oceanía'),
+    ('Tarawa', 'Kiribati', 'Oceanía'),
+    ('Abaiang', 'Kiribati', 'Oceanía'),
+    ('Chuuk', 'Micronesia', 'Oceanía'),
+    ('Kosrae', 'Micronesia', 'Oceanía'),
+    ('Pohnpei', 'Micronesia', 'Oceanía'),
+    ('Yap', 'Micronesia', 'Oceanía'),
+    ('Port Moresby', 'Papúa Nueva Guinea', 'Oceanía'),
+    ('Lae', 'Papúa Nueva Guinea', 'Oceanía'),
+    ('Madang', 'Papúa Nueva Guinea', 'Oceanía'),
+    ('Rabaul', 'Papúa Nueva Guinea', 'Oceanía'),
+    ('Bora Bora', 'Polinesia Francesa', 'Oceanía'),
+    ('Moorea', 'Polinesia Francesa', 'Oceanía'),
+    ('Papeete', 'Polinesia Francesa', 'Oceanía'),
+    ('Nukualofa', 'Tonga', 'Oceanía'),
+    ('Nuku''alofa', 'Tonga', 'Oceanía'),
+    ('Espiritu Santo', 'Vanuatu', 'Oceanía'),
+    ('Tanna', 'Vanuatu', 'Oceanía'),
+    ('Port Vila', 'Vanuatu', 'Oceanía'),
+    ('Savai''i', 'Samoa', 'Oceanía'),
+    ('Savaiʻi', 'Samoa', 'Oceanía'),
+    ('Upolu', 'Samoa', 'Oceanía'),
+    ('Lalomanu', 'Samoa', 'Oceanía'),
+    ('Hagåtña', 'Guam', 'Oceanía'),
+    ('Hagatna', 'Guam', 'Oceanía'),
+    ('Tumon', 'Guam', 'Oceanía'),
+    ('Tamuning', 'Guam', 'Oceanía'),
+    ('Dededo', 'Guam', 'Oceanía')
+)
+UPDATE destinos d
+SET pais = cd.pais_correcto,
+    continente_id = c.id
+FROM correccion_destinos cd
+JOIN continente c
+  ON pg_temp.jmj_geo_norm(c.nombre) = pg_temp.jmj_geo_norm(cd.continente_correcto)
+WHERE pg_temp.jmj_geo_norm(d.nombre) = pg_temp.jmj_geo_norm(cd.nombre_destino);
+
+-- 3) Sincroniza hoteles con el destino al que pertenecen.
+-- Esto evita que un hotel de una ciudad corregida siga apareciendo con pais antiguo.
+UPDATE alojamientos a
+SET ciudad = d.nombre,
+    pais = d.pais
+FROM destinos d
+WHERE a.destino_id = d.id
+  AND (
+    a.ciudad IS DISTINCT FROM d.nombre
+    OR a.pais IS DISTINCT FROM d.pais
+  );
+
+DROP FUNCTION pg_temp.jmj_geo_norm(text);
+
+COMMIT;
