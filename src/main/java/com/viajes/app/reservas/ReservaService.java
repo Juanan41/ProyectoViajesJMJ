@@ -50,7 +50,7 @@ public class ReservaService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
 
         Habitacion habitacion = habitacionRepository.findById(dto.getHabitacionId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Habitación no encontrada"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "HabitaciÃƒÂ³n no encontrada"));
 
         if (dto.getFechaInicio() == null || dto.getFechaFin() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Las fechas son obligatorias");
@@ -71,23 +71,23 @@ public class ReservaService {
         try {
             transporte = TransporteTipo.valueOf(dto.getTransporte().toUpperCase());
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transporte inválido");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transporte invÃƒÂ¡lido");
         }
 
         int huespedes = dto.getHuespedes() != null && dto.getHuespedes() > 0 ? dto.getHuespedes() : 1;
 
         if (huespedes > 8) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El máximo permitido es de 8 huéspedes");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El mÃƒÂ¡ximo permitido es de 8 huÃƒÂ©spedes");
         }
 
         if (habitacion.getCapacidad() < huespedes) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La habitación no tiene capacidad suficiente");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La habitaciÃƒÂ³n no tiene capacidad suficiente");
         }
 
         if (!esHabitacionCompatible(habitacion, huespedes)) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "La habitación seleccionada no es compatible con el número de huéspedes"
+                    "La habitaciÃƒÂ³n seleccionada no es compatible con el nÃƒÂºmero de huÃƒÂ©spedes"
             );
         }
 
@@ -143,21 +143,32 @@ public class ReservaService {
         return mapToDto(reserva);
     }
 
+    @Transactional
     public ReservaResponseDto cancelarReserva(Long id, String emailUsuario) {
 
         Reserva reserva = reservaRepository.findByIdAndUsuarioEmail(id, emailUsuario)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reserva no encontrada"));
 
         if ("CANCELADA".equalsIgnoreCase(reserva.getEstado())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La reserva ya está cancelada");
+            return mapToDto(reserva);
         }
+
+        Usuario usuario = reserva.getUsuario();
+
+        BigDecimal saldoActual = usuario.getSaldo() != null
+                ? usuario.getSaldo()
+                : BigDecimal.ZERO;
+
+        BigDecimal importeDevolucion = BigDecimal.valueOf(reserva.getPrecioTotal());
+
+        usuario.setSaldo(saldoActual.add(importeDevolucion));
+        usuarioRepository.save(usuario);
 
         reserva.setEstado("CANCELADA");
 
         Reserva actualizada = reservaRepository.save(reserva);
         return mapToDto(actualizada);
     }
-
     private ReservaResponseDto mapToDto(Reserva reserva) {
         Alojamiento alojamiento = reserva.getHabitacion().getAlojamiento();
         Destino destino = alojamiento.getDestino();
@@ -249,7 +260,7 @@ public class ReservaService {
         int numero = Math.floorMod(safeId, 18) + 1;
 
         if (transporte == TransporteTipo.TREN) {
-            return "Vía " + numero;
+            return "VÃƒÂ­a " + numero;
         }
 
         if (transporte == TransporteTipo.BARCO) {
