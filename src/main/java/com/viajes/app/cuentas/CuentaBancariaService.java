@@ -6,11 +6,10 @@ import com.viajes.app.users.Usuario;
 import com.viajes.app.users.UsuarioRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class CuentaBancariaService {
@@ -25,13 +24,17 @@ public class CuentaBancariaService {
     }
 
     public CuentaBancariaResponseDto crearCuenta(CuentaBancariaRequestDto dto, String emailUsuario) {
-
         Usuario usuario = usuarioRepository.findByEmail(emailUsuario)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
 
-        cuentaBancariaRepository.findByUsuarioEmail(emailUsuario).ifPresent(c -> {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El usuario ya tiene una cuenta bancaria registrada");
-        });
+        long totalTarjetas = cuentaBancariaRepository.countByUsuarioEmail(emailUsuario);
+
+        if (totalTarjetas >= 2) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Solo puedes tener un maximo de 2 tarjetas."
+            );
+        }
 
         String ibanNormalizado = normalizarIban(dto.getIban());
 
@@ -48,7 +51,7 @@ public class CuentaBancariaService {
         }
 
         if (cuentaBancariaRepository.findByIban(ibanNormalizado).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ese IBAN ya está registrado");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ese IBAN ya esta registrado");
         }
 
         CuentaBancaria cuenta = new CuentaBancaria();
@@ -64,19 +67,20 @@ public class CuentaBancariaService {
         return mapToDto(guardada);
     }
 
-    public CuentaBancariaResponseDto obtenerMiCuenta(String emailUsuario) {
-        CuentaBancaria cuenta = cuentaBancariaRepository.findByUsuarioEmail(emailUsuario)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe cuenta bancaria para este usuario"));
-
-        return mapToDto(cuenta);
+    public List<CuentaBancariaResponseDto> obtenerMisCuentas(String emailUsuario) {
+        return cuentaBancariaRepository.findAllByUsuarioEmail(emailUsuario)
+                .stream()
+                .map(this::mapToDto)
+                .toList();
     }
 
     public CuentaBancariaResponseDto actualizarCuenta(CuentaBancariaRequestDto dto, String emailUsuario) {
-        CuentaBancaria cuenta = cuentaBancariaRepository.findByUsuarioEmail(emailUsuario)
+        CuentaBancaria cuenta = cuentaBancariaRepository.findAllByUsuarioEmail(emailUsuario)
+                .stream()
+                .findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe cuenta bancaria para este usuario"));
 
         String ibanNormalizado = normalizarIban(dto.getIban());
-
 
         if (ibanNormalizado.isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El IBAN es obligatorio");
@@ -93,7 +97,7 @@ public class CuentaBancariaService {
         CuentaBancaria existenteConEseIban = cuentaBancariaRepository.findByIban(ibanNormalizado).orElse(null);
 
         if (existenteConEseIban != null && !existenteConEseIban.getId().equals(cuenta.getId())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ese IBAN ya está registrado");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ese IBAN ya esta registrado");
         }
 
         cuenta.setIban(ibanNormalizado);
@@ -105,17 +109,14 @@ public class CuentaBancariaService {
         return mapToDto(actualizada);
     }
 
-    @Transactional
     public void eliminarCuenta(String emailUsuario) {
+        List<CuentaBancaria> cuentas = cuentaBancariaRepository.findAllByUsuarioEmail(emailUsuario);
 
-        CuentaBancaria cuenta = cuentaBancariaRepository.findByUsuarioEmail(emailUsuario)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe cuenta bancaria para este usuario"));
+        if (cuentas.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe cuenta bancaria para este usuario");
+        }
 
-        Usuario usuario = cuenta.getUsuario();
-        cuentaBancariaRepository.delete(cuenta);
-
-        usuario.setSaldo(BigDecimal.ZERO);
-        usuarioRepository.save(usuario);
+        cuentaBancariaRepository.delete(cuentas.get(0));
     }
 
     private CuentaBancariaResponseDto mapToDto(CuentaBancaria cuenta) {

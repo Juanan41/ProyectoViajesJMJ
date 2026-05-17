@@ -14,8 +14,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -46,7 +46,8 @@ class CuentaBancariaServiceTest {
         dto.setSwiftBic("CAIXESBBXXX");
 
         when(usuarioRepository.findByEmail(emailUsuario)).thenReturn(Optional.of(usuario));
-        when(cuentaBancariaRepository.findByUsuarioEmail(emailUsuario)).thenReturn(Optional.empty());
+        when(cuentaBancariaRepository.countByUsuarioEmail(emailUsuario)).thenReturn(0L);
+        when(cuentaBancariaRepository.findByIban("ES9121000418450200051332")).thenReturn(Optional.empty());
 
         when(cuentaBancariaRepository.save(any(CuentaBancaria.class))).thenAnswer(invocation -> {
             CuentaBancaria cuenta = invocation.getArgument(0);
@@ -100,11 +101,10 @@ class CuentaBancariaServiceTest {
     }
 
     @Test
-    void debeLanzarErrorSiUsuarioYaTieneCuentaBancaria() {
+    void debeLanzarErrorSiUsuarioYaTieneDosTarjetas() {
         String emailUsuario = "cliente1@viajes.com";
 
         Usuario usuario = crearUsuario(1L, "cliente1", emailUsuario, Rol.USER);
-        CuentaBancaria existente = crearCuenta(99L, "ES1111111111111111111111", "Cliente Uno", "Banco", "BIC", usuario);
 
         CuentaBancariaRequestDto dto = new CuentaBancariaRequestDto();
         dto.setIban("ES9121000418450200051332");
@@ -113,12 +113,12 @@ class CuentaBancariaServiceTest {
         dto.setSwiftBic("CAIXESBBXXX");
 
         when(usuarioRepository.findByEmail(emailUsuario)).thenReturn(Optional.of(usuario));
-        when(cuentaBancariaRepository.findByUsuarioEmail(emailUsuario)).thenReturn(Optional.of(existente));
+        when(cuentaBancariaRepository.countByUsuarioEmail(emailUsuario)).thenReturn(2L);
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> cuentaBancariaService.crearCuenta(dto, emailUsuario));
 
-        assertEquals("400 BAD_REQUEST \"El usuario ya tiene una cuenta bancaria registrada\"", exception.getMessage());
+        assertEquals("400 BAD_REQUEST \"Solo puedes tener un maximo de 2 tarjetas.\"", exception.getMessage());
 
         verify(cuentaBancariaRepository, never()).save(any());
     }
@@ -135,7 +135,7 @@ class CuentaBancariaServiceTest {
         dto.setSwiftBic("CAIXESBBXXX");
 
         when(usuarioRepository.findByEmail(emailUsuario)).thenReturn(Optional.of(usuario));
-        when(cuentaBancariaRepository.findByUsuarioEmail(emailUsuario)).thenReturn(Optional.empty());
+        when(cuentaBancariaRepository.countByUsuarioEmail(emailUsuario)).thenReturn(0L);
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> cuentaBancariaService.crearCuenta(dto, emailUsuario));
@@ -157,7 +157,7 @@ class CuentaBancariaServiceTest {
         dto.setSwiftBic("CAIXESBBXXX");
 
         when(usuarioRepository.findByEmail(emailUsuario)).thenReturn(Optional.of(usuario));
-        when(cuentaBancariaRepository.findByUsuarioEmail(emailUsuario)).thenReturn(Optional.empty());
+        when(cuentaBancariaRepository.countByUsuarioEmail(emailUsuario)).thenReturn(0L);
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> cuentaBancariaService.crearCuenta(dto, emailUsuario));
@@ -179,7 +179,7 @@ class CuentaBancariaServiceTest {
         dto.setSwiftBic("CAIXESBBXXX");
 
         when(usuarioRepository.findByEmail(emailUsuario)).thenReturn(Optional.of(usuario));
-        when(cuentaBancariaRepository.findByUsuarioEmail(emailUsuario)).thenReturn(Optional.empty());
+        when(cuentaBancariaRepository.countByUsuarioEmail(emailUsuario)).thenReturn(0L);
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> cuentaBancariaService.crearCuenta(dto, emailUsuario));
@@ -190,7 +190,7 @@ class CuentaBancariaServiceTest {
     }
 
     @Test
-    void debeObtenerCuentaDelUsuario() {
+    void debeObtenerCuentasDelUsuario() {
         String emailUsuario = "cliente1@viajes.com";
         Usuario usuario = crearUsuario(1L, "cliente1", emailUsuario, Rol.USER);
 
@@ -205,29 +205,32 @@ class CuentaBancariaServiceTest {
         cuenta.setActiva(true);
         cuenta.setFechaRegistro(LocalDateTime.now());
 
-        when(cuentaBancariaRepository.findByUsuarioEmail(emailUsuario)).thenReturn(Optional.of(cuenta));
+        when(cuentaBancariaRepository.findAllByUsuarioEmail(emailUsuario)).thenReturn(List.of(cuenta));
 
-        CuentaBancariaResponseDto response = cuentaBancariaService.obtenerMiCuenta(emailUsuario);
+        List<CuentaBancariaResponseDto> response = cuentaBancariaService.obtenerMisCuentas(emailUsuario);
 
         assertNotNull(response);
-        assertEquals(10L, response.getId());
-        assertEquals("Cliente Uno", response.getTitular());
-        assertEquals("CaixaBank", response.getEntidad());
-        assertEquals("CAIXESBBXXX", response.getSwiftBic());
-        assertEquals("ES91 **** **** **** 1332", response.getIbanMascarado());
-        assertTrue(response.getActiva());
+        assertEquals(1, response.size());
+
+        CuentaBancariaResponseDto primera = response.get(0);
+        assertEquals(10L, primera.getId());
+        assertEquals("Cliente Uno", primera.getTitular());
+        assertEquals("CaixaBank", primera.getEntidad());
+        assertEquals("CAIXESBBXXX", primera.getSwiftBic());
+        assertEquals("ES91 **** **** **** 1332", primera.getIbanMascarado());
+        assertTrue(primera.getActiva());
     }
 
     @Test
-    void debeLanzarErrorSiNoExisteCuentaParaElUsuario() {
+    void debeDevolverListaVaciaSiNoExisteCuentaParaElUsuario() {
         String emailUsuario = "cliente1@viajes.com";
 
-        when(cuentaBancariaRepository.findByUsuarioEmail(emailUsuario)).thenReturn(Optional.empty());
+        when(cuentaBancariaRepository.findAllByUsuarioEmail(emailUsuario)).thenReturn(List.of());
 
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> cuentaBancariaService.obtenerMiCuenta(emailUsuario));
+        List<CuentaBancariaResponseDto> response = cuentaBancariaService.obtenerMisCuentas(emailUsuario);
 
-        assertEquals("404 NOT_FOUND \"No existe cuenta bancaria para este usuario\"", exception.getMessage());
+        assertNotNull(response);
+        assertTrue(response.isEmpty());
     }
 
     @Test
@@ -252,7 +255,8 @@ class CuentaBancariaServiceTest {
         dto.setEntidad("Banco Santander");
         dto.setSwiftBic("BSCHESMMXXX");
 
-        when(cuentaBancariaRepository.findByUsuarioEmail(emailUsuario)).thenReturn(Optional.of(cuenta));
+        when(cuentaBancariaRepository.findAllByUsuarioEmail(emailUsuario)).thenReturn(List.of(cuenta));
+        when(cuentaBancariaRepository.findByIban("ES7620770024003102575766")).thenReturn(Optional.empty());
         when(cuentaBancariaRepository.save(any(CuentaBancaria.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         CuentaBancariaResponseDto response = cuentaBancariaService.actualizarCuenta(dto, emailUsuario);
@@ -274,7 +278,6 @@ class CuentaBancariaServiceTest {
     void debeEliminarCuentaCorrectamente() {
         String emailUsuario = "cliente1@viajes.com";
         Usuario usuario = crearUsuario(1L, "cliente1", emailUsuario, Rol.USER);
-        usuario.setSaldo(BigDecimal.valueOf(250));
 
         CuentaBancaria cuenta = crearCuenta(
                 10L,
@@ -285,13 +288,11 @@ class CuentaBancariaServiceTest {
                 usuario
         );
 
-        when(cuentaBancariaRepository.findByUsuarioEmail(emailUsuario)).thenReturn(Optional.of(cuenta));
+        when(cuentaBancariaRepository.findAllByUsuarioEmail(emailUsuario)).thenReturn(List.of(cuenta));
 
         assertDoesNotThrow(() -> cuentaBancariaService.eliminarCuenta(emailUsuario));
 
         verify(cuentaBancariaRepository).delete(cuenta);
-        assertEquals(BigDecimal.ZERO, usuario.getSaldo());
-        verify(usuarioRepository).save(usuario);
     }
 
     @Test
@@ -310,12 +311,12 @@ class CuentaBancariaServiceTest {
         cuenta.setActiva(true);
         cuenta.setFechaRegistro(LocalDateTime.now());
 
-        when(cuentaBancariaRepository.findByUsuarioEmail(emailUsuario)).thenReturn(Optional.of(cuenta));
+        when(cuentaBancariaRepository.findAllByUsuarioEmail(emailUsuario)).thenReturn(List.of(cuenta));
 
-        CuentaBancariaResponseDto response = cuentaBancariaService.obtenerMiCuenta(emailUsuario);
+        List<CuentaBancariaResponseDto> response = cuentaBancariaService.obtenerMisCuentas(emailUsuario);
 
-        assertEquals("ES91 **** **** **** 1332", response.getIbanMascarado());
-        assertNotEquals("ES9121000418450200051332", response.getIbanMascarado());
+        assertEquals("ES91 **** **** **** 1332", response.get(0).getIbanMascarado());
+        assertNotEquals("ES9121000418450200051332", response.get(0).getIbanMascarado());
     }
 
     private Usuario crearUsuario(Long id, String username, String email, Rol rol) {

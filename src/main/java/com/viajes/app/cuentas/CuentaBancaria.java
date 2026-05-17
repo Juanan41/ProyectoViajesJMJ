@@ -20,8 +20,8 @@ public class CuentaBancaria {
     private Boolean activa;
     private LocalDateTime fechaRegistro;
 
-    @OneToOne
-    @JoinColumn(name = "usuario_id", unique = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
     public CuentaBancaria() {

@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/cuentas")
 public class CuentaBancariaRestController {
@@ -25,9 +27,9 @@ public class CuentaBancariaRestController {
     }
 
     @GetMapping("/me")
-    public CuentaBancariaResponseDto obtenerMiCuenta(Authentication authentication) {
+    public List<CuentaBancariaResponseDto> obtenerMiCuenta(Authentication authentication) {
         String emailUsuario = authentication.getName();
-        return cuentaBancariaService.obtenerMiCuenta(emailUsuario);
+        return cuentaBancariaService.obtenerMisCuentas(emailUsuario);
     }
 
     @PutMapping("/me")
