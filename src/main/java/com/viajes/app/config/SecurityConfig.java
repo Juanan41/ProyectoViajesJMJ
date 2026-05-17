@@ -21,7 +21,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
-
 @Configuration
 public class SecurityConfig {
 
@@ -47,6 +46,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/opiniones/alojamiento/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/recomendar").permitAll()
 
+                        .requestMatchers("/api/cuentas/**").authenticated()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
@@ -85,4 +85,3 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 }
-

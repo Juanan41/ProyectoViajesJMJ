@@ -22,6 +22,15 @@ public class CuentaBancariaRestController {
     @ResponseStatus(HttpStatus.CREATED)
     public CuentaBancariaResponseDto crearCuenta(@RequestBody CuentaBancariaRequestDto dto,
                                                  Authentication authentication) {
+
+        System.out.println("ENTRA EN POST /api/cuentas");
+
+        if (authentication == null) {
+            System.out.println("AUTHENTICATION ES NULL EN /api/cuentas");
+        } else {
+            System.out.println("USUARIO AUTENTICADO EN /api/cuentas: " + authentication.getName());
+        }
+
         String emailUsuario = authentication.getName();
         return cuentaBancariaService.crearCuenta(dto, emailUsuario);
     }
