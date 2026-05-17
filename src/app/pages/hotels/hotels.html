@@ -1,176 +1,664 @@
-@if (!city() || !country()) {
-<div class="flex-1 flex flex-col items-center justify-center">
-  <div class="loading loading-spinner loading-lg text-emerald-500 mb-4"></div>
-  <p class="text-gray-400">{{ 'Cargando alojamientos...' | translate }}</p>
+@if (!hotel()) {
+<div class="flex-1 flex flex-col items-center justify-center py-20">
+  <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mb-4"></div>
+  <p class="text-gray-400">{{ 'Cargando hotel...' | translate }}</p>
 </div>
 }
 
-@if (city() && country()) {
+@if (hotel()) {
 <div class="flex-1 w-full bg-[rgb(23,25,25)]">
-  <div class="relative h-[40vh] w-full overflow-hidden">
-    <img loading="lazy" [src]="city().image" [alt]="city().name | translate" class="w-full h-full object-cover" />
-    <div class="absolute inset-0 bg-gradient-to-t from-[rgb(23,25,25)] via-[rgb(23,25,25)]/20 to-transparent"></div>
+  <div class="relative h-[55vh] w-full overflow-hidden">
+    <img loading="lazy" [src]="getHotelImage(hotel())" [alt]="hotel().nombre | translate"
+      class="w-full h-full object-cover" />
+
+    <div class="absolute inset-0 bg-gradient-to-t from-[rgb(23,25,25)] via-[rgb(23,25,25)]/35 to-black/30"></div>
 
     <div class="absolute inset-0 flex items-end pb-12">
       <div class="max-w-7xl mx-auto px-4 w-full">
-        <a [routerLink]="['/continent', country().id]"
+        <a routerLink="/continents"
           class="inline-flex items-center gap-2 text-white bg-black/40 hover:bg-black/60 px-4 py-2 rounded-full backdrop-blur-md transition-all mb-6 text-sm group">
           <lucide-icon [name]="ArrowLeftIcon"
             class="w-4 h-4 transition-transform group-hover:-translate-x-1"></lucide-icon>
           {{ 'Volver a destinos' | translate }}
         </a>
 
-        <h1 class="text-4xl md:text-6xl font-bold text-white mb-2">
-          {{ city().name | translate }}
+        <div class="flex items-center gap-2 mb-4">
+          <span
+            class="bg-emerald-500 text-[rgb(23,25,25)] text-xs font-black px-3 py-1 rounded-full uppercase tracking-widest">
+            {{ (hotel().tipo || 'HOTEL') | translate }}
+          </span>
+
+          @if (hasHotelReviews(hotel())) {
+          <div class="flex items-center gap-1">
+            @for (_ of getArray(getHotelRating(hotel())); track $index) {
+            <lucide-icon [name]="StarIcon" class="w-4 h-4 fill-yellow-500 text-yellow-500"></lucide-icon>
+            }
+          </div>
+          } @else {
+          <span class="text-xs font-bold uppercase tracking-widest text-gray-400">
+            {{ 'Este hotel todavía no tiene reseñas.' | translate }}
+          </span>
+          }
+        </div>
+
+        <h1 class="text-4xl md:text-6xl font-black text-white mb-4">
+          {{ hotel().nombre | translate }}
         </h1>
 
-        <p class="text-gray-300 text-lg">
-          {{ city().description | translate }}
-        </p>
+        <div class="flex items-center gap-2 text-gray-300">
+          <lucide-icon [name]="MapPinIcon" class="w-5 h-5 text-emerald-500"></lucide-icon>
+          <span>{{ getHotelLocation(hotel()) | translate }}</span>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="max-w-7xl mx-auto px-4 py-12">
-    <div class="flex flex-col lg:flex-row gap-8">
-      <div class="w-full lg:w-80">
-        <div class="sticky top-24 bg-[rgb(33,36,37)] rounded-3xl p-6 border border-gray-800 shadow-xl">
-          <div class="flex items-center justify-between mb-8">
-            <h2 class="text-xl font-bold text-white">
-              {{ 'Filtros' | translate }}
-            </h2>
+  <div class="max-w-7xl mx-auto px-4 py-12 pb-24">
+    <div class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8">
+      <div class="space-y-8">
+        <section class="bg-[rgb(33,36,37)] rounded-3xl border border-gray-800 p-6 md:p-8">
+          <h2 class="text-2xl font-bold text-white mb-4">
+            {{ 'Descripción del hotel' | translate }}
+          </h2>
 
-            <button type="button" (click)="clearFilters()"
-              class="text-xs text-emerald-500 hover:text-emerald-400 transition-colors uppercase font-bold tracking-widest">
-              {{ 'Limpiar' | translate }}
-            </button>
-          </div>
-
-          <div class="space-y-8">
-            <div>
-              <label class="text-xs font-bold text-gray-500 uppercase tracking-widest block mb-4">
-                {{ 'Precio máximo' | translate }}
-              </label>
-
-              <input type="range" [(ngModel)]="filters.maxPrice" min="0" max="5000" step="100"
-                class="range range-emerald range-xs" />
-
-              <div class="flex justify-between mt-2 text-emerald-500 font-mono text-sm">
-                <span>0€</span>
-                <span>{{ filters.maxPrice }}€</span>
-              </div>
-            </div>
-
-            <div>
-              <label class="text-xs font-bold text-gray-500 uppercase tracking-widest block mb-4">
-                {{ 'Comodidades principales' | translate }}
-              </label>
-
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
-                @for (amenity of amenityOptions; track amenity.key) {
-                <button type="button" (click)="toggleAmenity(amenity.key)"
-                  [class]="isAmenitySelected(amenity.key) ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500' : 'border-gray-700 bg-[rgb(23,25,25)] text-gray-400 hover:text-white hover:border-gray-500'"
-                  class="flex items-center gap-3 w-full p-3 rounded-xl border transition-all text-left">
-                  <lucide-icon [name]="amenity.icon" class="w-5 h-5"></lucide-icon>
-                  <span class="text-sm font-bold">{{ amenity.label | translate }}</span>
-                </button>
-                }
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex-1 space-y-6">
-        <div class="flex items-center justify-between mb-8 bg-[rgb(33,36,37)] p-4 rounded-2xl border border-gray-800">
-          <span class="text-gray-400">
-            {{ 'Mostrando' | translate }}
-            <span class="text-white font-bold">{{ filteredHotels.length }}</span>
-            {{ 'opciones disponibles' | translate }}
-          </span>
-        </div>
-
-        @if (filteredHotels.length === 0) {
-        <div class="bg-[rgb(33,36,37)] border border-gray-800 rounded-3xl p-10 text-center">
-          <p class="text-gray-400 mb-4">
-            {{ 'No hay alojamientos que coincidan con esos filtros.' | translate }}
+          <p class="text-gray-400 leading-relaxed">
+            {{ getHotelDescription(hotel()) | translate }}
           </p>
+        </section>
 
-          <button type="button" (click)="clearFilters()"
-            class="bg-emerald-500 text-[rgb(23,25,25)] font-bold px-6 py-3 rounded-xl hover:bg-emerald-400 transition-colors uppercase tracking-widest text-xs">
-            {{ 'Limpiar filtros' | translate }}
-          </button>
-        </div>
-        }
+        <section class="bg-[rgb(33,36,37)] rounded-3xl border border-gray-800 p-6 md:p-8">
+          <h2 class="text-2xl font-bold text-white mb-6">
+            {{ 'Comodidades del hotel' | translate }}
+          </h2>
 
-        <div class="grid grid-cols-1 gap-6">
-          @for (hotel of filteredHotels; track hotel.id) {
-          <div [routerLink]="['/hotel', hotel.id]"
-            class="group flex flex-col md:flex-row bg-[rgb(33,36,37)] rounded-3xl overflow-hidden border border-gray-800 hover:border-emerald-500/50 transition-all duration-500 cursor-pointer shadow-lg hover:shadow-emerald-500/5">
-            <div class="w-full md:w-80 h-64 md:h-auto relative overflow-hidden">
-              <img loading="lazy" [src]="getHotelImage(hotel)" [alt]="(hotel.nombre || hotel.name) | translate"
-                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-
-              <div
-                class="absolute top-4 left-4 bg-emerald-500 text-[rgb(23,25,25)] text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">
-                {{ hotel.tipo | translate }}
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+            @for (amenity of getVisibleAmenities(); track amenity.key) {
+            <div class="flex items-center gap-3 bg-[rgb(23,25,25)] border border-gray-800 rounded-2xl p-4">
+              <div class="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                <lucide-icon [name]="amenity.icon" class="w-5 h-5 text-emerald-500"></lucide-icon>
               </div>
+
+              <span class="text-sm font-bold text-gray-200">
+                {{ amenity.label | translate }}
+              </span>
+            </div>
+            }
+          </div>
+        </section>
+
+        <section class="bg-[rgb(33,36,37)] rounded-3xl border border-gray-800 p-6 md:p-8">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <div>
+              <h2 class="text-2xl font-bold text-white">
+                {{ 'Habitaciones disponibles' | translate }}
+              </h2>
+
+              <p class="text-gray-500 text-sm mt-1">
+                {{ getGuestsRuleMessage() | translate }}
+              </p>
             </div>
 
-            <div class="flex-1 p-8 flex flex-col">
-              <div class="flex justify-between items-start mb-4 gap-4">
-                <div>
-                  <h3 class="text-2xl font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">
-                    {{ hotel.nombre | translate }}
+            <div class="bg-[rgb(23,25,25)] border border-gray-800 rounded-2xl px-4 py-3">
+              <p class="text-gray-500 text-xs uppercase tracking-widest font-bold">
+                {{ 'Huéspedes actuales' | translate }}
+              </p>
+
+              <p class="text-white font-black text-xl">
+                {{ guests }}
+              </p>
+            </div>
+          </div>
+
+          @if (habitaciones().length === 0) {
+          <div class="bg-[rgb(23,25,25)] border border-gray-800 rounded-2xl p-6 text-center">
+            <p class="text-gray-400">
+              {{ 'No hay habitaciones disponibles en este hotel.' | translate }}
+            </p>
+          </div>
+          }
+
+          @if (habitaciones().length > 0 && compatibleRoomsCount === 0) {
+          <div class="bg-yellow-500/10 border border-yellow-500/20 rounded-2xl p-5 mb-5">
+            <p class="text-yellow-400 font-bold mb-1">
+              {{ 'No hay habitaciones compatibles' | translate }}
+            </p>
+
+            <p class="text-gray-400 text-sm">
+              {{ 'Reduce el número de huéspedes o elige otra reserva.' | translate }}
+            </p>
+          </div>
+          }
+
+          <div class="space-y-4">
+            @for (room of habitaciones(); track room.id) {
+            <div [ngClass]="getRoomCardClasses(room)"
+              class="border rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all">
+              <div>
+                <div class="flex flex-wrap items-center gap-3 mb-1">
+                  <h3 class="text-white font-bold text-lg">
+                    {{ getRoomName(room) | translate }}
                   </h3>
 
-                  @if (hasHotelReviews(hotel)) {
-                  <div class="flex items-center gap-1">
-                    @for (_ of getArray(getHotelRating(hotel)); track $index) {
+                  @if (isRoomSelected(room)) {
+                  <span
+                    class="bg-emerald-500 text-[rgb(23,25,25)] text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-widest">
+                    {{ 'Seleccionada' | translate }}
+                  </span>
+                  }
+
+                  @if (!isRoomAvailable(room)) {
+                  <span
+                    class="bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-widest">
+                    {{ 'No compatible' | translate }}
+                  </span>
+                  }
+                </div>
+
+                <p class="text-gray-500 text-sm">
+                  {{ 'Capacidad' | translate }}:
+                  <span class="text-gray-300">{{ getRoomCapacityLabel(room) }}</span>
+                  ·
+                  {{ getRoomRegimen(room) | translate }}
+                </p>
+
+                <p class="text-gray-500 text-xs mt-2">
+                  {{ getRoomTypeHelp(room) | translate }}
+                </p>
+
+                @if (!isRoomAvailable(room)) {
+                <p class="text-red-400 text-xs mt-2">
+                  {{ 'Esta habitación no es compatible con el número de huéspedes indicado.' | translate }}
+                </p>
+                }
+              </div>
+
+              <div class="flex flex-col md:items-end gap-3">
+                <div class="text-left md:text-right">
+                  <p class="text-emerald-500 text-2xl font-black">
+                    {{ getRoomPrice(room) | number:'1.2-2' }}€
+                  </p>
+
+                  <p class="text-gray-500 text-xs uppercase tracking-widest">
+                    {{ 'por noche' | translate }}
+                  </p>
+                </div>
+
+                <button type="button" (click)="selectRoom(room)" [disabled]="!isRoomAvailable(room)"
+                  [class]="isRoomSelected(room)
+                    ? 'bg-emerald-500 text-[rgb(23,25,25)]'
+                    : 'bg-white text-black hover:bg-emerald-500 hover:text-[rgb(23,25,25)] disabled:bg-gray-800 disabled:text-gray-500 disabled:cursor-not-allowed'"
+                  class="px-5 py-2.5 rounded-xl font-black transition-all uppercase tracking-widest text-xs">
+                  @if (isRoomSelected(room)) {
+                  {{ 'Elegida' | translate }}
+                  } @else {
+                  {{ 'Elegir habitación' | translate }}
+                  }
+                </button>
+              </div>
+            </div>
+            }
+          </div>
+        </section>
+
+        <section class="bg-[rgb(33,36,37)] rounded-3xl border border-gray-800 p-6 md:p-8">
+          <div class="flex items-center justify-between gap-4 mb-6">
+            <h2 class="text-2xl font-bold text-white">
+              {{ 'Reseñas' | translate }}
+            </h2>
+
+            <span class="text-gray-400 text-sm">
+              {{ reviews().length }} {{ 'opiniones' | translate }}
+            </span>
+          </div>
+
+          <div class="bg-[rgb(23,25,25)] border border-gray-800 rounded-2xl p-5 mb-6">
+            <h3 class="text-white font-bold mb-4">
+              @if (editingReviewId) {
+              {{ 'Editar reseña' | translate }}
+              } @else {
+              {{ 'Escribir una reseña' | translate }}
+              }
+            </h3>
+
+            <div class="flex items-center gap-2 mb-4">
+              @for (star of [1, 2, 3, 4, 5]; track star) {
+              <button type="button" (click)="setRating(star)" class="transition-transform hover:scale-110">
+                <lucide-icon [name]="StarIcon"
+                  [class]="star <= newReviewRating ? 'w-7 h-7 fill-yellow-500 text-yellow-500' : 'w-7 h-7 text-gray-600 hover:text-yellow-500 transition-colors'"></lucide-icon>
+              </button>
+              }
+
+              <span class="text-gray-400 text-sm ml-2">
+                {{ getRatingLabel(newReviewRating) | translate }}
+              </span>
+            </div>
+
+            <textarea [(ngModel)]="newReviewComment" name="newReviewComment" rows="4"
+              class="w-full bg-[rgb(33,36,37)] border border-gray-700 text-white rounded-xl p-4 focus:outline-none focus:border-emerald-500 resize-none"
+              [placeholder]="'Cuenta tu experiencia en este hotel...' | translate"></textarea>
+
+            <div class="flex justify-end gap-3 mt-4">
+              @if (editingReviewId) {
+              <button type="button" (click)="cancelEditReview()"
+                class="border border-gray-700 hover:bg-gray-800 text-gray-300 font-bold py-2.5 px-5 rounded-xl transition-all uppercase tracking-widest text-xs">
+                {{ 'Cancelar' | translate }}
+              </button>
+              }
+
+              <button type="button" (click)="addReview()" [disabled]="!newReviewComment.trim()"
+                class="bg-emerald-500 hover:bg-emerald-400 disabled:bg-gray-800 disabled:text-gray-500 text-[rgb(23,25,25)] font-bold py-2.5 px-5 rounded-xl transition-all uppercase tracking-widest text-xs">
+                @if (editingReviewId) {
+                {{ 'Guardar cambios' | translate }}
+                } @else {
+                {{ 'Publicar reseña' | translate }}
+                }
+              </button>
+            </div>
+          </div>
+
+          @if (reviews().length === 0) {
+          <div class="text-center py-8 text-gray-400">
+            <lucide-icon [name]="StarIcon" class="w-10 h-10 mx-auto mb-3 opacity-50"></lucide-icon>
+            <p>{{ 'Este hotel todavía no tiene reseñas.' | translate }}</p>
+          </div>
+          }
+
+          <div class="space-y-4">
+            @for (review of reviews(); track review.id) {
+            <div class="bg-[rgb(23,25,25)] border border-gray-800 rounded-2xl p-5">
+              <div class="flex justify-between items-start gap-4 mb-3">
+                <div>
+                  <h3 class="text-white font-bold">
+                    {{ review.userName || 'Usuario' }}
+                  </h3>
+
+                  <p class="text-gray-500 text-xs">
+                    {{ review.date | date:'dd/MM/yyyy' }}
+                  </p>
+                </div>
+
+                <div class="flex flex-col items-end gap-2">
+                  <div class="flex gap-1">
+                    @for (_ of getArray(review.rating); track $index) {
                     <lucide-icon [name]="StarIcon" class="w-4 h-4 fill-yellow-500 text-yellow-500"></lucide-icon>
                     }
                   </div>
-                  } @else {
-                  <p class="text-xs font-bold uppercase tracking-widest text-gray-500">
-                    {{ 'Este hotel todavía no tiene reseñas.' | translate }}
-                  </p>
-                  }
-                </div>
 
-                <div class="text-right">
-                  <span class="text-emerald-500 text-2xl font-bold">{{ getHotelPrice(hotel) }}€</span>
-                  <span class="text-gray-500 text-xs block uppercase tracking-tighter">
-                    {{ 'por noche' | translate }}
-                  </span>
-                </div>
-              </div>
+                  @if (isMyReview(review)) {
+                  <div class="flex gap-3">
+                    <button type="button" (click)="startEditReview(review)"
+                      class="text-emerald-500 hover:text-emerald-400 text-xs font-bold uppercase tracking-widest">
+                      {{ 'Editar' | translate }}
+                    </button>
 
-              <p class="text-gray-400 text-sm leading-relaxed mb-8 flex-1 line-clamp-3">
-                {{ getHotelDescription(hotel) | translate }}
-              </p>
-
-              <div
-                class="flex flex-col sm:flex-row sm:items-center justify-between gap-5 pt-6 border-t border-gray-800">
-                <div class="flex flex-wrap gap-3">
-                  @for (amenity of getVisibleAmenities(hotel); track amenity.key) {
-                  <div class="flex items-center gap-2 text-gray-400 text-xs font-bold uppercase tracking-widest">
-                    <lucide-icon [name]="amenity.icon" class="w-4 h-4 text-emerald-500"></lucide-icon>
-                    {{ amenity.shortLabel | translate }}
+                    <button type="button" (click)="askDeleteReview(review)"
+                      class="text-red-500 hover:text-red-400 text-xs font-bold uppercase tracking-widest">
+                      {{ 'Borrar' | translate }}
+                    </button>
                   </div>
                   }
                 </div>
+              </div>
 
-                <button
-                  class="bg-white text-black px-6 py-2.5 rounded-xl font-bold hover:bg-emerald-500 hover:text-white transition-all duration-300">
-                  {{ 'Ver detalles' | translate }}
+              <p class="text-gray-300">
+                {{ review.comment | translate }}
+              </p>
+            </div>
+            }
+          </div>
+        </section>
+
+        <section class="bg-[rgb(33,36,37)] rounded-3xl border border-gray-800 p-6 md:p-8">
+          <h2 class="text-2xl font-bold text-white mb-6">
+            {{ 'También te puede interesar' | translate }}
+          </h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            @for (destination of recommendations(); track destination.id) {
+            <a [routerLink]="['/hotels', destination.id]"
+              class="group bg-[rgb(23,25,25)] border border-gray-800 rounded-2xl overflow-hidden hover:border-emerald-500/50 transition-all">
+              <img loading="lazy" [src]="getDestinationImage(destination)" [alt]="destination.nombre | translate"
+                class="w-full h-36 object-cover group-hover:scale-105 transition-transform duration-500" />
+
+              <div class="p-4">
+                <h3 class="text-white font-bold group-hover:text-emerald-400 transition-colors">
+                  {{ destination.nombre | translate }}
+                </h3>
+
+                <p class="text-gray-500 text-sm">
+                  {{ destination.pais | translate }}
+                </p>
+              </div>
+            </a>
+            }
+          </div>
+        </section>
+      </div>
+
+      <aside class="lg:sticky lg:top-24 h-fit">
+        <div class="bg-[rgb(33,36,37)] rounded-3xl border border-gray-800 p-6 shadow-2xl">
+          <div class="flex items-end justify-between gap-4 mb-6">
+            <div>
+              <p class="text-gray-500 text-xs uppercase tracking-widest font-bold">
+                {{ 'Desde' | translate }}
+              </p>
+
+              <p class="text-3xl font-black text-emerald-500">
+                @if (selectedRoom(); as room) {
+                {{ getRoomPrice(room) | number:'1.2-2' }}€
+                } @else {
+                {{ getHotelPrice(hotel()) | number:'1.2-2' }}€
+                }
+              </p>
+
+              <p class="text-gray-500 text-xs uppercase tracking-widest">
+                {{ 'por noche' | translate }}
+              </p>
+            </div>
+
+            <lucide-icon [name]="CalendarCheckIcon" class="w-10 h-10 text-emerald-500"></lucide-icon>
+          </div>
+
+          @if (selectedRoom(); as room) {
+          <div class="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-4 mb-5">
+            <p class="text-gray-500 text-xs uppercase tracking-widest font-bold mb-1">
+              {{ 'Habitación seleccionada' | translate }}
+            </p>
+
+            <p class="text-white font-bold">
+              {{ getRoomName(room) | translate }}
+            </p>
+
+            <p class="text-gray-400 text-sm">
+              {{ 'Capacidad' | translate }}: {{ getRoomCapacityLabel(room) }}
+            </p>
+          </div>
+          } @else {
+          <div class="bg-yellow-500/10 border border-yellow-500/20 rounded-2xl p-4 mb-5">
+            <p class="text-yellow-400 text-sm">
+              {{ 'No hay ninguna habitación compatible seleccionada.' | translate }}
+            </p>
+          </div>
+          }
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">
+                {{ 'Entrada' | translate }}
+              </label>
+
+              <input type="date" [(ngModel)]="checkInDate" name="checkInDate"
+                class="w-full bg-[rgb(23,25,25)] border border-gray-800 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500" />
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">
+                {{ 'Salida' | translate }}
+              </label>
+
+              <input type="date" [(ngModel)]="checkOutDate" name="checkOutDate"
+                class="w-full bg-[rgb(23,25,25)] border border-gray-800 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500" />
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">
+                {{ 'Huéspedes' | translate }}
+              </label>
+
+              <input type="number" min="1" [max]="maxGuests" [(ngModel)]="guests"
+                (ngModelChange)="onGuestsChange($event)" name="guests"
+                class="w-full bg-[rgb(23,25,25)] border border-gray-800 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500" />
+
+              <p class="text-gray-500 text-xs mt-2">
+                {{ '1 huésped: cualquier habitación compatible. 2 huéspedes: doble, estándar/deluxe, suite o grupal. 3-4
+                huéspedes: suite
+                o grupal. 5-8 huéspedes: solo grupal.' | translate }}
+              </p>
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3">
+                {{ 'Transporte' | translate }}
+              </label>
+
+              <div class="grid grid-cols-3 gap-2">
+                <button type="button" (click)="selectedTransport = 'AVION'"
+                  [class]="selectedTransport === 'AVION' ? 'bg-emerald-500 text-[rgb(23,25,25)] border-emerald-500' : 'bg-[rgb(23,25,25)] text-gray-400 border-gray-800 hover:text-white'"
+                  class="border rounded-xl p-3 flex flex-col items-center gap-2 transition-all">
+                  <lucide-icon [name]="PlaneIcon" class="w-5 h-5"></lucide-icon>
+                  <span class="text-[10px] font-black uppercase">{{ 'Avión' | translate }}</span>
+                </button>
+
+                <button type="button" (click)="selectedTransport = 'TREN'"
+                  [class]="selectedTransport === 'TREN' ? 'bg-emerald-500 text-[rgb(23,25,25)] border-emerald-500' : 'bg-[rgb(23,25,25)] text-gray-400 border-gray-800 hover:text-white'"
+                  class="border rounded-xl p-3 flex flex-col items-center gap-2 transition-all">
+                  <lucide-icon [name]="TrainIcon" class="w-5 h-5"></lucide-icon>
+                  <span class="text-[10px] font-black uppercase">{{ 'Tren' | translate }}</span>
+                </button>
+
+                <button type="button" (click)="selectedTransport = 'BARCO'"
+                  [class]="selectedTransport === 'BARCO' ? 'bg-emerald-500 text-[rgb(23,25,25)] border-emerald-500' : 'bg-[rgb(23,25,25)] text-gray-400 border-gray-800 hover:text-white'"
+                  class="border rounded-xl p-3 flex flex-col items-center gap-2 transition-all">
+                  <lucide-icon [name]="ShipIcon" class="w-5 h-5"></lucide-icon>
+                  <span class="text-[10px] font-black uppercase">{{ 'Barco' | translate }}</span>
                 </button>
               </div>
             </div>
           </div>
+
+          <div class="border-t border-gray-800 mt-6 pt-6 space-y-3">
+            <div class="flex justify-between text-gray-400 text-sm">
+              <span>{{ 'Noches' | translate }}</span>
+              <span>{{ nights }}</span>
+            </div>
+
+            <div class="flex justify-between text-gray-400 text-sm">
+              <span>{{ 'Huéspedes' | translate }}</span>
+              <span>{{ guests }}</span>
+            </div>
+
+            <div class="flex justify-between text-gray-400 text-sm">
+              <span>{{ 'Transporte' | translate }}: {{ getTransportLabel(selectedTransport) | translate }}</span>
+              <span>{{ getTransportPrice(selectedTransport) | number:'1.2-2' }}€</span>
+            </div>
+
+            <div class="flex justify-between items-center text-white pt-3 border-t border-gray-800">
+              <span class="font-bold">{{ 'Total' | translate }}</span>
+              <span class="text-3xl font-black text-emerald-500">{{ totalPrice | number:'1.2-2' }}€</span>
+            </div>
+          </div>
+
+          @if (!auth.isLoggedIn()) {
+          <p class="text-yellow-400 text-sm mt-5 bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-3">
+            {{ 'Inicia sesión para poder reservar este hotel.' | translate }}
+          </p>
           }
+
+          @if (auth.isLoggedIn() && !isCheckingCard() && !hasPaymentCard()) {
+          <p class="text-yellow-400 text-sm mt-5 bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-3">
+            {{ 'Necesitas añadir una tarjeta en tu perfil antes de reservar.' | translate }}
+          </p>
+          }
+
+          @if (auth.isLoggedIn() && hasPaymentCard() && totalPrice > 0 && auth.credits() < totalPrice) { <p
+            class="text-red-400 text-sm mt-5 bg-red-500/10 border border-red-500/20 rounded-xl p-3">
+            {{ 'No tienes saldo suficiente para completar esta reserva.' | translate }}
+            </p>
+            }
+
+            @if (habitaciones().length > 0 && !selectedRoom()) {
+            <p class="text-yellow-400 text-sm mt-5 bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-3">
+              {{ 'Selecciona una habitación compatible para poder reservar.' | translate }}
+            </p>
+            }
+
+            <button type="button" (click)="reservar()" [disabled]="isBooking()"
+              [class.opacity-80]="!canBook || isBooking()" [class.cursor-not-allowed]="isBooking()"
+              class="w-full mt-6 bg-emerald-500 hover:bg-emerald-400 text-[rgb(23,25,25)] font-black py-4 rounded-xl transition-all uppercase tracking-widest text-xs">
+              @if (isBooking()) {
+              {{ 'Procesando...' | translate }}
+              } @else {
+              {{ 'Reservar ahora' | translate }}
+              }
+            </button>
         </div>
+      </aside>
+    </div>
+  </div>
+
+  @if (travelOverlapModal()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center px-4">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="closeTravelOverlapModal()"></div>
+
+    <div class="relative w-full max-w-lg bg-[rgb(23,25,25)] border border-yellow-500/20 rounded-3xl shadow-2xl p-6">
+      <button type="button" (click)="closeTravelOverlapModal()"
+        class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors text-gray-300">
+        ✕
+      </button>
+
+      <div
+        class="w-14 h-14 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 flex items-center justify-center mb-5 text-2xl font-black">
+        !
+      </div>
+
+      <h3 class="text-2xl font-black text-white mb-2">
+        {{ 'Ya tienes un viaje en esas fechas' | translate }}
+      </h3>
+
+      <p class="text-gray-400 mb-5">
+        {{ 'Hemos encontrado otro viaje que coincide con las fechas que has elegido. Puedes cancelar o reservar
+        igualmente.' | translate }}
+      </p>
+
+      <div class="bg-[rgb(33,36,37)] border border-white/10 rounded-2xl p-4 mb-5">
+        <p class="text-xs text-gray-500 uppercase tracking-widest font-bold mb-2">
+          {{ 'Nueva reserva' | translate }}
+        </p>
+
+        <p class="text-white font-bold">
+          {{ formatDate(travelOverlapModal()?.requestedStart) }} -
+          {{ formatDate(travelOverlapModal()?.requestedEnd) }}
+        </p>
+      </div>
+
+      <div class="space-y-3 mb-6">
+        <p class="text-xs text-gray-500 uppercase tracking-widest font-bold">
+          {{ 'Viajes que coinciden' | translate }}
+        </p>
+
+        @for (conflict of travelOverlapModal()?.conflicts || []; track conflict.id) {
+        <div class="bg-[rgb(33,36,37)] border border-yellow-500/10 rounded-2xl p-4">
+          <p class="text-white font-bold">
+            {{ conflict.destinoNombre | translate }}
+          </p>
+
+          <p class="text-sm text-gray-400">
+            {{ conflict.alojamientoNombre | translate }}
+          </p>
+
+          <p class="text-xs text-gray-500 mt-2">
+            {{ formatDate(conflict.checkIn) }} - {{ formatDate(conflict.checkOut) }}
+          </p>
+        </div>
+        }
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button type="button" (click)="closeTravelOverlapModal()"
+          class="flex-1 py-3 rounded-xl border border-white/10 text-white font-bold hover:bg-white/10 transition-colors">
+          {{ 'Cancelar' | translate }}
+        </button>
+
+        <button type="button" (click)="confirmTravelOverlapBooking()" [disabled]="isBooking()"
+          class="flex-1 py-3 rounded-xl bg-emerald-500 text-[rgb(23,25,25)] font-black hover:bg-emerald-400 disabled:bg-gray-700 disabled:text-gray-400 transition-colors">
+          @if (isBooking()) {
+          {{ 'Reservando...' | translate }}
+          } @else {
+          {{ 'Reservar igualmente' | translate }}
+          }
+        </button>
       </div>
     </div>
   </div>
+  }
+
+  @if (bookingModal()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center px-4">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="closeBookingModal()"></div>
+
+    <div class="relative w-full max-w-md bg-[rgb(23,25,25)] border border-white/10 rounded-3xl shadow-2xl p-6">
+      <button type="button" (click)="closeBookingModal()"
+        class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors text-gray-300">
+        ✕
+      </button>
+
+      <div
+        [class]="bookingModal()?.type === 'error' ? 'bg-red-500/10 border-red-500/20 text-red-500' : 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500'"
+        class="w-14 h-14 rounded-2xl border flex items-center justify-center mb-5 text-2xl font-black">
+        !
+      </div>
+
+      <h3 class="text-2xl font-black text-white mb-2">
+        {{ (bookingModal()?.title || '') | translate }}
+      </h3>
+
+      <p class="text-gray-400 mb-6">
+        {{ (bookingModal()?.message || '') | translate }}
+      </p>
+
+      <button type="button" (click)="closeBookingModal()"
+        class="w-full py-3 rounded-xl bg-emerald-500 text-[rgb(23,25,25)] font-black hover:bg-emerald-400 transition-colors uppercase tracking-widest text-xs">
+        {{ 'Entendido' | translate }}
+      </button>
+    </div>
+  </div>
+  }
+
+  @if (reviewToDelete()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center px-4">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="closeDeleteReviewModal()"></div>
+
+    <div class="relative w-full max-w-md bg-[rgb(23,25,25)] border border-red-500/20 rounded-3xl shadow-2xl p-6">
+      <button type="button" (click)="closeDeleteReviewModal()"
+        class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors text-gray-300">
+        ✕
+      </button>
+
+      <div class="w-14 h-14 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-5">
+        <span class="text-red-500 text-2xl font-black">!</span>
+      </div>
+
+      <h3 class="text-2xl font-black text-white mb-2">
+        {{ 'Borrar reseña' | translate }}
+      </h3>
+
+      <p class="text-gray-400 mb-5">
+        {{ '¿Seguro que quieres borrar esta reseña?' | translate }}
+      </p>
+
+      @if (deleteReviewError()) {
+      <p class="text-red-400 text-sm mb-4">
+        {{ deleteReviewError() | translate }}
+      </p>
+      }
+
+      <div class="flex gap-3">
+        <button type="button" (click)="closeDeleteReviewModal()"
+          class="flex-1 py-3 rounded-xl border border-white/10 text-white font-bold hover:bg-white/10 transition-colors">
+          {{ 'No, volver' | translate }}
+        </button>
+
+        <button type="button" (click)="confirmDeleteReview()" [disabled]="isDeletingReview()"
+          class="flex-1 py-3 rounded-xl bg-red-500 text-white font-bold hover:bg-red-400 disabled:bg-gray-700 disabled:text-gray-400 transition-colors">
+          @if (isDeletingReview()) {
+          {{ 'Borrando...' | translate }}
+          } @else {
+          {{ 'Sí, borrar' | translate }}
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+  }
 </div>
 }

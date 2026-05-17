@@ -1,6 +1,6 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import {
   LucideAngularModule,
   ArrowLeft,
@@ -29,6 +29,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 })
 export class Receipt implements OnInit {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private reservaService = inject(ReservaService);
   private ticketService = inject(TicketService);
   private auth = inject(Auth);
@@ -74,7 +75,7 @@ export class Receipt implements OnInit {
   }
 
   goBack() {
-    window.history.back();
+    this.router.navigate(['/trips']);
   }
 
   get userName(): string {
@@ -141,7 +142,7 @@ export class Receipt implements OnInit {
   }
 
   formatMoney(value: number | undefined | null): string {
-    return `${Number(value || 0).toFixed(2)}\u20ac`;
+    return `${Number(value || 0).toFixed(2)}€`;
   }
 
   async downloadPdf() {

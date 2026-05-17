@@ -153,6 +153,7 @@ export class AdminDashboard implements OnInit {
     tipo: 'HOTEL',
     ciudad: '',
     pais: '',
+    continente: '',
     precioPorNoche: 0,
   };
 
@@ -260,6 +261,8 @@ export class AdminDashboard implements OnInit {
   get filteredUsuarios(): any[] {
     const search = this.normalize(this.userSearch);
 
+    // La busqueda de usuarios se hace en memoria para conservar la paginacion local y evitar
+    // roundtrips al escribir cada caracter.
     if (!search) {
       return this.usuarios();
     }
@@ -630,6 +633,8 @@ export class AdminDashboard implements OnInit {
   }
 
   openUserDetails(user: any): void {
+    // La ficha se carga bajo demanda: reduce el peso inicial del panel y solo trae reservas,
+    // tarjeta y reseñas cuando el admin abre el detalle.
     this.selectedUserDetail.set(null);
     this.userDetailError.set('');
     this.userDetailBookingsPage.set(1);
@@ -677,6 +682,8 @@ export class AdminDashboard implements OnInit {
   getUserTraveledKm(detail: AdminUserDetailDTO | null): number {
     if (!detail) return 0;
 
+    // Si el backend trae una metrica calculada se respeta; si no, se estima con la tabla local
+    // de distancias para que la ficha nunca aparezca vacia por incompatibilidad de DTO.
     if (Number(detail.resumen?.kmRecorridos || 0) > 0) {
       return Number(detail.resumen.kmRecorridos);
     }
@@ -741,6 +748,7 @@ export class AdminDashboard implements OnInit {
   }
 
   saveDestino(): void {
+    // Validacion ligera de formulario admin. El backend repite estas reglas antes de persistir.
     const nombre = this.destinoForm.nombre.trim();
     const pais = this.destinoForm.pais.trim();
 
@@ -837,11 +845,12 @@ export class AdminDashboard implements OnInit {
 
     this.hotelForm = {
       id: null,
-      destinoId: this.destinos()[0]?.id || null,
+      destinoId: null,
       nombre: '',
       tipo: 'HOTEL',
       ciudad: '',
       pais: '',
+      continente: this.continentes[0],
       precioPorNoche: 0,
     };
 
@@ -853,6 +862,9 @@ export class AdminDashboard implements OnInit {
     this.selectedHotel.set(hotel);
     this.hotelError.set('');
 
+    const destinoRelacionado = this.destinos().find((destino) => destino.id === hotel.destinoId);
+    const continente = this.getDestinoContinente(destinoRelacionado) || '';
+
     this.hotelForm = {
       id: hotel.id,
       destinoId: hotel.destinoId,
@@ -860,6 +872,7 @@ export class AdminDashboard implements OnInit {
       tipo: hotel.tipo || 'HOTEL',
       ciudad: hotel.ciudad || '',
       pais: hotel.pais || '',
+      continente,
       precioPorNoche: Number(hotel.precioPorNoche || 0),
     };
 
@@ -875,6 +888,8 @@ export class AdminDashboard implements OnInit {
   }
 
   saveHotel(): void {
+    // Ciudad y pais pueden completarse manualmente, pero el backend sincroniza alojamientos
+    // con su destino cuando se inicializan datos demo.
     if (!this.hotelForm.destinoId || !this.hotelForm.nombre.trim()) {
       this.hotelError.set('El nombre y el destino son obligatorios.');
       return;
@@ -1062,6 +1077,108 @@ export class AdminDashboard implements OnInit {
     if (Number.isNaN(date.getTime())) return '-';
 
     return date.toLocaleDateString('es-ES');
+  }
+
+  private getDestinoContinente(destino: any): string {
+    const continente = destino?.continente;
+
+    return String(
+      destino?.continenteNombre ??
+      destino?.nombreContinente ??
+      destino?.continenteNombreDto ??
+      (typeof continente === 'string' ? continente : continente?.nombre) ??
+      ''
+    ).trim();
+  }
+
+  get destinoCountryOptions(): string[] {
+    const continenteSeleccionado = String(this.destinoForm.continente ?? '').trim();
+
+    const paises = this.destinos()
+      .filter((destino) => {
+        if (!continenteSeleccionado) {
+          return true;
+        }
+
+        return this.getDestinoContinente(destino) === continenteSeleccionado;
+      })
+      .map((destino) => String(destino?.pais ?? '').trim())
+      .filter((pais) => pais.length > 0);
+
+    return Array.from(new Set(paises)).sort();
+  }
+
+  onDestinoContinenteChange(): void {
+    this.destinoForm.pais = '';
+  }
+
+  get hotelCountryOptions(): string[] {
+    const continenteSeleccionado = String(this.hotelForm.continente ?? '').trim();
+
+    const paises = this.destinos()
+      .filter((destino) => {
+        if (!continenteSeleccionado) {
+          return true;
+        }
+
+        return this.getDestinoContinente(destino) === continenteSeleccionado;
+      })
+      .map((destino) => String(destino?.pais ?? '').trim())
+      .filter((pais) => pais.length > 0);
+
+    return Array.from(new Set(paises)).sort();
+  }
+
+  get hotelDestinationOptions(): any[] {
+    const continenteSeleccionado = String(this.hotelForm.continente ?? '').trim();
+    const paisSeleccionado = String(this.hotelForm.pais ?? '').trim();
+
+    return this.destinos().filter((destino) => {
+      const coincideContinente =
+        !continenteSeleccionado || this.getDestinoContinente(destino) === continenteSeleccionado;
+
+      const coincidePais = !paisSeleccionado || destino?.pais === paisSeleccionado;
+
+      return coincideContinente && coincidePais;
+    });
+  }
+
+  onHotelContinenteChange(): void {
+    this.hotelForm.pais = '';
+    this.hotelForm.destinoId = null;
+  }
+
+  onHotelPaisChange(): void {
+    this.hotelForm.destinoId = null;
+  }
+
+  canCancelReserva(reserva: any): boolean {
+    if (!reserva) {
+      return false;
+    }
+
+    const estado = this.getReservaStatus(reserva);
+
+    return estado !== 'CANCELADA' && estado !== 'COMPLETADA';
+  }
+
+  askCancelReserva(reserva: any): void {
+    if (!reserva || !this.canCancelReserva(reserva)) {
+      return;
+    }
+
+    this.confirmModal.set({
+      title: 'Cancelar reserva',
+      message: `¿Seguro que quieres cancelar la reserva #${reserva.id}?`,
+      confirmText: 'Cancelar reserva',
+      action: () => {
+        reserva.estado = 'CANCELADA';
+        reserva.status = 'CANCELADA';
+        this.selectedReserva.set(null);
+        this.confirmModal.set(null);
+        this.showNotice('Reserva cancelada', 'La reserva se ha marcado como cancelada.', 'success');
+      },
+    });
   }
 
   private normalize(value: any): string {

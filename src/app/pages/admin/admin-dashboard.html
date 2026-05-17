@@ -499,11 +499,20 @@
                   {{ getReservaStatus(reserva) | translate }}
                 </span>
               </td>
-              <td class="p-4 text-right">
-                <button type="button" (click)="openReservaDetail(reserva)"
-                  class="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 inline-flex items-center justify-center">
-                  <lucide-icon [name]="EyeIcon" class="w-4 h-4"></lucide-icon>
-                </button>
+              <td class="p-4">
+                <div class="flex justify-end gap-2">
+                  <button type="button" (click)="openReservaDetail(reserva)"
+                    class="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 inline-flex items-center justify-center"
+                    [title]="'Ver detalle' | translate">
+                    <lucide-icon [name]="EyeIcon" class="w-4 h-4"></lucide-icon>
+                  </button>
+
+                  <button type="button" (click)="askCancelReserva(reserva)" [disabled]="!canCancelReserva(reserva)"
+                    class="w-9 h-9 rounded-xl bg-red-500/10 hover:bg-red-500/20 disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center justify-center"
+                    [title]="'Cancelar reserva' | translate">
+                    <lucide-icon [name]="XIcon" class="w-4 h-4 text-red-400"></lucide-icon>
+                  </button>
+                </div>
               </td>
             </tr>
             } @empty {
@@ -841,6 +850,18 @@
       <p><span class="text-gray-500">{{ 'Transporte' | translate }}:</span> {{ selectedReserva()?.transporteNombre |
         translate }}</p>
     </div>
+
+    <div class="flex gap-3 mt-6">
+      <button type="button" (click)="closeReservaDetail()"
+        class="flex-1 bg-white/5 hover:bg-white/10 rounded-xl py-3 font-bold">
+        {{ 'Cerrar' | translate }}
+      </button>
+
+      <button type="button" (click)="askCancelReserva(selectedReserva()!)" [disabled]="!canCancelReserva(selectedReserva())"
+        class="flex-1 bg-red-500/10 hover:bg-red-500/20 text-red-300 rounded-xl py-3 font-black disabled:opacity-40 disabled:cursor-not-allowed">
+        {{ 'Cancelar reserva' | translate }}
+      </button>
+    </div>
   </div>
 </div>
 }
@@ -866,17 +887,23 @@
       <input [(ngModel)]="destinoForm.nombre" [placeholder]="'Nombre' | translate"
         class="bg-[rgb(23,25,25)] border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500" />
 
-      <input [(ngModel)]="destinoForm.pais" [placeholder]="'País' | translate"
-        class="bg-[rgb(23,25,25)] border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500" />
-
-      <select [(ngModel)]="destinoForm.continente"
+      <select [(ngModel)]="destinoForm.continente" (ngModelChange)="onDestinoContinenteChange()"
         class="bg-[rgb(23,25,25)] border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500">
+        <option value="" disabled>{{ 'Selecciona continente' | translate }}</option>
         @for (continente of continentes; track continente) {
         <option [value]="continente">{{ continente | translate }}</option>
         }
       </select>
 
-      <input type="number" [(ngModel)]="destinoForm.precio" [placeholder]="'Precio' | translate"
+      <select [(ngModel)]="destinoForm.pais" [disabled]="!destinoForm.continente"
+        class="bg-[rgb(23,25,25)] border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed">
+        <option value="" disabled>{{ 'Selecciona país' | translate }}</option>
+        @for (pais of destinoCountryOptions; track pais) {
+        <option [value]="pais">{{ pais | translate }}</option>
+        }
+      </select>
+
+      <input type="number" [(ngModel)]="destinoForm.precio" [placeholder]="'Precio' | translate" min="1"
         class="bg-[rgb(23,25,25)] border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500" />
 
       <input [(ngModel)]="destinoForm.imagen" [placeholder]="'Imagen' | translate"
@@ -927,10 +954,27 @@
     </h2>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <select [(ngModel)]="hotelForm.destinoId"
-        class="md:col-span-2 bg-[rgb(23,25,25)] border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500">
-        @for (destino of destinos(); track destino.id) {
-        <option [value]="destino.id">{{ destino.nombre | translate }} - {{ destino.pais | translate }}</option>
+      <select [(ngModel)]="hotelForm.continente" (ngModelChange)="onHotelContinenteChange()"
+        class="bg-[rgb(23,25,25)] border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500">
+        <option value="" disabled>{{ 'Selecciona continente' | translate }}</option>
+        @for (continente of continentes; track continente) {
+        <option [value]="continente">{{ continente | translate }}</option>
+        }
+      </select>
+
+      <select [(ngModel)]="hotelForm.pais" (ngModelChange)="onHotelPaisChange()" [disabled]="!hotelForm.continente"
+        class="bg-[rgb(23,25,25)] border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed">
+        <option value="" disabled>{{ 'Selecciona país' | translate }}</option>
+        @for (pais of hotelCountryOptions; track pais) {
+        <option [value]="pais">{{ pais | translate }}</option>
+        }
+      </select>
+
+      <select [(ngModel)]="hotelForm.destinoId" [disabled]="!hotelForm.continente || !hotelForm.pais"
+        class="md:col-span-2 bg-[rgb(23,25,25)] border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed">
+        <option [ngValue]="null" disabled>{{ 'Selecciona destino' | translate }}</option>
+        @for (destino of hotelDestinationOptions; track destino.id) {
+        <option [ngValue]="destino.id">{{ destino.nombre | translate }} - {{ destino.pais | translate }}</option>
         }
       </select>
 
@@ -944,13 +988,7 @@
         }
       </select>
 
-      <input [(ngModel)]="hotelForm.ciudad" [placeholder]="'Ciudad' | translate"
-        class="bg-[rgb(23,25,25)] border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500" />
-
-      <input [(ngModel)]="hotelForm.pais" [placeholder]="'País' | translate"
-        class="bg-[rgb(23,25,25)] border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500" />
-
-      <input type="number" [(ngModel)]="hotelForm.precioPorNoche" [placeholder]="'Precio noche' | translate"
+      <input type="number" [(ngModel)]="hotelForm.precioPorNoche" [placeholder]="'Precio' | translate" min="1"
         class="md:col-span-2 bg-[rgb(23,25,25)] border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500" />
     </div>
 
@@ -972,60 +1010,7 @@
         {{ 'Guardar cambios' | translate }}
         }
       </button>
-    </div>
-  </div>
-</div>
-}
-
-@if (confirmModal()) {
-<div class="fixed inset-0 z-50 flex items-center justify-center px-4">
-  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="closeConfirmModal()"></div>
-
-  <div class="relative w-full max-w-md bg-[rgb(33,36,37)] border border-red-500/20 rounded-3xl p-6">
-    <h2 class="text-2xl font-black mb-3">{{ confirmModal()?.title | translate }}</h2>
-    <p class="text-gray-400 mb-6">{{ confirmModal()?.message | translate }}</p>
-
-    <div class="flex gap-3">
-      <button type="button" (click)="closeConfirmModal()"
-        class="flex-1 bg-white/5 hover:bg-white/10 rounded-xl py-3 font-bold">
-        {{ 'Cancelar' | translate }}
-      </button>
-
-      <button type="button" (click)="confirmAction()" [disabled]="isDeleting()"
-        class="flex-1 bg-red-500 hover:bg-red-400 disabled:bg-gray-700 rounded-xl py-3 font-black">
-        @if (isDeleting()) {
-        {{ 'Eliminando...' | translate }}
-        } @else {
-        {{ confirmModal()?.confirmText | translate }}
-        }
-      </button>
-    </div>
-  </div>
-</div>
-}
-
-@if (noticeModal()) {
-<div class="fixed inset-0 z-50 flex items-center justify-center px-4">
-  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="closeNotice()"></div>
-
-  <div class="relative w-full max-w-md bg-[rgb(33,36,37)] border border-white/10 rounded-3xl p-6">
-    <div
-      [class]="noticeModal()?.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : 'bg-red-500/10 border-red-500/20 text-red-500'"
-      class="w-14 h-14 rounded-2xl border flex items-center justify-center mb-5">
-      @if (noticeModal()?.type === 'success') {
-      <lucide-icon [name]="CheckIcon" class="w-7 h-7"></lucide-icon>
-      } @else {
-      <lucide-icon [name]="AlertIcon" class="w-7 h-7"></lucide-icon>
-      }
-    </div>
-
-    <h2 class="text-2xl font-black mb-3">{{ noticeModal()?.title | translate }}</h2>
-    <p class="text-gray-400 mb-6">{{ noticeModal()?.message | translate }}</p>
-
-    <button type="button" (click)="closeNotice()"
-      class="w-full bg-emerald-500 hover:bg-emerald-400 text-[rgb(23,25,25)] rounded-xl py-3 font-black uppercase tracking-widest text-xs">
-      {{ 'Entendido' | translate }}
-    </button>
+     </div>
   </div>
 </div>
 }

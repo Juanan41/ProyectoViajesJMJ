@@ -242,7 +242,9 @@ export class Countries implements OnInit {
 
       'Estados Unidos': 'US',
       México: 'MX',
+      Mexico: 'MX',
       Canadá: 'CA',
+      Canada: 'CA',
       Bahamas: 'BS',
       Belice: 'BZ',
       Cuba: 'CU',
@@ -250,8 +252,10 @@ export class Countries implements OnInit {
       Guatemala: 'GT',
       Honduras: 'HN',
       Panamá: 'PA',
+      Panama: 'PA',
       'Puerto Rico': 'PR',
       'República Dominicana': 'DO',
+      'Republica Dominicana': 'DO',
       Curazao: 'CW',
       'Costa Rica': 'CR',
       Jamaica: 'JM',
@@ -261,6 +265,7 @@ export class Countries implements OnInit {
       Brasil: 'BR',
       Colombia: 'CO',
       Perú: 'PE',
+      Peru: 'PE',
       Chile: 'CL',
       Uruguay: 'UY',
       Aruba: 'AW',
@@ -275,6 +280,7 @@ export class Countries implements OnInit {
       Australia: 'AU',
       'Nueva Zelanda': 'NZ',
       Fiyi: 'FJ',
+      Fiji: 'FJ',
       'Polinesia Francesa': 'PF',
       Samoa: 'WS',
       Tonga: 'TO',
@@ -284,9 +290,12 @@ export class Countries implements OnInit {
       Guam: 'GU',
       'Islas Cook': 'CK',
       'Islas Salomón': 'SB',
+      'Islas Salomon': 'SB',
       'Papúa Nueva Guinea': 'PG',
+      'Papua Nueva Guinea': 'PG',
       'Nueva Caledonia': 'NC',
       Palaos: 'PW',
+      Palau: 'PW',
     };
 
     return map[pais] || 'UN';
@@ -324,6 +333,50 @@ export class Countries implements OnInit {
         'https://images.unsplash.com/photo-1504893524553-b855bce32c67?q=80&w=1600&auto=format&fit=crop',
       Bélgica:
         'https://images.unsplash.com/photo-1491557345352-5929e343eb89?q=80&w=1600&auto=format&fit=crop',
+
+      India:
+        'https://images.unsplash.com/photo-1774934950562-755df93e1c88?q=80&w=1744&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      Indonesia:
+        'https://plus.unsplash.com/premium_photo-1677829177642-30def98b0963?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      Malasia:
+        'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?q=80&w=1728&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+
+      Argelia:
+        'https://images.unsplash.com/photo-1656978310683-d415ee895c2c?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      Senegal:
+        'https://images.unsplash.com/photo-1681225241052-ac67808b0c62?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+
+      Bahamas:
+        'https://images.unsplash.com/photo-1501698335706-90b736210a61?q=80&w=1548&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      Belice:
+        'https://images.unsplash.com/photo-1585543805890-6051f7829f98?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      Canadá:
+        'https://images.unsplash.com/photo-1519832979-6fa011b87667?q=80&w=1706&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      Canada:
+        'https://images.unsplash.com/photo-1519832979-6fa011b87667?q=80&w=1706&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      Cuba: 'https://images.unsplash.com/photo-1581253058396-24685f752e68?q=80&w=1886&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      Panamá:
+        'https://images.unsplash.com/photo-1632505702897-cc41b0ba3b64?q=80&w=2066&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      Panama:
+        'https://images.unsplash.com/photo-1632505702897-cc41b0ba3b64?q=80&w=2066&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      'Puerto Rico':
+        'https://images.unsplash.com/photo-1625642471723-12744e6e4211?q=80&w=1160&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      'República Dominicana':
+        'https://images.unsplash.com/photo-1697302611781-5166533305da?q=80&w=1548&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      'Republica Dominicana':
+        'https://images.unsplash.com/photo-1697302611781-5166533305da?q=80&w=1548&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+
+      Guam: 'https://images.unsplash.com/photo-1587101118649-cd27302cfdeb?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      Kiribati:
+        'https://images.unsplash.com/photo-1590491484047-3fc9757d5fba?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      'Islas Salomón':
+        'https://images.unsplash.com/photo-1627512729059-fb322f8436f7?q=80&w=1604&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      'Islas Salomon':
+        'https://images.unsplash.com/photo-1627512729059-fb322f8436f7?q=80&w=1604&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      Micronesia:
+        'https://images.unsplash.com/photo-1553602889-f85ab725f992?q=80&w=2064&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      Vanuatu:
+        'https://images.unsplash.com/photo-1672812407183-001d3533f49a?q=80&w=1548&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     };
 
     return map[pais] || fallback || 'assets/placeholder.jpg';

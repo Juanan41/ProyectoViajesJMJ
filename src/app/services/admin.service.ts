@@ -229,6 +229,14 @@ export class AdminService {
     });
   }
 
+  cancelReserva(id: number): Observable<ReservaAdminResponse> {
+    return this.http
+      .put<any>(`${this.apiUrl}/admin/reservas/${id}/cancelar`, {}, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(map((reserva) => this.normalizeReserva(reserva)));
+  }
+
   private normalizeUsuario(usuario: any): AdminUsuario {
     return {
       id: Number(usuario?.id || 0),
