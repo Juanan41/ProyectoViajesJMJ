@@ -67,6 +67,7 @@ export class AdminDashboard implements OnInit {
   hotelSearch = '';
   reservaSearch = '';
   reservaStatusFilter = 'ALL';
+  selectedHotelDestino = signal<any | null>(null);
 
   userPage = signal(1);
   readonly userPageSize = 10;
@@ -136,26 +137,26 @@ export class AdminDashboard implements OnInit {
     saldo: 0,
   };
 
-  destinoForm = {
-    id: null as number | null,
-    nombre: '',
-    pais: '',
-    continente: '',
-    precio: 0,
-    imagen: '',
-    descripcion: '',
-  };
+destinoForm = {
+  id: null as number | null,
+  nombre: '',
+  pais: '',
+  continente: '',
+  precio: null as number | null,
+  imagen: '',
+  descripcion: '',
+};
 
-  hotelForm = {
-    id: null as number | null,
-    destinoId: null as number | null,
-    nombre: '',
-    tipo: 'HOTEL',
-    ciudad: '',
-    pais: '',
-    continente: '',
-    precioPorNoche: 0,
-  };
+hotelForm = {
+  id: null as number | null,
+  destinoId: null as number | null,
+  nombre: '',
+  tipo: 'HOTEL',
+  ciudad: '',
+  pais: '',
+  continente: '',
+  precioPorNoche: null as number | null,
+};
 
   readonly continentes = [
     'Europa',
@@ -364,10 +365,36 @@ export class AdminDashboard implements OnInit {
     }
   }
 
+  viewDestinationHotels(destino: any): void {
+    this.selectedHotelDestino.set(destino);
+    this.hotelSearch = '';
+    this.hotelSort = 'nombre';
+    this.activeTab.set('hoteles');
+    this.resetHotelPagination();
+  }
+
+  clearDestinationHotelFilter(): void {
+    this.selectedHotelDestino.set(null);
+    this.resetHotelPagination();
+  }
+
+  onHotelSearchChange(): void {
+    if (this.selectedHotelDestino()) {
+      this.selectedHotelDestino.set(null);
+    }
+
+    this.resetHotelPagination();
+  }
+
   get filteredHoteles(): AdminHotelDTO[] {
     const search = this.normalize(this.hotelSearch);
+    const selectedDestino = this.selectedHotelDestino();
 
     const filtered = this.hoteles().filter((hotel) => {
+      if (selectedDestino && Number(hotel.destinoId) !== Number(selectedDestino.id)) {
+        return false;
+      }
+
       if (!search) return true;
 
       return (
@@ -588,18 +615,22 @@ export class AdminDashboard implements OnInit {
   }
 
   askDeleteUser(user: any): void {
+    if (!user || !user.id) {
+      return;
+    }
+
     if (user.role === 'ADMIN') {
       this.showNotice(
         'No se pudo eliminar el usuario',
-        'No se puede borrar un administrador',
-        'error',
+        'No se puede borrar un administrador.',
+        'error'
       );
       return;
     }
 
     this.confirmModal.set({
       title: 'Eliminar usuario',
-      message: '¿Seguro que quieres eliminar este usuario? Esta acción no se puede deshacer.',
+      message: `¿Seguro que quieres eliminar el usuario "${user.username}"? Esta acción no se puede deshacer.`,
       confirmText: 'Eliminar',
       action: () => this.deleteUser(user.id),
     });
@@ -712,8 +743,8 @@ export class AdminDashboard implements OnInit {
       id: null,
       nombre: '',
       pais: '',
-      continente: this.continentes[0],
-      precio: 0,
+      continente: '',
+      precio: null,
       imagen: '',
       descripcion: '',
     };
@@ -802,10 +833,13 @@ export class AdminDashboard implements OnInit {
   }
 
   askDeleteDestino(destino: any): void {
+    if (!destino || !destino.id) {
+      return;
+    }
+
     this.confirmModal.set({
       title: 'Eliminar destino',
-      message:
-        '¿Seguro que quieres eliminar este destino? Si tiene reservas asociadas, puede que no se pueda borrar.',
+      message: `¿Seguro que quieres eliminar el destino "${destino.nombre}"? Si tiene hoteles, habitaciones o reservas asociadas, puede que no se pueda borrar.`,
       confirmText: 'Eliminar',
       action: () => this.deleteDestino(destino.id),
     });
@@ -850,8 +884,8 @@ export class AdminDashboard implements OnInit {
       tipo: 'HOTEL',
       ciudad: '',
       pais: '',
-      continente: this.continentes[0],
-      precioPorNoche: 0,
+      continente: '',
+      precioPorNoche: null,
     };
 
     this.showHotelModal.set(true);
@@ -870,8 +904,8 @@ export class AdminDashboard implements OnInit {
       destinoId: hotel.destinoId,
       nombre: hotel.nombre || '',
       tipo: hotel.tipo || 'HOTEL',
-      ciudad: hotel.ciudad || '',
-      pais: hotel.pais || '',
+      ciudad: hotel.ciudad || destinoRelacionado?.nombre || '',
+      pais: hotel.pais || destinoRelacionado?.pais || '',
       continente,
       precioPorNoche: Number(hotel.precioPorNoche || 0),
     };
@@ -935,11 +969,22 @@ export class AdminDashboard implements OnInit {
   }
 
   askDeleteHotel(hotel: AdminHotelDTO): void {
+    if (!hotel || !hotel.id) {
+      this.showNotice(
+        'Error',
+        'No se ha podido identificar el hotel que quieres eliminar.',
+        'error'
+      );
+      return;
+    }
+
     this.confirmModal.set({
       title: 'Eliminar hotel',
-      message: '¿Seguro que quieres eliminar este hotel?',
+      message: `¿Seguro que quieres eliminar el hotel "${hotel.nombre}"? Esta acción no se puede deshacer.`,
       confirmText: 'Eliminar',
-      action: () => this.deleteHotel(hotel.id),
+      action: () => {
+        this.deleteHotel(hotel.id);
+      },
     });
   }
 
@@ -950,14 +995,26 @@ export class AdminDashboard implements OnInit {
       next: () => {
         this.isDeleting.set(false);
         this.confirmModal.set(null);
-        this.showNotice('Hotel eliminado', 'El hotel se ha eliminado correctamente.', 'success');
+
+        this.showNotice(
+          'Hotel eliminado',
+          'El hotel se ha eliminado correctamente.',
+          'success'
+        );
+
         this.loadHoteles();
       },
       error: (err) => {
         console.error('Error eliminando hotel', err);
+
         this.isDeleting.set(false);
         this.confirmModal.set(null);
-        this.showNotice('No se pudo eliminar el hotel', 'No se pudo eliminar el hotel.', 'error');
+
+        this.showNotice(
+          'No se pudo eliminar el hotel',
+          'El backend no ha podido eliminar el hotel. Puede que tenga habitaciones, reservas u opiniones asociadas.',
+          'error'
+        );
       },
     });
   }
@@ -979,7 +1036,9 @@ export class AdminDashboard implements OnInit {
   confirmAction(): void {
     const modal = this.confirmModal();
 
-    if (!modal || this.isDeleting()) return;
+    if (!modal || this.isDeleting()) {
+      return;
+    }
 
     modal.action();
   }
@@ -1039,6 +1098,39 @@ export class AdminDashboard implements OnInit {
     return onlyNumbers ? onlyNumbers.slice(-4) : '----';
   }
 
+    canCancelReserva(reserva: any): boolean {
+    if (!reserva) {
+      return false;
+    }
+
+    const estado = this.getReservaStatus(reserva);
+
+    return estado !== 'CANCELADA' && estado !== 'COMPLETADA';
+  }
+
+  askCancelReserva(reserva: any): void {
+    if (!reserva || !this.canCancelReserva(reserva)) {
+      return;
+    }
+
+    this.confirmModal.set({
+      title: 'Cancelar reserva',
+      message: `¿Seguro que quieres cancelar la reserva #${reserva.id}?`,
+      confirmText: 'Cancelar reserva',
+      action: () => {
+        reserva.estado = 'CANCELADA';
+        reserva.status = 'CANCELADA';
+        this.selectedReserva.set(null);
+        this.confirmModal.set(null);
+        this.showNotice(
+          'Reserva cancelada',
+          'La reserva se ha marcado como cancelada.',
+          'success'
+        );
+      },
+    });
+  }
+
   getReservaStatus(reserva: any): string {
     const estado = String(reserva?.estado || '').toUpperCase();
 
@@ -1080,106 +1172,88 @@ export class AdminDashboard implements OnInit {
   }
 
   private getDestinoContinente(destino: any): string {
-    const continente = destino?.continente;
+  const continente = destino?.continente;
 
-    return String(
-      destino?.continenteNombre ??
-      destino?.nombreContinente ??
-      destino?.continenteNombreDto ??
-      (typeof continente === 'string' ? continente : continente?.nombre) ??
-      ''
-    ).trim();
-  }
+  return String(
+    destino?.continenteNombre ??
+    destino?.nombreContinente ??
+    destino?.continenteNombreDto ??
+    (typeof continente === 'string' ? continente : continente?.nombre) ??
+    ''
+  ).trim();
+}
 
-  get destinoCountryOptions(): string[] {
-    const continenteSeleccionado = String(this.destinoForm.continente ?? '').trim();
+get destinoCountryOptions(): string[] {
+  const continenteSeleccionado = String(this.destinoForm.continente ?? '').trim();
 
-    const paises = this.destinos()
-      .filter((destino) => {
-        if (!continenteSeleccionado) {
-          return true;
-        }
+  const paises = this.destinos()
+    .filter((destino) => {
+      if (!continenteSeleccionado) {
+        return false;
+      }
 
-        return this.getDestinoContinente(destino) === continenteSeleccionado;
-      })
-      .map((destino) => String(destino?.pais ?? '').trim())
-      .filter((pais) => pais.length > 0);
+      return this.getDestinoContinente(destino) === continenteSeleccionado;
+    })
+    .map((destino) => String(destino?.pais ?? '').trim())
+    .filter((pais) => pais.length > 0);
 
-    return Array.from(new Set(paises)).sort();
-  }
+  return Array.from(new Set(paises)).sort();
+}
 
-  onDestinoContinenteChange(): void {
-    this.destinoForm.pais = '';
-  }
+onDestinoContinenteChange(): void {
+  this.destinoForm.pais = '';
+}
 
-  get hotelCountryOptions(): string[] {
-    const continenteSeleccionado = String(this.hotelForm.continente ?? '').trim();
+get hotelCountryOptions(): string[] {
+  const continenteSeleccionado = String(this.hotelForm.continente ?? '').trim();
 
-    const paises = this.destinos()
-      .filter((destino) => {
-        if (!continenteSeleccionado) {
-          return true;
-        }
+  const paises = this.destinos()
+    .filter((destino) => {
+      if (!continenteSeleccionado) {
+        return false;
+      }
 
-        return this.getDestinoContinente(destino) === continenteSeleccionado;
-      })
-      .map((destino) => String(destino?.pais ?? '').trim())
-      .filter((pais) => pais.length > 0);
+      return this.getDestinoContinente(destino) === continenteSeleccionado;
+    })
+    .map((destino) => String(destino?.pais ?? '').trim())
+    .filter((pais) => pais.length > 0);
 
-    return Array.from(new Set(paises)).sort();
-  }
+  return Array.from(new Set(paises)).sort();
+}
 
-  get hotelDestinationOptions(): any[] {
-    const continenteSeleccionado = String(this.hotelForm.continente ?? '').trim();
-    const paisSeleccionado = String(this.hotelForm.pais ?? '').trim();
+get hotelCityOptions(): any[] {
+  const continenteSeleccionado = String(this.hotelForm.continente ?? '').trim();
+  const paisSeleccionado = String(this.hotelForm.pais ?? '').trim();
 
-    return this.destinos().filter((destino) => {
-      const coincideContinente =
-        !continenteSeleccionado || this.getDestinoContinente(destino) === continenteSeleccionado;
+  return this.destinos().filter((destino) => {
+    const coincideContinente =
+      continenteSeleccionado && this.getDestinoContinente(destino) === continenteSeleccionado;
 
-      const coincidePais = !paisSeleccionado || destino?.pais === paisSeleccionado;
+    const coincidePais =
+      paisSeleccionado && destino?.pais === paisSeleccionado;
 
-      return coincideContinente && coincidePais;
-    });
-  }
+    return coincideContinente && coincidePais;
+  });
+}
 
-  onHotelContinenteChange(): void {
-    this.hotelForm.pais = '';
-    this.hotelForm.destinoId = null;
-  }
+onHotelContinenteChange(): void {
+  this.hotelForm.pais = '';
+  this.hotelForm.ciudad = '';
+  this.hotelForm.destinoId = null;
+}
 
-  onHotelPaisChange(): void {
-    this.hotelForm.destinoId = null;
-  }
+onHotelPaisChange(): void {
+  this.hotelForm.ciudad = '';
+  this.hotelForm.destinoId = null;
+}
 
-  canCancelReserva(reserva: any): boolean {
-    if (!reserva) {
-      return false;
-    }
+onHotelCiudadChange(): void {
+  const destinoSeleccionado = this.destinos().find(
+    (destino) => destino.id === this.hotelForm.destinoId
+  );
 
-    const estado = this.getReservaStatus(reserva);
-
-    return estado !== 'CANCELADA' && estado !== 'COMPLETADA';
-  }
-
-  askCancelReserva(reserva: any): void {
-    if (!reserva || !this.canCancelReserva(reserva)) {
-      return;
-    }
-
-    this.confirmModal.set({
-      title: 'Cancelar reserva',
-      message: `¿Seguro que quieres cancelar la reserva #${reserva.id}?`,
-      confirmText: 'Cancelar reserva',
-      action: () => {
-        reserva.estado = 'CANCELADA';
-        reserva.status = 'CANCELADA';
-        this.selectedReserva.set(null);
-        this.confirmModal.set(null);
-        this.showNotice('Reserva cancelada', 'La reserva se ha marcado como cancelada.', 'success');
-      },
-    });
-  }
+  this.hotelForm.ciudad = destinoSeleccionado?.nombre || '';
+}
 
   private normalize(value: any): string {
     return String(value || '')

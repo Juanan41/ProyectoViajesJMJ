@@ -21,7 +21,13 @@ export const routes: Routes = [
   { path: 'continents', component: Continents },
   { path: 'continent/:id', component: Countries },
   { path: 'countries/:country', component: Cities },
+
+
+  { path: 'hotels/destino/:destinoId', component: Hotels },
+
+  
   { path: 'hotels/:id', component: Hotels },
+
   { path: 'hotel/:id', component: HotelComponent },
   { path: 'trips', component: Trips, canActivate: [AuthGuard] },
   { path: 'profile', component: Profile, canActivate: [AuthGuard] },

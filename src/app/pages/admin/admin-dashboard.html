@@ -259,7 +259,8 @@
 
               <div class="flex gap-2">
                 <a [routerLink]="['/hotels', dest.id]"
-                  class="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center">
+                  class="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center"
+                  [title]="'Ver hoteles' | translate">
                   <lucide-icon [name]="EyeIcon" class="w-4 h-4"></lucide-icon>
                 </a>
 
@@ -324,7 +325,7 @@
           <div class="relative">
             <lucide-icon [name]="SearchIcon"
               class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"></lucide-icon>
-            <input type="text" [(ngModel)]="hotelSearch" (ngModelChange)="resetHotelPagination()"
+            <input type="text" [(ngModel)]="hotelSearch" (ngModelChange)="onHotelSearchChange()"
               [placeholder]="'Buscar hotel' | translate"
               class="w-full md:w-64 bg-[rgb(23,25,25)] border border-white/10 rounded-xl py-3 pl-10 pr-4 text-sm outline-none focus:border-emerald-500" />
           </div>
@@ -343,6 +344,21 @@
           </button>
         </div>
       </div>
+
+      @if (selectedHotelDestino()) {
+      <div
+        class="mb-6 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <p class="text-sm text-emerald-200">
+          {{ 'Mostrando hoteles de' | translate }}
+          <span class="font-black text-white">{{ selectedHotelDestino()?.nombre | translate }}</span>
+        </p>
+
+        <button type="button" (click)="clearDestinationHotelFilter()"
+          class="self-start sm:self-auto px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-black uppercase tracking-widest">
+          {{ 'Ver todos' | translate }}
+        </button>
+      </div>
+      }
 
       @if (isLoadingHoteles()) {
       <div class="py-12 text-center text-gray-400">
@@ -888,23 +904,23 @@
         class="bg-[rgb(23,25,25)] border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500" />
 
       <select [(ngModel)]="destinoForm.continente" (ngModelChange)="onDestinoContinenteChange()"
-        class="bg-[rgb(23,25,25)] border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500">
-        <option value="" disabled>{{ 'Selecciona continente' | translate }}</option>
-        @for (continente of continentes; track continente) {
-        <option [value]="continente">{{ continente | translate }}</option>
-        }
-      </select>
+  class="bg-[rgb(23,25,25)] border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500">
+  <option value="" disabled>{{ 'Selecciona continente' | translate }}</option>
+  @for (continente of continentes; track continente) {
+  <option [value]="continente">{{ continente | translate }}</option>
+  }
+</select>
 
-      <select [(ngModel)]="destinoForm.pais" [disabled]="!destinoForm.continente"
-        class="bg-[rgb(23,25,25)] border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed">
-        <option value="" disabled>{{ 'Selecciona país' | translate }}</option>
-        @for (pais of destinoCountryOptions; track pais) {
-        <option [value]="pais">{{ pais | translate }}</option>
-        }
-      </select>
+<select [(ngModel)]="destinoForm.pais" [disabled]="!destinoForm.continente"
+  class="bg-[rgb(23,25,25)] border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed">
+  <option value="" disabled>{{ 'Selecciona país' | translate }}</option>
+  @for (pais of destinoCountryOptions; track pais) {
+  <option [value]="pais">{{ pais | translate }}</option>
+  }
+</select>
 
-      <input type="number" [(ngModel)]="destinoForm.precio" [placeholder]="'Precio' | translate" min="1"
-        class="bg-[rgb(23,25,25)] border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500" />
+<input type="number" [(ngModel)]="destinoForm.precio" [placeholder]="'Precio' | translate" min="1"
+  class="bg-[rgb(23,25,25)] border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500" />
 
       <input [(ngModel)]="destinoForm.imagen" [placeholder]="'Imagen' | translate"
         class="md:col-span-2 bg-[rgb(23,25,25)] border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500" />
@@ -970,15 +986,16 @@
         }
       </select>
 
-      <select [(ngModel)]="hotelForm.destinoId" [disabled]="!hotelForm.continente || !hotelForm.pais"
+      <select [(ngModel)]="hotelForm.destinoId" (ngModelChange)="onHotelCiudadChange()"
+        [disabled]="!hotelForm.continente || !hotelForm.pais"
         class="md:col-span-2 bg-[rgb(23,25,25)] border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed">
-        <option [ngValue]="null" disabled>{{ 'Selecciona destino' | translate }}</option>
-        @for (destino of hotelDestinationOptions; track destino.id) {
-        <option [ngValue]="destino.id">{{ destino.nombre | translate }} - {{ destino.pais | translate }}</option>
+        <option [ngValue]="null" disabled>{{ 'Selecciona ciudad' | translate }}</option>
+        @for (destino of hotelCityOptions; track destino.id) {
+        <option [ngValue]="destino.id">{{ destino.nombre | translate }}</option>
         }
       </select>
 
-      <input [(ngModel)]="hotelForm.nombre" [placeholder]="'Nombre' | translate"
+      <input [(ngModel)]="hotelForm.nombre" [placeholder]="'Nombre del hotel' | translate"
         class="bg-[rgb(23,25,25)] border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500" />
 
       <select [(ngModel)]="hotelForm.tipo"
@@ -991,7 +1008,6 @@
       <input type="number" [(ngModel)]="hotelForm.precioPorNoche" [placeholder]="'Precio' | translate" min="1"
         class="md:col-span-2 bg-[rgb(23,25,25)] border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500" />
     </div>
-
     @if (hotelError()) {
     <p class="text-red-400 text-sm mt-4">{{ hotelError() | translate }}</p>
     }
@@ -1002,7 +1018,7 @@
         {{ 'Cancelar' | translate }}
       </button>
 
-      <button type="button" (click)="saveHotel()"
+            <button type="button" (click)="saveHotel()"
         class="flex-1 bg-emerald-500 hover:bg-emerald-400 text-[rgb(23,25,25)] rounded-xl py-3 font-black">
         @if (isSavingHotel()) {
         {{ 'Guardando...' | translate }}
@@ -1010,7 +1026,81 @@
         {{ 'Guardar cambios' | translate }}
         }
       </button>
-     </div>
+    </div>
   </div>
 </div>
 }
+
+@if (confirmModal()) {
+<div class="fixed inset-0 z-[100] flex items-center justify-center px-4">
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="closeConfirmModal()"></div>
+
+  <div class="relative w-full max-w-md bg-[rgb(33,36,37)] border border-white/10 rounded-3xl p-6 shadow-2xl">
+    <div class="flex items-start gap-4 mb-5">
+      <div class="w-12 h-12 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+        <lucide-icon [name]="AlertIcon" class="w-6 h-6 text-red-400"></lucide-icon>
+      </div>
+
+      <div>
+        <h2 class="text-2xl font-black text-white">
+          {{ confirmModal()?.title | translate }}
+        </h2>
+        <p class="text-gray-400 text-sm mt-2 leading-relaxed">
+          {{ confirmModal()?.message | translate }}
+        </p>
+      </div>
+    </div>
+
+    <div class="flex gap-3">
+      <button type="button" (click)="closeConfirmModal()" [disabled]="isDeleting()"
+        class="flex-1 bg-white/5 hover:bg-white/10 rounded-xl py-3 font-bold disabled:opacity-50">
+        {{ 'Cancelar' | translate }}
+      </button>
+
+      <button type="button" (click)="confirmAction()" [disabled]="isDeleting()"
+        class="flex-1 bg-red-500 hover:bg-red-400 text-white rounded-xl py-3 font-black disabled:opacity-50">
+        @if (isDeleting()) {
+        {{ 'Eliminando...' | translate }}
+        } @else {
+        {{ confirmModal()?.confirmText | translate }}
+        }
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+@if (noticeModal()) {
+<div class="fixed inset-0 z-[110] flex items-center justify-center px-4">
+  <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" (click)="closeNotice()"></div>
+
+  <div class="relative w-full max-w-md bg-[rgb(33,36,37)] border border-white/10 rounded-3xl p-6 shadow-2xl">
+    <div class="flex items-start gap-4 mb-5">
+      <div
+        [class]="noticeModal()?.type === 'success'
+          ? 'w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center'
+          : 'w-12 h-12 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center'">
+        <lucide-icon
+          [name]="noticeModal()?.type === 'success' ? CheckIcon : AlertIcon"
+          [class]="noticeModal()?.type === 'success' ? 'w-6 h-6 text-emerald-400' : 'w-6 h-6 text-red-400'">
+        </lucide-icon>
+      </div>
+
+      <div>
+        <h2 class="text-2xl font-black text-white">
+          {{ noticeModal()?.title | translate }}
+        </h2>
+        <p class="text-gray-400 text-sm mt-2 leading-relaxed">
+          {{ noticeModal()?.message | translate }}
+        </p>
+      </div>
+    </div>
+
+    <button type="button" (click)="closeNotice()"
+      class="w-full bg-emerald-500 hover:bg-emerald-400 text-[rgb(23,25,25)] rounded-xl py-3 font-black">
+      {{ 'Aceptar' | translate }}
+    </button>
+  </div>
+</div>
+}
+

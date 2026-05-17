@@ -87,10 +87,17 @@ export class HotelComponent implements OnInit {
 
   ngOnInit() {
     this.route.paramMap.subscribe((params) => {
+      const destinoId = params.get('destinoId');
       const id = params.get('id');
+
+      if (destinoId) {
+        this.loadHotelFullData(Number(destinoId));
+        return;
+      }
 
       if (id) {
         this.loadHotelFullData(Number(id));
+        return;
       }
     });
   }
