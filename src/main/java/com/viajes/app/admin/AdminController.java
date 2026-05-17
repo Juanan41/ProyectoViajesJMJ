@@ -190,6 +190,11 @@ public class AdminController {
         return reservaService.obtenerTodasReservas();
     }
 
+    @PutMapping("/reservas/{id}/cancelar")
+    public ReservaResponseDto cancelarReservaAdmin(@PathVariable Long id) {
+        return reservaService.cancelarReservaAdmin(id);
+    }
+
     @GetMapping("/destinos")
     public List<DestinoDTO> listarDestinos() {
         return destinoRepository.findAll()
@@ -404,6 +409,7 @@ public class AdminController {
         String pais = getString(request, "pais");
         String imagen = getString(request, "imagen");
         Double precio = getDouble(request, "precio");
+        Long continenteId = getLong(request, "continenteId");
         String continenteNombre = getString(request, "continente");
 
         if (nombre == null || nombre.isBlank()) {
@@ -427,7 +433,12 @@ public class AdminController {
             destino.setImagen(imagen.trim());
         }
 
-        if (continenteNombre != null && !continenteNombre.isBlank()) {
+        if (continenteId != null) {
+            Continente continente = continenteRepository.findById(continenteId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Continente no encontrado"));
+
+            destino.setContinente(continente);
+        } else if (continenteNombre != null && !continenteNombre.isBlank()) {
             Continente continente = continenteRepository.findByNombre(continenteNombre.trim())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Continente no encontrado"));
 
@@ -448,14 +459,6 @@ public class AdminController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre del alojamiento es obligatorio");
         }
 
-        if (ciudad == null || ciudad.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La ciudad es obligatoria");
-        }
-
-        if (pais == null || pais.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El país es obligatorio");
-        }
-
         if (precioPorNoche == null || precioPorNoche.compareTo(BigDecimal.ZERO) <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El precio por noche no es válido");
         }
@@ -467,9 +470,28 @@ public class AdminController {
         Destino destino = destinoRepository.findById(destinoId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Destino no encontrado"));
 
+        String ciudadFinal = destino.getNombre();
+        String paisFinal = destino.getPais();
+
+        if ((ciudadFinal == null || ciudadFinal.isBlank()) && ciudad != null) {
+            ciudadFinal = ciudad.trim();
+        }
+
+        if ((paisFinal == null || paisFinal.isBlank()) && pais != null) {
+            paisFinal = pais.trim();
+        }
+
+        if (ciudadFinal == null || ciudadFinal.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La ciudad del destino no es válida");
+        }
+
+        if (paisFinal == null || paisFinal.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El país del destino no es válido");
+        }
+
         alojamiento.setNombre(nombre.trim());
-        alojamiento.setCiudad(ciudad.trim());
-        alojamiento.setPais(pais.trim());
+        alojamiento.setCiudad(ciudadFinal.trim());
+        alojamiento.setPais(paisFinal.trim());
         alojamiento.setPrecioPorNoche(precioPorNoche);
         alojamiento.setDestino(destino);
         alojamiento.setTipo(TipoAlojamiento.HOTEL);

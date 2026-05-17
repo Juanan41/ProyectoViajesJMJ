@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -92,8 +93,11 @@ public class ReservaService {
         }
 
         double transporteCoste = getTransporteCoste(transporte);
-        double precioTotal = (habitacion.getPrecioPorNoche() * noches * huespedes) + transporteCoste;
-        BigDecimal precioTotalSaldo = BigDecimal.valueOf(precioTotal);
+        BigDecimal precioTotalSaldo = BigDecimal.valueOf(habitacion.getPrecioPorNoche())
+                .multiply(BigDecimal.valueOf(noches))
+                .multiply(BigDecimal.valueOf(huespedes))
+                .add(BigDecimal.valueOf(transporteCoste))
+                .setScale(2, RoundingMode.HALF_UP);
 
         if (usuario.getSaldo().compareTo(precioTotalSaldo) < 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Saldo insuficiente");
@@ -106,7 +110,7 @@ public class ReservaService {
         reserva.setFechaInicio(dto.getFechaInicio());
         reserva.setFechaFin(dto.getFechaFin());
         reserva.setHuespedes(huespedes);
-        reserva.setPrecioTotal(precioTotal);
+        reserva.setPrecioTotal(precioTotalSaldo.doubleValue());
         reserva.setEstado("CONFIRMADA");
         reserva.setFechaReserva(LocalDateTime.now());
 
@@ -149,26 +153,44 @@ public class ReservaService {
         Reserva reserva = reservaRepository.findByIdAndUsuarioEmail(id, emailUsuario)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reserva no encontrada"));
 
+        return cancelarReservaInterna(reserva);
+    }
+
+    @Transactional
+    public ReservaResponseDto cancelarReservaAdmin(Long id) {
+
+        Reserva reserva = reservaRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reserva no encontrada"));
+
+        return cancelarReservaInterna(reserva);
+    }
+
+    private ReservaResponseDto cancelarReservaInterna(Reserva reserva) {
         if ("CANCELADA".equalsIgnoreCase(reserva.getEstado())) {
             return mapToDto(reserva);
         }
 
         Usuario usuario = reserva.getUsuario();
 
-        BigDecimal saldoActual = usuario.getSaldo() != null
-                ? usuario.getSaldo()
-                : BigDecimal.ZERO;
+        if (usuario != null) {
+            BigDecimal saldoActual = usuario.getSaldo() != null
+                    ? usuario.getSaldo()
+                    : BigDecimal.ZERO;
 
-        BigDecimal importeDevolucion = BigDecimal.valueOf(reserva.getPrecioTotal());
+            BigDecimal importeDevolucion = reserva.getPrecioTotal() != null
+                    ? BigDecimal.valueOf(reserva.getPrecioTotal()).setScale(2, RoundingMode.HALF_UP)
+                    : BigDecimal.ZERO;
 
-        usuario.setSaldo(saldoActual.add(importeDevolucion));
-        usuarioRepository.save(usuario);
+            usuario.setSaldo(saldoActual.add(importeDevolucion));
+            usuarioRepository.save(usuario);
+        }
 
         reserva.setEstado("CANCELADA");
 
         Reserva actualizada = reservaRepository.save(reserva);
         return mapToDto(actualizada);
     }
+
     private ReservaResponseDto mapToDto(Reserva reserva) {
         Alojamiento alojamiento = reserva.getHabitacion().getAlojamiento();
         Destino destino = alojamiento.getDestino();
@@ -301,9 +323,9 @@ public class ReservaService {
 
         if (
                 nombre.contains("grupal") ||
-                nombre.contains("grupo") ||
-                nombre.contains("familiar") ||
-                nombre.contains("family")
+                        nombre.contains("grupo") ||
+                        nombre.contains("familiar") ||
+                        nombre.contains("family")
         ) {
             return "group";
         }
@@ -318,9 +340,9 @@ public class ReservaService {
 
         if (
                 nombre.contains("doble") ||
-                nombre.contains("deluxe") ||
-                nombre.contains("estandar") ||
-                nombre.contains("standard")
+                        nombre.contains("deluxe") ||
+                        nombre.contains("estandar") ||
+                        nombre.contains("standard")
         ) {
             return "double";
         }
