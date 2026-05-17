@@ -2,7 +2,7 @@ import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Review } from '../data/destinations';
 import { environment } from '../../environments/environment';
-import { Observable, switchMap, tap, map, of } from 'rxjs';
+import { Observable, switchMap, tap, map, of, throwError } from 'rxjs';
 
 export interface Card {
   id: string;
@@ -76,7 +76,16 @@ export class Auth {
   }
 
   register(data: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/auth/register`, data);
+    const email = String(data?.email || '').trim();
+
+    if (!this.emailValido(email)) {
+      return throwError(() => new Error('Introduce un correo válido, por ejemplo usuario@gmail.com.'));
+    }
+
+    return this.http.post<any>(`${this.apiUrl}/auth/register`, {
+      ...data,
+      email,
+    });
   }
 
   getPerfil(): Observable<any> {
@@ -90,6 +99,16 @@ export class Auth {
     email: string;
     avatarUrl?: string;
   }): Observable<UserData> {
+    const email = String(data.email || '').trim();
+
+    if (!this.emailValido(email)) {
+      return throwError(() => new Error('Introduce un correo válido, por ejemplo usuario@gmail.com.'));
+    }
+
+    data = {
+      ...data,
+      email,
+    };
     return this.http
       .put<any>(`${this.apiUrl}/usuarios/me`, data, {
         headers: this.getAuthHeaders(),
@@ -183,9 +202,46 @@ export class Auth {
   }
 
   agregarTarjeta(tarjeta: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/cuentas`, tarjeta, {
-      headers: this.getAuthHeaders(),
-    });
+    const titular = String(tarjeta?.titular || tarjeta?.holder || '').trim();
+    const numeroTarjetaOriginal = String(
+      tarjeta?.numeroTarjeta || tarjeta?.iban || ''
+    ).trim();
+
+    const numeroTarjetaLimpio = this.limpiarNumeroTarjeta(numeroTarjetaOriginal);
+
+    if (!this.titularTarjetaValido(titular)) {
+      return throwError(
+        () => new Error('El nombre del titular solo puede contener letras y espacios.')
+      );
+    }
+
+    if (!this.numeroTarjetaValido(numeroTarjetaLimpio)) {
+      return throwError(
+        () => new Error('El número de tarjeta debe tener 16 dígitos y no puede contener letras.')
+      );
+    }
+
+    return this.obtenerTarjetas().pipe(
+      switchMap((tarjetas) => {
+        if ((tarjetas || []).length >= 2) {
+          return throwError(
+            () => new Error('Solo puedes tener un máximo de 2 tarjetas.')
+          );
+        }
+
+        const payload = {
+          ...tarjeta,
+          titular,
+          holder: titular,
+          iban: numeroTarjetaLimpio,
+          numeroTarjeta: numeroTarjetaLimpio,
+        };
+
+        return this.http.post<any>(`${this.apiUrl}/cuentas`, payload, {
+          headers: this.getAuthHeaders(),
+        });
+      }),
+    );
   }
 
   borrarTarjeta(): Observable<any> {
@@ -278,6 +334,22 @@ export class Auth {
         this.logout();
       }
     }
+  }
+
+  private emailValido(email: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+  }
+
+  private titularTarjetaValido(titular: string): boolean {
+    return /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s]+$/.test(titular);
+  }
+
+  private limpiarNumeroTarjeta(numero: string): string {
+    return numero.replace(/\s+/g, '');
+  }
+
+  private numeroTarjetaValido(numero: string): boolean {
+    return /^\d{16}$/.test(numero);
   }
 
   private isTokenExpired(token: string): boolean {

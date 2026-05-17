@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+
 import { PantallaCargaComponent } from './pantalla_carga';
 
 describe('PantallaCargaComponent', () => {

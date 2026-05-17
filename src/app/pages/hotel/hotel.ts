@@ -624,6 +624,15 @@ export class HotelComponent implements OnInit {
       return;
     }
 
+    if (this.isCheckInBeforeToday()) {
+      this.openBookingModal(
+        'Fecha de entrada no válida',
+        'La fecha de entrada debe ser a partir de la fecha actual.',
+        'warning',
+      );
+      return;
+    }
+
     if (this.nights <= 0) {
       this.openBookingModal(
         'Fechas incorrectas',
@@ -826,6 +835,18 @@ export class HotelComponent implements OnInit {
     if (Number.isNaN(date.getTime())) return '-';
 
     return date.toLocaleDateString('es-ES');
+  }
+
+  private isCheckInBeforeToday(): boolean {
+    if (!this.checkInDate) return true;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const checkIn = new Date(this.checkInDate);
+    checkIn.setHours(0, 0, 0, 0);
+
+    return checkIn < today;
   }
 
   private normalizeText(value: any): string {

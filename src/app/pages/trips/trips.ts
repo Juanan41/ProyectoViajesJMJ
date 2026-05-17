@@ -50,6 +50,7 @@ export class Trips implements OnInit {
 
   isCancelling = signal(false);
   cancelError = signal('');
+  cancelSuccess = signal(false);
 
   activeTrips = computed(() =>
     this.trips().filter((trip) => trip.estado !== 'CANCELADA' && !this.isCompleted(trip)),
@@ -154,6 +155,7 @@ export class Trips implements OnInit {
 
   askCancelTrip(trip: ReservaResponse) {
     this.cancelError.set('');
+    this.cancelSuccess.set(false);
     this.selectedTripToCancel.set(trip);
   }
 
@@ -164,6 +166,10 @@ export class Trips implements OnInit {
     this.selectedTripToCancel.set(null);
   }
 
+  closeSuccessMessage() {
+    this.cancelSuccess.set(false);
+  }
+
   confirmCancelTrip() {
     const trip = this.selectedTripToCancel();
 
@@ -171,11 +177,20 @@ export class Trips implements OnInit {
 
     this.isCancelling.set(true);
     this.cancelError.set('');
+    this.cancelSuccess.set(false);
 
     this.reservaService.cancelarReserva(trip.id).subscribe({
-      next: () => {
+      next: (reservaCancelada) => {
+        const importeDevuelto = Number(reservaCancelada?.precioTotal ?? trip.precioTotal ?? 0);
+
+        if (importeDevuelto > 0) {
+          this.auth.updateCredits(importeDevuelto);
+        }
+
         this.isCancelling.set(false);
         this.selectedTripToCancel.set(null);
+        this.cancelSuccess.set(true);
+
         this.loadUserTrips();
       },
       error: (err) => {

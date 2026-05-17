@@ -18,10 +18,11 @@
 }
 
 .pantalla-carga::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.04), transparent);
+  background:
+    linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.04), transparent);
   animation: brilloFondo 4s ease-in-out infinite;
 }
 
@@ -63,7 +64,7 @@
 
 .globo::before,
 .globo::after {
-  content: '';
+  content: "";
   position: absolute;
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -212,9 +213,7 @@ h1 span {
 }
 
 @keyframes pulso {
-  0%,
-  80%,
-  100% {
+  0%, 80%, 100% {
     opacity: 0.35;
     transform: scale(0.8);
   }
@@ -240,8 +239,7 @@ h1 span {
 }
 
 @keyframes brilloFondo {
-  0%,
-  100% {
+  0%, 100% {
     opacity: 0.25;
   }
 

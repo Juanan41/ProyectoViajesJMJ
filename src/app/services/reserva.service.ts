@@ -44,8 +44,8 @@ export class ReservaService {
     });
   }
 
-  cancelarReserva(id: number): Observable<any> {
-    return this.http.post(
+  cancelarReserva(id: number): Observable<ReservaResponse> {
+    return this.http.post<ReservaResponse>(
       `${this.apiUrl}/reservas/${id}/cancelar`,
       {},
       {

@@ -14,6 +14,32 @@
     </div>
   </div>
 
+  @if (cancelSuccess()) {
+  <div
+    class="mb-8 rounded-3xl border border-emerald-500/30 bg-emerald-500/10 p-6 shadow-2xl shadow-emerald-500/10">
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <h2 class="text-2xl font-black text-emerald-400 mb-2 uppercase tracking-wide">
+          Devolución completada
+        </h2>
+
+        <p class="text-white font-semibold mb-1">
+          Tu viaje ha sido cancelado correctamente y el importe ha sido devuelto a tu saldo.
+        </p>
+
+        <p class="text-gray-300">
+          Te esperamos para futuros viajes y para seguir cumpliendo tus sueños.
+        </p>
+      </div>
+
+      <button type="button" (click)="closeSuccessMessage()"
+        class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
+        <lucide-icon [name]="XIcon" class="w-5 h-5 text-gray-300"></lucide-icon>
+      </button>
+    </div>
+  </div>
+  }
+
   @if (isLoading()) {
   <div class="flex-1 flex items-center justify-center py-20">
     <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>

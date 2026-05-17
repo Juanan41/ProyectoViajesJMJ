@@ -32,10 +32,16 @@
         <div>
           <label class="text-sm font-medium text-gray-300 block mb-1.5">{{ 'Titular de la Tarjeta' | translate
             }}</label>
-          <input type="text" [placeholder]="'Juan Pérez' | translate" maxlength="40" [(ngModel)]="cardHolder"
-            (ngModelChange)="cardHolder = $event.toUpperCase()" name="cardHolder"
+          <input
+            type="text"
+            [placeholder]="'Juan Pérez' | translate"
+            maxlength="40"
+            [ngModel]="cardHolder"
+            (input)="handleCardHolderChange($event)"
+            name="cardHolder"
             class="w-full bg-[rgb(33,36,37)] text-white border border-gray-700 rounded-xl py-3 px-4 focus:outline-none focus:border-emerald-500 transition-all uppercase"
-            required />
+            required
+          />
         </div>
 
         <div class="grid grid-cols-2 gap-5">
@@ -55,9 +61,11 @@
           </div>
         </div>
 
-        <button type="submit"
+        <button
+          type="submit"
           class="w-full bg-emerald-500 text-[rgb(23,25,25)] uppercase tracking-widest font-black rounded-xl py-4 hover:bg-emerald-400 transition-colors mt-6 disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-emerald-500/20"
-          [disabled]="!isValid || isLoading">
+          [disabled]="isLoading"
+        >
           {{ isLoading ? ('Guardando...' | translate) : ('Guardar Tarjeta' | translate) }}
         </button>
       </form>

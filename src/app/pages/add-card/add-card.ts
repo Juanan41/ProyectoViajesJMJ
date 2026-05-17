@@ -31,6 +31,14 @@ export class AddCard {
     return value.replace(/[^0-9]/g, '');
   }
 
+  private onlyLettersAndSpaces(value: string): string {
+    return value.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s]/g, '');
+  }
+
+  private isValidCardHolder(value: string): boolean {
+    return /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s]+$/.test(value.trim());
+  }
+
   formatCardNumber(value: string): string {
     const digits = this.onlyDigits(value).substring(0, 16);
     const matches = digits.match(/\d{1,4}/g);
@@ -42,11 +50,19 @@ export class AddCard {
     return digits.length >= 2 ? `${digits.substring(0, 2)}/${digits.substring(2, 4)}` : digits;
   }
 
+
+
   handleCardNumberChange(event: Event) {
     const input = event.target as HTMLInputElement;
     const formatted = this.formatCardNumber(input.value);
     this.cardNumber = formatted.substring(0, 19);
     input.value = this.cardNumber;
+  }
+
+  handleCardHolderChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.cardHolder = this.onlyLettersAndSpaces(input.value);
+    input.value = this.cardHolder;
   }
 
   handleExpiryChange(value: string) {
@@ -59,11 +75,12 @@ export class AddCard {
 
   get isValid(): boolean {
     const cleanNumber = this.cardNumber.replace(/\s+/g, '');
+
     return (
       /^\d{16}$/.test(cleanNumber) &&
       /^(0[1-9]|1[0-2])\/\d{2}$/.test(this.expiry) &&
       /^\d{3,4}$/.test(this.cvv) &&
-      this.cardHolder.trim().length > 0
+      this.isValidCardHolder(this.cardHolder)
     );
   }
 
@@ -92,13 +109,33 @@ export class AddCard {
         error: (err) => {
           if (err.name === 'TimeoutError') {
             this.errorMessage =
-              'El servidor no ha respondido. Comprueba que el backend esta arrancado.';
+              'El servidor no ha respondido. Comprueba que el backend está arrancado.';
+
           } else if (err.status === 0) {
             this.errorMessage = 'No se puede conectar con el backend.';
+
           } else if (err.status === 403) {
-            this.errorMessage = 'No tienes permiso o tu sesion ha caducado.';
+            this.errorMessage = 'No tienes permiso o tu sesión ha caducado.';
+
+          } else if (err.status === 400) {
+            const mensajeBackend =
+              typeof err.error === 'string'
+                ? err.error
+                : err?.error?.message || err?.error?.error;
+
+            this.errorMessage =
+              mensajeBackend || 'Solo puedes tener un máximo de 2 tarjetas.';
+
           } else {
-            this.errorMessage = err.error.message || 'Error al guardar la tarjeta.';
+            const mensajeBackend =
+              typeof err.error === 'string'
+                ? err.error
+                : err?.error?.message || err?.error?.error;
+
+            this.errorMessage =
+              mensajeBackend ||
+              err?.message ||
+              'Error al guardar la tarjeta. Revisa los datos.';
           }
         },
       });

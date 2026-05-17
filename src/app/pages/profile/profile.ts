@@ -122,12 +122,17 @@ export class Profile implements OnInit {
   deleteReviewError = signal('');
 
   ngOnInit() {
-    if (this.user) {
-      this.cargarReservas();
-    } else {
-      this.isLoading.set(false);
-    }
+  const token = localStorage.getItem('token');
+
+  if (token) {
+    this.cargarReservas();
+  } else {
+    this.activeTrips.set([]);
+    this.pastTrips.set([]);
+    this.reviews.set([]);
+    this.isLoading.set(false);
   }
+}
 
   get user() {
     return this.authService.user();

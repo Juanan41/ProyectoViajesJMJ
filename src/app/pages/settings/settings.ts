@@ -34,8 +34,15 @@ export class Settings implements OnInit {
   notice = signal<SettingsNotice | null>(null);
 
   ngOnInit() {
+  const token = localStorage.getItem('token');
+
+  if (token) {
     this.loadCards();
+  } else {
+    this.tarjetas.set([]);
+    this.isLoading.set(false);
   }
+}
 
   loadCards() {
     this.isLoading.set(true);
