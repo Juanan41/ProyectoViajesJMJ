@@ -1,7 +1,3 @@
-// ProyectoViajesJMJ - pages\add-card\add-card.ts
-// Responsabilidad: gestion de saldo y datos bancarios del usuario.
-// Nota profesional: Agrupa datos bancarios y saldo visible; mantener validaciones alineadas con backend.
-
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
@@ -11,10 +7,6 @@ import { Auth } from '../../services/auth';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { finalize, timeout } from 'rxjs';
 
-/**
- * Documento profesional: clase principal del archivo.
- * Agrupa datos bancarios y saldo visible; mantener validaciones alineadas con backend.
- */
 @Component({
   selector: 'app-add-card',
   standalone: true,
@@ -99,7 +91,8 @@ export class AddCard {
         next: () => this.router.navigate(['/settings']),
         error: (err) => {
           if (err.name === 'TimeoutError') {
-            this.errorMessage = 'El servidor no ha respondido. Comprueba que el backend esta arrancado.';
+            this.errorMessage =
+              'El servidor no ha respondido. Comprueba que el backend esta arrancado.';
           } else if (err.status === 0) {
             this.errorMessage = 'No se puede conectar con el backend.';
           } else if (err.status === 403) {

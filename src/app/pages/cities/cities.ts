@@ -1,18 +1,9 @@
-// ProyectoViajesJMJ - pages\cities\cities.ts
-// Responsabilidad: catalogo de destinos, navegacion geografica y busqueda.
-// Nota profesional: Soporta navegacion por destinos, paises, continentes y busqueda bilingue.
-
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { DestinoService } from '../../services/destino.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { LucideAngularModule, ArrowLeft, ChevronRight } from 'lucide-angular';
-
-/**
- * Documento profesional: clase principal del archivo.
- * Soporta navegacion por destinos, paises, continentes y busqueda bilingue.
- */
 @Component({
   selector: 'app-cities',
   standalone: true,

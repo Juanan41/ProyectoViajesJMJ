@@ -1,7 +1,3 @@
-// ProyectoViajesJMJ - pages\hotels\hotels.ts
-// Responsabilidad: catalogo de alojamientos, habitaciones y detalle hotelero.
-// Nota profesional: Representa el catalogo hotelero, sus habitaciones y las opciones que se pueden reservar.
-
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
@@ -20,10 +16,6 @@ import {
   hasHotelAmenity,
 } from '../../utils/hotel-amenities';
 
-/**
- * Documento profesional: clase principal del archivo.
- * Representa el catalogo hotelero, sus habitaciones y las opciones que se pueden reservar.
- */
 @Component({
   selector: 'app-hotels',
   standalone: true,
@@ -141,7 +133,9 @@ export class Hotels implements OnInit {
   }
 
   hasHotelReviews(hotel: any): boolean {
-    return Number(hotel?.totalOpiniones ?? hotel?.reviewCount ?? 0) > 0 && this.getHotelRating(hotel) > 0;
+    return (
+      Number(hotel?.totalOpiniones ?? hotel?.reviewCount ?? 0) > 0 && this.getHotelRating(hotel) > 0
+    );
   }
 
   getHotelDescription(hotel: any): string {

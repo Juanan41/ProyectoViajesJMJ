@@ -1,7 +1,3 @@
-// ProyectoViajesJMJ - pages\settings\settings.ts
-// Responsabilidad: pieza de soporte usada por la aplicacion ProyectoViajesJMJ.
-// Nota profesional: Modulo de soporte del proyecto; revisar dependencias antes de cambiar su contrato publico.
-
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -16,10 +12,6 @@ interface SettingsNotice {
   message: string;
 }
 
-/**
- * Documento profesional: clase principal del archivo.
- * Modulo de soporte del proyecto; revisar dependencias antes de cambiar su contrato publico.
- */
 @Component({
   selector: 'app-settings',
   standalone: true,

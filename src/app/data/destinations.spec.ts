@@ -1,7 +1,3 @@
-// ProyectoViajesJMJ - data\destinations.spec.ts
-// Responsabilidad: pruebas automatizadas que protegen el comportamiento esperado de este modulo.
-// Nota profesional: Define pruebas de regresion para que los cambios futuros mantengan el contrato del modulo.
-
 import { getCitiesByCountry, getCountriesByContinent, continents } from './destinations';
 
 describe('Destinations', () => {

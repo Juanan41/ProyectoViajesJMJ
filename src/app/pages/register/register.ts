@@ -1,7 +1,3 @@
-// ProyectoViajesJMJ - pages\register\register.ts
-// Responsabilidad: autenticacion, autorizacion y control de sesion.
-// Nota profesional: Gestiona autenticacion y sesion; los cambios aqui afectan al acceso de usuarios.
-
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -9,10 +5,6 @@ import { Router, RouterModule } from '@angular/router';
 import { Auth } from '../../services/auth';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
-/**
- * Documento profesional: clase principal del archivo.
- * Gestiona autenticacion y sesion; los cambios aqui afectan al acceso de usuarios.
- */
 @Component({
   selector: 'app-register',
   standalone: true,

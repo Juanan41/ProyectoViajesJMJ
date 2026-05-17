@@ -1,7 +1,3 @@
-// ProyectoViajesJMJ - data\persistence-api.ts
-// Responsabilidad: integracion entre capas de API, persistencia y logica de negocio.
-// Nota profesional: Modulo de soporte del proyecto; revisar dependencias antes de cambiar su contrato publico.
-
 const API_BASE_URL_STORAGE_KEY = 'jmj_api_base_url';
 
 declare global {

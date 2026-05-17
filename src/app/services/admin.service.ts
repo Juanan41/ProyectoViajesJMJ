@@ -464,7 +464,6 @@ export class AdminService {
 
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
-
     return token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : new HttpHeaders();
   }
 }

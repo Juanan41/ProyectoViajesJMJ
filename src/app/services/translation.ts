@@ -1,18 +1,6 @@
-// ProyectoViajesJMJ - services\translation.ts
-// Responsabilidad: traducciones, normalizacion de textos y soporte bilingue.
-// Nota profesional: Mantiene textos traducibles y normalizacion para que ES/EN funcionen sin romper nombres propios.
-
 import { Injectable, signal } from '@angular/core';
 
-/**
- * Contrato publico usado por componentes y servicios relacionados.
- */
 export type Language = 'es' | 'en';
-
-/**
- * Documento profesional: clase principal del archivo.
- * Mantiene textos traducibles y normalizacion para que ES/EN funcionen sin romper nombres propios.
- */
 @Injectable({
   providedIn: 'root',
 })
@@ -1234,6 +1222,21 @@ export class TranslationService {
       'Cargando hoteles...': 'Loading hotels...',
       Reintentar: 'Try again',
       'No se pudieron cargar los hoteles.': 'Hotels could not be loaded.',
+      'No hay destinos que coincidan con los filtros.': 'No destinations match the filters.',
+      'Nombre Completo': 'Full name',
+      opiniones: 'reviews',
+      Exp: 'Exp',
+      'Error al guardar la tarjeta.': 'Error saving the card.',
+      'Tarjeta eliminada': 'Card deleted',
+      'La tarjeta se ha eliminado correctamente y tu saldo se ha puesto a 0.':
+        'The card has been deleted successfully and your balance has been set to 0.',
+      'No se pudo eliminar la tarjeta': 'The card could not be deleted',
+      'Ha ocurrido un error al borrar la tarjeta. Inténtalo de nuevo.':
+        'An error occurred while deleting the card. Please try again.',
+      'No se ha podido generar el PDF. Inténtalo de nuevo.':
+        'The PDF could not be generated. Please try again.',
+      'Esta habitación no es compatible con el número de huéspedes seleccionado.':
+        'This room is not compatible with the selected number of guests.',
       '¿Seguro que quieres eliminar este hotel?': 'Are you sure you want to delete this hotel?',
     },
   };
@@ -1315,7 +1318,7 @@ export class TranslationService {
   }
 
   private normalizeText(value: string): string {
-    return this.fixMojibake(value).replace(/\s+/g, ' ').trim();
+    return this.fixCommonMojibake(this.fixMojibake(value)).replace(/\s+/g, ' ').trim();
   }
 
   private toComparableKey(value: string): string {
@@ -1326,6 +1329,35 @@ export class TranslationService {
       .replace(/[¿?¡!.,:;'"’`´()[\]{}_/\\|-]/g, ' ')
       .replace(/\s+/g, ' ')
       .trim();
+  }
+
+  private fixCommonMojibake(value: string): string {
+    return value
+      .replaceAll('\u00c3\u00a1', '\u00e1')
+      .replaceAll('\u00c3\u00a9', '\u00e9')
+      .replaceAll('\u00c3\u00ad', '\u00ed')
+      .replaceAll('\u00c3\u00b3', '\u00f3')
+      .replaceAll('\u00c3\u00ba', '\u00fa')
+      .replaceAll('\u00c3\u0081', '\u00c1')
+      .replaceAll('\u00c3\u0089', '\u00c9')
+      .replaceAll('\u00c3\u008d', '\u00cd')
+      .replaceAll('\u00c3\u0093', '\u00d3')
+      .replaceAll('\u00c3\u009a', '\u00da')
+      .replaceAll('\u00c3\u00b1', '\u00f1')
+      .replaceAll('\u00c3\u0091', '\u00d1')
+      .replaceAll('\u00c3\u00bc', '\u00fc')
+      .replaceAll('\u00c3\u009c', '\u00dc')
+      .replaceAll('\u00c2\u00bf', '\u00bf')
+      .replaceAll('\u00c2\u00a1', '\u00a1')
+      .replaceAll('\u00c2\u00b7', '\u00b7')
+      .replaceAll('\u00e2\u0082\u00ac', '\u20ac')
+      .replaceAll('\u00e2\u0080\u0093', '-')
+      .replaceAll('\u00e2\u0080\u0094', '-')
+      .replaceAll('\u00e2\u0080\u00a6', '...')
+      .replaceAll('\u00e2\u0080\u0099', "'")
+      .replaceAll('\u00e2\u0080\u009c', '"')
+      .replaceAll('\u00e2\u0080\u009d', '"')
+      .replaceAll('\u00c2', '');
   }
 
   private fixMojibake(value: string): string {
@@ -1389,6 +1421,23 @@ export class TranslationService {
     const accommodationIn = value.match(/^Alojamiento cómodo y bien ubicado en (.+)\.$/i);
     if (accommodationIn) {
       return `Comfortable and well-located accommodation in ${this.translate(accommodationIn[1])}.`;
+    }
+
+    const cleanAccommodationIn = value.match(/^Alojamiento cómodo y bien ubicado en (.+)\.$/i);
+    if (cleanAccommodationIn) {
+      return `Comfortable and well-located accommodation in ${this.translate(cleanAccommodationIn[1])}.`;
+    }
+
+    const cleanHotelIn = value.match(
+      /^Hotel cómodo y bien ubicado en (.+), ideal para descansar después de descubrir la ciudad\.$/i,
+    );
+    if (cleanHotelIn) {
+      return `Comfortable and well-located hotel in ${this.translate(cleanHotelIn[1])}, ideal for resting after discovering the city.`;
+    }
+
+    const cleanShortHotelIn = value.match(/^Hotel cómodo y bien ubicado en (.+)\.$/i);
+    if (cleanShortHotelIn) {
+      return `Comfortable and well-located hotel in ${this.translate(cleanShortHotelIn[1])}.`;
     }
 
     const shortHotelIn = value.match(/^Hotel cÃ³modo y bien ubicado en (.+)\.$/i);

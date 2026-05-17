@@ -1,7 +1,3 @@
-// ProyectoViajesJMJ - pages\hotel\hotel.ts
-// Responsabilidad: catalogo de alojamientos, habitaciones y detalle hotelero.
-// Nota profesional: Representa el catalogo hotelero, sus habitaciones y las opciones que se pueden reservar.
-
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
@@ -26,10 +22,6 @@ import { getHotelPriceValue, getVisibleHotelAmenities } from '../../utils/hotel-
 type TransportType = 'AVION' | 'TREN' | 'BARCO';
 type RoomCategory = 'single' | 'double' | 'suite' | 'group';
 
-/**
- * Documento profesional: clase principal del archivo.
- * Representa el catalogo hotelero, sus habitaciones y las opciones que se pueden reservar.
- */
 @Component({
   selector: 'app-hotel',
   standalone: true,
@@ -168,7 +160,6 @@ export class HotelComponent implements OnInit {
     return this.selectedRoomId() === Number(room?.id);
   }
 
-  // Mantiene en el cliente la misma matriz de compatibilidad que valida el backend.
   isRoomAvailable(room: any): boolean {
     const capacity = this.getRoomCapacity(room);
     const category = this.getRoomCategory(room);
@@ -284,7 +275,6 @@ export class HotelComponent implements OnInit {
 
     if (!room || this.nights <= 0) return 0;
 
-    // Precio estimado visible antes de reservar; el backend vuelve a calcularlo y valida saldo.
     const roomPrice = this.getRoomPrice(room);
     return roomPrice * this.nights * this.guests + this.getTransportPrice(this.selectedTransport);
   }
@@ -323,7 +313,10 @@ export class HotelComponent implements OnInit {
   }
 
   hasHotelReviews(hotel: any): boolean {
-    return Number(hotel?.totalOpiniones ?? hotel?.reviewCount ?? this.reviews().length ?? 0) > 0 && this.getHotelRating(hotel) > 0;
+    return (
+      Number(hotel?.totalOpiniones ?? hotel?.reviewCount ?? this.reviews().length ?? 0) > 0 &&
+      this.getHotelRating(hotel) > 0
+    );
   }
 
   getHotelDescription(hotel: any): string {
@@ -622,7 +615,6 @@ export class HotelComponent implements OnInit {
   }
 
   reservar() {
-    // Las validaciones se ordenan de lo más barato a lo más crítico antes de crear la reserva.
     if (!this.auth.isLoggedIn()) {
       this.openBookingModal(
         'Inicia sesión',
@@ -749,7 +741,6 @@ export class HotelComponent implements OnInit {
 
       if (!reservationStart || !reservationEnd) return false;
 
-      // Intervalos semiabiertos [entrada, salida): salir el mismo día que entra otro viaje no bloquea.
       return requestedStart < reservationEnd && reservationStart < requestedEnd;
     });
   }
@@ -800,8 +791,6 @@ export class HotelComponent implements OnInit {
 
   private createReservation(bookingRequest: any) {
     this.isCreatingBooking.set(true);
-
-    // El servidor es la fuente de verdad para capacidad, compatibilidad, precio final y saldo.
     this.destinoService.crearReserva(bookingRequest).subscribe({
       next: (res) => {
         this.isCreatingBooking.set(false);

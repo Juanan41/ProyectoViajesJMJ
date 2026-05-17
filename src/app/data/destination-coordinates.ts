@@ -1,10 +1,3 @@
-// ProyectoViajesJMJ - data\destination-coordinates.ts
-// Responsabilidad: catalogo de destinos, navegacion geografica y busqueda.
-// Nota profesional: Soporta navegacion por destinos, paises, continentes y busqueda bilingue.
-
-/**
- * Contrato publico usado por componentes y servicios relacionados.
- */
 export interface Coordinates {
   latitude: number;
   longitude: number;

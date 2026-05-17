@@ -77,6 +77,9 @@ export class AdminDashboard implements OnInit {
   hotelPage = signal(1);
   readonly hotelPageSize = 10;
 
+  reservaPage = signal(1);
+  readonly reservaPageSize = 10;
+
   hotelSort: 'nombre' | 'destino' | 'precio' | 'reservas' = 'nombre';
 
   isLoadingHoteles = signal(false);
@@ -189,6 +192,10 @@ export class AdminDashboard implements OnInit {
     if (tab === 'hoteles') {
       this.resetHotelPagination();
     }
+
+    if (tab === 'reservas') {
+      this.resetReservaPagination();
+    }
   }
 
   loadUsuarios(): void {
@@ -221,10 +228,12 @@ export class AdminDashboard implements OnInit {
     this.adminService.getReservas().subscribe({
       next: (reservas) => {
         this.reservas.set(reservas || []);
+        this.resetReservaPagination();
       },
       error: (err) => {
         console.error('Error cargando reservas', err);
         this.reservas.set([]);
+        this.resetReservaPagination();
       },
     });
   }
@@ -336,6 +345,10 @@ export class AdminDashboard implements OnInit {
     this.destinoPage.set(1);
   }
 
+  resetReservasPagination(): void {
+    this.resetReservaPagination();
+  }
+
   previousDestinoPage(): void {
     if (this.destinoPage() > 1) {
       this.destinoPage.update((page) => page - 1);
@@ -430,6 +443,40 @@ export class AdminDashboard implements OnInit {
 
       return matchesSearch && matchesStatus;
     });
+  }
+
+  get paginatedReservas(): ReservaAdminResponse[] {
+    const start = (this.reservaPage() - 1) * this.reservaPageSize;
+    return this.filteredReservas.slice(start, start + this.reservaPageSize);
+  }
+
+  get totalReservaPages(): number {
+    return Math.max(1, Math.ceil(this.filteredReservas.length / this.reservaPageSize));
+  }
+
+  get reservaPageStart(): number {
+    if (this.filteredReservas.length === 0) return 0;
+    return (this.reservaPage() - 1) * this.reservaPageSize + 1;
+  }
+
+  get reservaPageEnd(): number {
+    return Math.min(this.reservaPage() * this.reservaPageSize, this.filteredReservas.length);
+  }
+
+  resetReservaPagination(): void {
+    this.reservaPage.set(1);
+  }
+
+  previousReservaPage(): void {
+    if (this.reservaPage() > 1) {
+      this.reservaPage.update((page) => page - 1);
+    }
+  }
+
+  nextReservaPage(): void {
+    if (this.reservaPage() < this.totalReservaPages) {
+      this.reservaPage.update((page) => page + 1);
+    }
   }
 
   get totalRevenue(): number {
@@ -929,7 +976,6 @@ export class AdminDashboard implements OnInit {
   closeNotice(): void {
     this.noticeModal.set(null);
   }
-
 
   getPaginatedUserReservations(detail: AdminUserDetailDTO | null | undefined): any[] {
     const reservas = this.getUserReservations(detail);

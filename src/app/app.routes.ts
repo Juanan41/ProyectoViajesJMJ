@@ -1,7 +1,3 @@
-// ProyectoViajesJMJ - app.routes.ts
-// Responsabilidad: estructura global de navegacion, layout y composicion de la aplicacion.
-// Nota profesional: Forma parte de la estructura base de la aplicacion y se renderiza en multiples pantallas.
-
 import { Routes } from '@angular/router';
 import { Home } from './pages/home/home';
 import { Continents } from './pages/continents/continents';

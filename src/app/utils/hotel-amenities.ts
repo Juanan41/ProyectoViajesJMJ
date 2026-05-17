@@ -1,7 +1,3 @@
-// ProyectoViajesJMJ - utils\hotel-amenities.ts
-// Responsabilidad: catalogo de alojamientos, habitaciones y detalle hotelero.
-// Nota profesional: Representa el catalogo hotelero, sus habitaciones y las opciones que se pueden reservar.
-
 import {
   Wifi,
   Coffee,
@@ -15,9 +11,6 @@ import {
   Eye,
 } from 'lucide-angular';
 
-/**
- * Contrato publico usado por componentes y servicios relacionados.
- */
 export type AmenityKey =
   | 'wifi'
   | 'breakfast'
@@ -30,16 +23,9 @@ export type AmenityKey =
   | 'restaurant'
   | 'views';
 
-/**
- * Contrato publico usado por componentes y servicios relacionados.
- */
 export type HotelFilters = {
   maxPrice: number;
 } & Record<AmenityKey, boolean>;
-
-/**
- * Contrato publico usado por componentes y servicios relacionados.
- */
 export interface AmenityOption {
   key: AmenityKey;
   label: string;

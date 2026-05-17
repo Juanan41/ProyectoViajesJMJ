@@ -1,8 +1,4 @@
-// ProyectoViajesJMJ - pages\search-results\search-results.ts
-// Responsabilidad: catalogo de destinos, navegacion geografica y busqueda.
-// Nota profesional: Soporta navegacion por destinos, paises, continentes y busqueda bilingue.
-
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
@@ -18,12 +14,8 @@ import {
 import { DestinoDTO, DestinoService } from '../../services/destino.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
-type SortOption = 'relevance' | 'priceAsc' | 'priceDesc' | 'nameAsc';
+type SortOption = 'relevance' | 'price-asc' | 'price-desc' | 'rating-desc' | 'name-asc';
 
-/**
- * Documento profesional: clase principal del archivo.
- * Soporta navegacion por destinos, paises, continentes y busqueda bilingue.
- */
 @Component({
   selector: 'app-search-results',
   standalone: true,
@@ -44,52 +36,24 @@ export class SearchResults implements OnInit {
   query = signal('');
   results = signal<DestinoDTO[]>([]);
   isLoading = signal(true);
-  showFilters = signal(false);
 
-  filters = {
-    maxPrice: 5000,
-    continentId: 0,
-    sort: 'relevance' as SortOption,
-  };
+  maxPrice: number | null = null;
+  sortBy: SortOption = 'relevance';
 
-  readonly continentes = [
-    { id: 0, name: 'Todos los continentes' },
-    { id: 1, name: 'Europa' },
-    { id: 2, name: 'Asia' },
-    { id: 3, name: 'África' },
-    { id: 4, name: 'América del Norte' },
-    { id: 5, name: 'América del Sur' },
-    { id: 6, name: 'Oceanía' },
-  ];
-
-  filteredResults = computed(() => {
-    const filtered = this.results().filter((item) => {
-      const price = this.getPrice(item);
-      const matchesPrice = price <= this.filters.maxPrice;
-      const matchesContinent =
-        this.filters.continentId === 0 || Number(item.continenteId) === this.filters.continentId;
-
-      return matchesPrice && matchesContinent;
-    });
-
-    return [...filtered].sort((a, b) => {
-      if (this.filters.sort === 'priceAsc') return this.getPrice(a) - this.getPrice(b);
-      if (this.filters.sort === 'priceDesc') return this.getPrice(b) - this.getPrice(a);
-      if (this.filters.sort === 'nameAsc') return (a.nombre || '').localeCompare(b.nombre || '');
-      return 0;
-    });
-  });
-
-  ngOnInit() {
+  ngOnInit(): void {
     this.route.queryParams.subscribe((params) => {
       const q = params['q'] || '';
+
       this.query.set(q);
+      this.maxPrice = null;
+      this.sortBy = 'relevance';
       this.performSearch(q);
     });
   }
 
-  performSearch(query: string) {
+  performSearch(query: string): void {
     this.isLoading.set(true);
+
     if (!query.trim()) {
       this.results.set([]);
       this.isLoading.set(false);
@@ -98,39 +62,64 @@ export class SearchResults implements OnInit {
 
     this.destinoService.searchDestinos(query).subscribe({
       next: (data) => {
-        this.results.set(data);
+        this.results.set(data || []);
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error('Error cargando resultados de búsqueda', err);
+        console.error('Error en la búsqueda:', err);
         this.results.set([]);
         this.isLoading.set(false);
       },
     });
   }
 
-  toggleFilters() {
-    this.showFilters.update((value) => !value);
+  get filteredResults(): DestinoDTO[] {
+    let filtered = [...this.results()];
+
+    const priceLimit = Number(this.maxPrice || 0);
+
+    if (priceLimit > 0) {
+      filtered = filtered.filter((item) => this.getDisplayPrice(item) <= priceLimit);
+    }
+
+    switch (this.sortBy) {
+      case 'price-asc':
+        return filtered.sort((a, b) => this.getDisplayPrice(a) - this.getDisplayPrice(b));
+
+      case 'price-desc':
+        return filtered.sort((a, b) => this.getDisplayPrice(b) - this.getDisplayPrice(a));
+
+      case 'rating-desc':
+        return filtered.sort((a, b) => this.getRating(b) - this.getRating(a));
+
+      case 'name-asc':
+        return filtered.sort((a, b) =>
+          String(a.nombre || '').localeCompare(String(b.nombre || ''), 'es'),
+        );
+
+      case 'relevance':
+      default:
+        return filtered;
+    }
   }
 
-  clearFilters() {
-    this.filters = {
-      maxPrice: 5000,
-      continentId: 0,
-      sort: 'relevance',
-    };
+  get hasActiveFilters(): boolean {
+    return Number(this.maxPrice || 0) > 0 || this.sortBy !== 'relevance';
   }
 
-  applyFilters() {
-    this.showFilters.set(false);
-  }
-
-  getPrice(item: DestinoDTO): number {
+  getDisplayPrice(item: DestinoDTO): number {
     return Number(item.precioPorNoche || item.precio || 0);
   }
 
+  getRating(item: DestinoDTO): number {
+    return Number(item.rating || item.estrellas || 5);
+  }
+
+  getImage(item: DestinoDTO): string {
+    return item.imagenUrl || item.imagen || 'assets/placeholder.jpg';
+  }
+
   getArray(length: number): any[] {
-    const safeLength = Math.max(3, Math.min(5, Math.round(Number(length || 0))));
-    return new Array(safeLength);
+    return new Array(Math.max(0, Math.round(length || 0)));
   }
 }

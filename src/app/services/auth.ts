@@ -1,16 +1,9 @@
-// ProyectoViajesJMJ - services\auth.ts
-// Responsabilidad: autenticacion, autorizacion y control de sesion.
-// Nota profesional: Gestiona autenticacion y sesion; los cambios aqui afectan al acceso de usuarios.
-
 import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Review } from '../data/destinations';
 import { environment } from '../../environments/environment';
 import { Observable, switchMap, tap, map, of } from 'rxjs';
 
-/**
- * Contrato publico usado por componentes y servicios relacionados.
- */
 export interface Card {
   id: string;
   last4: string;
@@ -18,9 +11,6 @@ export interface Card {
   expiry: string;
 }
 
-/**
- * Contrato publico usado por componentes y servicios relacionados.
- */
 export interface UserData {
   id: string;
   name: string;
@@ -31,10 +21,6 @@ export interface UserData {
   reviews?: Review[];
 }
 
-/**
- * Documento profesional: clase principal del archivo.
- * Gestiona autenticacion y sesion; los cambios aqui afectan al acceso de usuarios.
- */
 @Injectable({
   providedIn: 'root',
 })
@@ -50,7 +36,6 @@ export class Auth {
     this.restoreSession();
   }
 
-  // Tras autenticar, se refrescan perfil y saldo para que navbar/perfil usen la misma sesión.
   login(credentials: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/auth/login`, credentials).pipe(
       tap((response) => {
@@ -176,7 +161,6 @@ export class Auth {
       return of([]);
     }
 
-    // El backend modela la tarjeta como cuenta bancaria; aquí se adapta al formato visual.
     return this.http
       .get<any[]>(`${this.apiUrl}/cuentas/me`, {
         headers: this.getAuthHeaders(),
@@ -217,7 +201,6 @@ export class Auth {
       })
       .pipe(
         tap(() => {
-          // Por regla de negocio, al eliminar el método de pago se reinicia el saldo local.
           this.credits.set(0);
           this.updateUser({ saldo: 0 });
         }),
@@ -277,7 +260,6 @@ export class Auth {
     const token = localStorage.getItem('token');
     const storedUser = localStorage.getItem('user');
 
-    // Evita enseñar una sesión caducada antes de que el backend rechace la primera petición.
     if (token && this.isTokenExpired(token)) {
       this.logout();
       return;

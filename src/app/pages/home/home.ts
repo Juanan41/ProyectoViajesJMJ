@@ -1,17 +1,9 @@
-// ProyectoViajesJMJ - pages\home\home.ts
-// Responsabilidad: pieza de soporte usada por la aplicacion ProyectoViajesJMJ.
-// Nota profesional: Modulo de soporte del proyecto; revisar dependencias antes de cambiar su contrato publico.
-
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DestinoCarousel } from '../../components/destino-carousel/destino-carousel';
 import { DestinoService, DestinoDTO } from '../../services/destino.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
-/**
- * Documento profesional: clase principal del archivo.
- * Modulo de soporte del proyecto; revisar dependencias antes de cambiar su contrato publico.
- */
 @Component({
   selector: 'app-home',
   standalone: true,

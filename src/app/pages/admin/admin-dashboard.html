@@ -441,13 +441,19 @@
     @if (activeTab() === 'reservas') {
     <section class="bg-[rgb(33,36,37)] border border-white/10 rounded-3xl p-6">
       <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
-        <h2 class="text-2xl font-black">{{ 'Gestión de reservas' | translate }}</h2>
+        <div>
+          <h2 class="text-2xl font-black">{{ 'Gestión de reservas' | translate }}</h2>
+          <p class="text-gray-500 text-sm">
+            {{ filteredReservas.length }} {{ 'reservas encontradas' | translate }}
+          </p>
+        </div>
 
         <div class="flex flex-col sm:flex-row gap-3">
-          <input type="text" [(ngModel)]="reservaSearch" [placeholder]="'Buscar reserva' | translate"
+          <input type="text" [(ngModel)]="reservaSearch" (ngModelChange)="resetReservaPagination()"
+            [placeholder]="'Buscar reserva' | translate"
             class="bg-[rgb(23,25,25)] border border-white/10 rounded-xl py-3 px-4 text-sm outline-none focus:border-emerald-500" />
 
-          <select [(ngModel)]="reservaStatusFilter"
+          <select [(ngModel)]="reservaStatusFilter" (ngModelChange)="resetReservaPagination()"
             class="bg-[rgb(23,25,25)] border border-white/10 rounded-xl py-3 px-4 text-sm outline-none focus:border-emerald-500">
             <option value="ALL">{{ 'Todas' | translate }}</option>
             <option value="CONFIRMADA">{{ 'Confirmada' | translate }}</option>
@@ -473,7 +479,7 @@
           </thead>
 
           <tbody class="divide-y divide-white/10">
-            @for (reserva of filteredReservas; track reserva.id) {
+            @for (reserva of paginatedReservas; track reserva.id) {
             <tr class="hover:bg-white/[0.03]">
               <td class="p-4 font-bold">#{{ reserva.id }}</td>
               <td class="p-4">
@@ -510,6 +516,31 @@
           </tbody>
         </table>
       </div>
+
+      @if (filteredReservas.length > 0) {
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-6">
+        <p class="text-sm text-gray-500">
+          {{ 'Mostrando' | translate }} {{ reservaPageStart }} - {{ reservaPageEnd }}
+          {{ 'de' | translate }} {{ filteredReservas.length }}
+        </p>
+
+        <div class="flex items-center gap-3">
+          <button type="button" (click)="previousReservaPage()" [disabled]="reservaPage() === 1"
+            class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold uppercase tracking-widest">
+            {{ 'Anterior' | translate }}
+          </button>
+
+          <span class="text-sm text-gray-400">
+            {{ reservaPage() }} / {{ totalReservaPages }}
+          </span>
+
+          <button type="button" (click)="nextReservaPage()" [disabled]="reservaPage() === totalReservaPages"
+            class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold uppercase tracking-widest">
+            {{ 'Siguiente' | translate }}
+          </button>
+        </div>
+      </div>
+      }
     </section>
     }
   </div>

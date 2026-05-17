@@ -1,17 +1,9 @@
-// ProyectoViajesJMJ - pages\continents\continents.ts
-// Responsabilidad: catalogo de destinos, navegacion geografica y busqueda.
-// Nota profesional: Soporta navegacion por destinos, paises, continentes y busqueda bilingue.
-
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { LucideAngularModule, ChevronRight } from 'lucide-angular';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
-/**
- * Documento profesional: clase principal del archivo.
- * Soporta navegacion por destinos, paises, continentes y busqueda bilingue.
- */
 @Component({
   selector: 'app-continents',
   standalone: true,
@@ -26,37 +18,43 @@ export class Continents {
       id: 1,
       name: 'Europa',
       description: 'Descubre la historia, el arte y una cultura inigualable.',
-      image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?q=80&w=1600&auto=format&fit=crop',
+      image:
+        'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?q=80&w=1600&auto=format&fit=crop',
     },
     {
       id: 2,
       name: 'Asia',
       description: 'Explora maravillas ancestrales y ciudades vanguardistas.',
-      image: 'https://images.unsplash.com/photo-1464817739973-0128fe77aaa1?q=80&w=1600&auto=format&fit=crop',
+      image:
+        'https://images.unsplash.com/photo-1464817739973-0128fe77aaa1?q=80&w=1600&auto=format&fit=crop',
     },
     {
       id: 3,
       name: 'África',
       description: 'Naturaleza salvaje y paisajes únicos en el mundo.',
-      image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?q=80&w=1600&auto=format&fit=crop',
+      image:
+        'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?q=80&w=1600&auto=format&fit=crop',
     },
     {
       id: 4,
-      name: 'Oceanía',
-      description: 'Islas paradisíacas y aventuras increíbles.',
-      image: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?q=80&w=1600&auto=format&fit=crop',
+      name: 'América del Norte',
+      description: 'Ciudades icónicas y una gran diversidad natural.',
+      image:
+        'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?q=80&w=1600&auto=format&fit=crop',
     },
     {
       id: 5,
-      name: 'América del Norte',
-      description: 'Ciudades icónicas y una gran diversidad natural.',
-      image: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?q=80&w=1600&auto=format&fit=crop',
+      name: 'América del Sur',
+      description: 'Cultura vibrante, selvas y maravillas naturales.',
+      image:
+        'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?q=80&w=1600&auto=format&fit=crop',
     },
     {
       id: 6,
-      name: 'América del Sur',
-      description: 'Cultura vibrante, selvas y maravillas naturales.',
-      image: 'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?q=80&w=1600&auto=format&fit=crop',
+      name: 'Oceanía',
+      description: 'Islas paradisíacas y aventuras increíbles.',
+      image:
+        'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?q=80&w=1600&auto=format&fit=crop',
     },
   ];
 }

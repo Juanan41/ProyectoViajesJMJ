@@ -1,15 +1,8 @@
-// ProyectoViajesJMJ - services\opinion.service.ts
-// Responsabilidad: resenas de alojamientos y valoracion de experiencias.
-// Nota profesional: Gestiona resenas y valoraciones asociadas a alojamientos y usuarios autenticados.
-
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
-/**
- * Contrato publico usado por componentes y servicios relacionados.
- */
 export interface OpinionDTO {
   id: number;
   alojamientoId: number;
@@ -22,18 +15,11 @@ export interface OpinionDTO {
   fechaOpinion: string;
 }
 
-/**
- * Contrato publico usado por componentes y servicios relacionados.
- */
 export interface CreateOpinionDTO {
   puntuacion: number;
   comentario: string;
 }
 
-/**
- * Documento profesional: clase principal del archivo.
- * Gestiona resenas y valoraciones asociadas a alojamientos y usuarios autenticados.
- */
 @Injectable({
   providedIn: 'root',
 })

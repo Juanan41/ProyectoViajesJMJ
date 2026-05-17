@@ -20,7 +20,6 @@ function processFile(filePath) {
   let content = fs.readFileSync(filePath, 'utf8');
   let changed = false;
 
-  // 1. Fix malformed translations like "Text | translate" inside tags
   content = content.replace(/>([^<>{}]+?)\|\s*translate\s*</g, (match, text) => {
     const cleanText = text.trim();
     stringsFound.add(cleanText);
@@ -28,24 +27,19 @@ function processFile(filePath) {
     return match.replace(text + '| translate', `{{ '${cleanText}' | translate }}`);
   });
 
-  // 2. Find plain text between HTML tags
   content = content.replace(/>([^<>{}]+?)</g, (match, text) => {
     const trimmed = text.trim();
 
-    // Skip empty, pure whitespace, pure numbers/symbols
-    // Skip if already translated or empty
     if (
       trimmed.length > 1 &&
       /[a-zA-ZáéíóúÁÉÍÓÚñÑ¿¡]/.test(trimmed) &&
       !trimmed.includes('{{') &&
       !trimmed.includes('}}')
     ) {
-      // Skip angular special template syntax like @if, @for
       if (trimmed.startsWith('@')) return match;
 
       stringsFound.add(trimmed);
       changed = true;
-      // Preserve original whitespace around the text
       return match.replace(trimmed, `{{ '${trimmed.replace(/'/g, "\\'")}' | translate }}`);
     }
     return match;
@@ -59,7 +53,6 @@ function processFile(filePath) {
 
 console.log('Scanning HTML files for raw text...\n');
 
-// Start processing
 const pagesDir = path.join(__dirname, 'src', 'app', 'pages');
 const componentsDir = path.join(__dirname, 'src', 'app', 'components');
 const layoutDir = path.join(__dirname, 'src', 'app', 'layout');
@@ -70,7 +63,6 @@ const layoutDir = path.join(__dirname, 'src', 'app', 'layout');
   }
 });
 
-// Output the strings found so they can be added to translation.ts
 console.log('\n======================================================');
 console.log('      NEW STRINGS FOUND (Copy to translation.ts)      ');
 console.log('======================================================\n');

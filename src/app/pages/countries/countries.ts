@@ -1,7 +1,3 @@
-// ProyectoViajesJMJ - pages\countries\countries.ts
-// Responsabilidad: catalogo de destinos, navegacion geografica y busqueda.
-// Nota profesional: Soporta navegacion por destinos, paises, continentes y busqueda bilingue.
-
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
@@ -9,10 +5,6 @@ import { LucideAngularModule, ArrowLeft, MapPin, ArrowRight, ChevronRight } from
 import { DestinoService, DestinoDTO } from '../../services/destino.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
-/**
- * Documento profesional: clase principal del archivo.
- * Soporta navegacion por destinos, paises, continentes y busqueda bilingue.
- */
 @Component({
   selector: 'app-countries',
   standalone: true,
@@ -56,9 +48,9 @@ export class Countries implements OnInit {
             europe: 1,
             asia: 2,
             africa: 3,
-            oceania: 4,
-            'north-america': 5,
-            'south-america': 6,
+            'north-america': 4,
+            'south-america': 5,
+            oceania: 6,
           };
 
           numericId = mapStr[id.toLowerCase()] || 1;
@@ -78,37 +70,43 @@ export class Countries implements OnInit {
         id: 1,
         name: 'Europa',
         description: 'Descubre la historia, el arte y una cultura inigualable.',
-        image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?q=80&w=1600&auto=format&fit=crop',
+        image:
+          'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?q=80&w=1600&auto=format&fit=crop',
       },
       '2': {
         id: 2,
         name: 'Asia',
         description: 'Explora maravillas ancestrales y ciudades vanguardistas.',
-        image: 'https://images.unsplash.com/photo-1464817739973-0128fe77aaa1?q=80&w=1600&auto=format&fit=crop',
+        image:
+          'https://images.unsplash.com/photo-1464817739973-0128fe77aaa1?q=80&w=1600&auto=format&fit=crop',
       },
       '3': {
         id: 3,
         name: 'África',
         description: 'Naturaleza salvaje y paisajes únicos en el mundo.',
-        image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?q=80&w=1600&auto=format&fit=crop',
+        image:
+          'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?q=80&w=1600&auto=format&fit=crop',
       },
       '4': {
         id: 4,
-        name: 'Oceanía',
-        description: 'Islas paradisíacas y aventuras increíbles.',
-        image: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?q=80&w=1600&auto=format&fit=crop',
+        name: 'América del Norte',
+        description: 'Ciudades icónicas y una gran diversidad natural.',
+        image:
+          'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?q=80&w=1600&auto=format&fit=crop',
       },
       '5': {
         id: 5,
-        name: 'América del Norte',
-        description: 'Ciudades icónicas y una gran diversidad natural.',
-        image: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?q=80&w=1600&auto=format&fit=crop',
+        name: 'América del Sur',
+        description: 'Cultura vibrante, selvas y maravillas naturales.',
+        image:
+          'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?q=80&w=1600&auto=format&fit=crop',
       },
       '6': {
         id: 6,
-        name: 'América del Sur',
-        description: 'Cultura vibrante, selvas y maravillas naturales.',
-        image: 'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?q=80&w=1600&auto=format&fit=crop',
+        name: 'Oceanía',
+        description: 'Islas paradisíacas y aventuras increíbles.',
+        image:
+          'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?q=80&w=1600&auto=format&fit=crop',
       },
     };
 
@@ -206,6 +204,9 @@ export class Countries implements OnInit {
       Suecia: 'SE',
       Islandia: 'IS',
       Bélgica: 'BE',
+      Suiza: 'CH',
+      Polonia: 'PL',
+      Irlanda: 'IE',
 
       Japón: 'JP',
       China: 'CN',
@@ -213,21 +214,48 @@ export class Countries implements OnInit {
       Tailandia: 'TH',
       India: 'IN',
       'Corea del Sur': 'KR',
+      Qatar: 'QA',
+      Vietnam: 'VN',
+      Indonesia: 'ID',
+      Nepal: 'NP',
+      Filipinas: 'PH',
+      Israel: 'IL',
+      Malasia: 'MY',
+      Singapur: 'SG',
+      Turquía: 'TR',
 
       Egipto: 'EG',
       Marruecos: 'MA',
       Sudáfrica: 'ZA',
       Kenia: 'KE',
       Tanzania: 'TZ',
-
-      Australia: 'AU',
-      'Nueva Zelanda': 'NZ',
-      Fiyi: 'FJ',
-      'Polinesia Francesa': 'PF',
+      Nigeria: 'NG',
+      Ruanda: 'RW',
+      Senegal: 'SN',
+      Mauricio: 'MU',
+      Namibia: 'NA',
+      Túnez: 'TN',
+      Argelia: 'DZ',
+      Etiopía: 'ET',
+      Ghana: 'GH',
+      Seychelles: 'SC',
 
       'Estados Unidos': 'US',
       México: 'MX',
       Canadá: 'CA',
+      Bahamas: 'BS',
+      Belice: 'BZ',
+      Cuba: 'CU',
+      'El Salvador': 'SV',
+      Guatemala: 'GT',
+      Honduras: 'HN',
+      Panamá: 'PA',
+      'Puerto Rico': 'PR',
+      'República Dominicana': 'DO',
+      Curazao: 'CW',
+      'Costa Rica': 'CR',
+      Jamaica: 'JM',
+      Nicaragua: 'NI',
 
       Argentina: 'AR',
       Brasil: 'BR',
@@ -235,6 +263,30 @@ export class Countries implements OnInit {
       Perú: 'PE',
       Chile: 'CL',
       Uruguay: 'UY',
+      Aruba: 'AW',
+      Bolivia: 'BO',
+      Ecuador: 'EC',
+      Paraguay: 'PY',
+      Venezuela: 'VE',
+      Guyana: 'GY',
+      'Guayana Francesa': 'GF',
+      Surinam: 'SR',
+
+      Australia: 'AU',
+      'Nueva Zelanda': 'NZ',
+      Fiyi: 'FJ',
+      'Polinesia Francesa': 'PF',
+      Samoa: 'WS',
+      Tonga: 'TO',
+      Vanuatu: 'VU',
+      Kiribati: 'KI',
+      Micronesia: 'FM',
+      Guam: 'GU',
+      'Islas Cook': 'CK',
+      'Islas Salomón': 'SB',
+      'Papúa Nueva Guinea': 'PG',
+      'Nueva Caledonia': 'NC',
+      Palaos: 'PW',
     };
 
     return map[pais] || 'UN';
@@ -242,21 +294,36 @@ export class Countries implements OnInit {
 
   private getCountryImage(pais: string, fallback?: string): string {
     const map: Record<string, string> = {
-      España: 'https://images.unsplash.com/photo-1543783207-ec64e4d95325?q=80&w=1600&auto=format&fit=crop',
-      Francia: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=1600&auto=format&fit=crop',
-      Italia: 'https://images.unsplash.com/photo-1529260830199-42c24126f198?q=80&w=1600&auto=format&fit=crop',
-      'Reino Unido': 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=1600&auto=format&fit=crop',
-      Grecia: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?q=80&w=1600&auto=format&fit=crop',
-      Austria: 'https://images.unsplash.com/photo-1516550893923-42d28e5677af?q=80&w=1600&auto=format&fit=crop',
-      Portugal: 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?q=80&w=1600&auto=format&fit=crop',
-      'República Checa': 'https://images.unsplash.com/photo-1519677100203-a0e668c92439?q=80&w=1600&auto=format&fit=crop',
-      Hungría: 'https://images.unsplash.com/photo-1549877452-9c387954fbc2?q=80&w=1600&auto=format&fit=crop',
-      'Países Bajos': 'https://images.unsplash.com/photo-1512470876302-972faa2aa9a4?q=80&w=1600&auto=format&fit=crop',
-      Croacia: 'https://images.unsplash.com/photo-1555990538-c48dbe0d6f4b?q=80&w=1600&auto=format&fit=crop',
-      Dinamarca: 'https://images.unsplash.com/photo-1513622470522-26c3c8a854bc?q=80&w=1600&auto=format&fit=crop',
-      Suecia: 'https://images.unsplash.com/photo-1509356843151-3e7d96241e11?q=80&w=1600&auto=format&fit=crop',
-      Islandia: 'https://images.unsplash.com/photo-1504893524553-b855bce32c67?q=80&w=1600&auto=format&fit=crop',
-      Bélgica: 'https://images.unsplash.com/photo-1491557345352-5929e343eb89?q=80&w=1600&auto=format&fit=crop',
+      España:
+        'https://images.unsplash.com/photo-1543783207-ec64e4d95325?q=80&w=1600&auto=format&fit=crop',
+      Francia:
+        'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=1600&auto=format&fit=crop',
+      Italia:
+        'https://images.unsplash.com/photo-1529260830199-42c24126f198?q=80&w=1600&auto=format&fit=crop',
+      'Reino Unido':
+        'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=1600&auto=format&fit=crop',
+      Grecia:
+        'https://images.unsplash.com/photo-1533105079780-92b9be482077?q=80&w=1600&auto=format&fit=crop',
+      Austria:
+        'https://images.unsplash.com/photo-1516550893923-42d28e5677af?q=80&w=1600&auto=format&fit=crop',
+      Portugal:
+        'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?q=80&w=1600&auto=format&fit=crop',
+      'República Checa':
+        'https://images.unsplash.com/photo-1519677100203-a0e668c92439?q=80&w=1600&auto=format&fit=crop',
+      Hungría:
+        'https://images.unsplash.com/photo-1549877452-9c387954fbc2?q=80&w=1600&auto=format&fit=crop',
+      'Países Bajos':
+        'https://images.unsplash.com/photo-1512470876302-972faa2aa9a4?q=80&w=1600&auto=format&fit=crop',
+      Croacia:
+        'https://images.unsplash.com/photo-1555990538-c48dbe0d6f4b?q=80&w=1600&auto=format&fit=crop',
+      Dinamarca:
+        'https://images.unsplash.com/photo-1513622470522-26c3c8a854bc?q=80&w=1600&auto=format&fit=crop',
+      Suecia:
+        'https://images.unsplash.com/photo-1509356843151-3e7d96241e11?q=80&w=1600&auto=format&fit=crop',
+      Islandia:
+        'https://images.unsplash.com/photo-1504893524553-b855bce32c67?q=80&w=1600&auto=format&fit=crop',
+      Bélgica:
+        'https://images.unsplash.com/photo-1491557345352-5929e343eb89?q=80&w=1600&auto=format&fit=crop',
     };
 
     return map[pais] || fallback || 'assets/placeholder.jpg';

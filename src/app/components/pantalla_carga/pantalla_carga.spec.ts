@@ -1,23 +1,18 @@
-// ProyectoViajesJMJ - components\pantalla_carga\pantalla_carga.spec.ts
-// Responsabilidad: pruebas automatizadas que protegen el comportamiento esperado de este modulo.
-// Nota profesional: Define pruebas de regresion para que los cambios futuros mantengan el contrato del modulo.
-
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { PantallaCargaComponent } from './pantalla_carga';
 
-import { LoadingOverlay } from './loading-overlay';
-
-describe('LoadingOverlay', () => {
-  let component: LoadingOverlay;
-  let fixture: ComponentFixture<LoadingOverlay>;
+describe('PantallaCargaComponent', () => {
+  let component: PantallaCargaComponent;
+  let fixture: ComponentFixture<PantallaCargaComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LoadingOverlay],
+      imports: [PantallaCargaComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(LoadingOverlay);
+    fixture = TestBed.createComponent(PantallaCargaComponent);
     component = fixture.componentInstance;
-    await fixture.whenStable();
+    fixture.detectChanges();
   });
 
   it('should create', () => {
