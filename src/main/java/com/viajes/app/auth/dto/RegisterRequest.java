@@ -1,13 +1,6 @@
-// ProyectoViajesJMJ - com/viajes/app/auth/dto/RegisterRequest.java
-// Responsabilidad: autenticacion, autorizacion y control de sesion.
-// Nota profesional: Gestiona autenticacion y sesion; los cambios aqui afectan al acceso de usuarios.
-
 package com.viajes.app.auth.dto;
 
-/**
- * Documento profesional: clase principal del archivo.
- * Gestiona autenticacion y sesion; los cambios aqui afectan al acceso de usuarios.
- */
+
 public class RegisterRequest {
 
     private String username;

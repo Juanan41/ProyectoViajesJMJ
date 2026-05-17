@@ -1,15 +1,7 @@
-// ProyectoViajesJMJ - com/viajes/app/cuentas/dto/CuentaBancariaResponseDto.java
-// Responsabilidad: gestion de saldo y datos bancarios del usuario.
-// Nota profesional: Agrupa datos bancarios y saldo visible; mantener validaciones alineadas con backend.
-
 package com.viajes.app.cuentas.dto;
 
 import java.time.LocalDateTime;
 
-/**
- * Documento profesional: clase principal del archivo.
- * Agrupa datos bancarios y saldo visible; mantener validaciones alineadas con backend.
- */
 public class CuentaBancariaResponseDto {
 
     private Long id;

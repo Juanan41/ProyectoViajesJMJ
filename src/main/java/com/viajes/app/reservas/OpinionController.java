@@ -1,6 +1,3 @@
-// ProyectoViajesJMJ - com/viajes/app/reservas/OpinionController.java
-// Responsabilidad: flujo de reservas, viajes y estados asociados.
-// Nota profesional: Contiene reglas de reserva, estados de viaje y datos usados por tickets/recibos/perfil.
 
 package com.viajes.app.reservas;
 
@@ -10,10 +7,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-/**
- * Documento profesional: clase principal del archivo.
- * Contiene reglas de reserva, estados de viaje y datos usados por tickets/recibos/perfil.
- */
 
 @RestController
 @RequestMapping("/api/opiniones")

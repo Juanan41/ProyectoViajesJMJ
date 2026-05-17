@@ -1,7 +1,3 @@
-// ProyectoViajesJMJ - com/viajes/app/auth/AuthController.java
-// Responsabilidad: autenticacion, autorizacion y control de sesion.
-// Nota profesional: Gestiona autenticacion y sesion; los cambios aqui afectan al acceso de usuarios.
-
 package com.viajes.app.auth;
 
 import com.viajes.app.auth.dto.LoginRequest;
@@ -13,10 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
-/**
- * Documento profesional: clase principal del archivo.
- * Gestiona autenticacion y sesion; los cambios aqui afectan al acceso de usuarios.
- */
 
 @RestController
 @RequestMapping("/api/auth")

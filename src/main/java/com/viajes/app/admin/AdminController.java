@@ -1,6 +1,3 @@
-// ProyectoViajesJMJ - com/viajes/app/admin/AdminController.java
-// Responsabilidad: funciones del panel de administracion y gestion operativa.
-// Nota profesional: Centraliza operaciones sensibles del panel admin; revisar permisos y borrados antes de modificar.
 
 package com.viajes.app.admin;
 
@@ -39,10 +36,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-/**
- * Documento profesional: clase principal del archivo.
- * Centraliza operaciones sensibles del panel admin; revisar permisos y borrados antes de modificar.
- */
+
 
 @RestController
 @RequestMapping("/api/admin")
@@ -89,7 +83,6 @@ public class AdminController {
     @GetMapping("/usuarios/{id}/detalle")
     @Transactional(readOnly = true)
     public Map<String, Object> obtenerDetalleUsuario(@PathVariable Long id) {
-        // La ficha admin agrupa datos dispersos para evitar varias llamadas desde el modal.
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
 
@@ -232,6 +225,7 @@ public class AdminController {
     @PutMapping("/usuarios/{id}")
     @Transactional
     public Map<String, Object> actualizarUsuario(@PathVariable Long id, @RequestBody Map<String, Object> request) {
+
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
 
@@ -282,7 +276,6 @@ public class AdminController {
     @DeleteMapping("/usuarios/{id}")
     @Transactional
     public Map<String, Object> eliminarUsuario(@PathVariable Long id) {
-        // Borrado físico controlado: primero dependencias directas, después el usuario.
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
 
@@ -406,7 +399,6 @@ public class AdminController {
     }
 
     private void rellenarDestino(Destino destino, Map<String, Object> request, boolean creando) {
-        // Centraliza la validación para que crear y editar destino mantengan el mismo contrato.
         String nombre = getString(request, "nombre");
         String descripcion = getString(request, "descripcion");
         String pais = getString(request, "pais");
@@ -753,6 +745,7 @@ public class AdminController {
 
     private DestinoDTO toDestinoResponse(Destino destino) {
         String continente = destino.getContinente() != null ? destino.getContinente().getNombre() : "";
+        Long continenteId = destino.getContinente() != null ? destino.getContinente().getId() : null;
 
         return new DestinoDTO(
                 destino.getId(),
@@ -761,6 +754,7 @@ public class AdminController {
                 destino.getPrecio(),
                 destino.getPais(),
                 continente,
+                continenteId,
                 destino.getImagen()
         );
     }

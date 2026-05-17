@@ -1,6 +1,3 @@
-// ProyectoViajesJMJ - com/viajes/app/users/SaldoRestController.java
-// Responsabilidad: gestion de saldo y datos bancarios del usuario.
-// Nota profesional: Agrupa datos bancarios y saldo visible; mantener validaciones alineadas con backend.
 
 package com.viajes.app.users;
 
@@ -11,10 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.Map;
-/**
- * Documento profesional: clase principal del archivo.
- * Agrupa datos bancarios y saldo visible; mantener validaciones alineadas con backend.
- */
+
 
 @RestController
 @RequestMapping("/api/saldo")

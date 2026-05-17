@@ -1,7 +1,3 @@
-// ProyectoViajesJMJ - com/viajes/app/reservas/OpinionService.java
-// Responsabilidad: flujo de reservas, viajes y estados asociados.
-// Nota profesional: Contiene reglas de reserva, estados de viaje y datos usados por tickets/recibos/perfil.
-
 package com.viajes.app.reservas;
 
 import com.viajes.app.alojamientos.Alojamiento;
@@ -17,10 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-/**
- * Documento profesional: clase principal del archivo.
- * Contiene reglas de reserva, estados de viaje y datos usados por tickets/recibos/perfil.
- */
+
 
 @Service
 public class OpinionService {

@@ -1,14 +1,6 @@
-// ProyectoViajesJMJ - com/viajes/app/destinos/dto/DestinoDTO.java
-// Responsabilidad: catalogo de destinos, navegacion geografica y busqueda.
-// Nota profesional: Soporta navegacion por destinos, paises, continentes y busqueda bilingue.
-
 package com.viajes.app.destinos.dto;
 
 
-/**
- * Documento profesional: clase principal del archivo.
- * Soporta navegacion por destinos, paises, continentes y busqueda bilingue.
- */
 public class DestinoDTO {
 
     private Long id;
@@ -18,18 +10,20 @@ public class DestinoDTO {
 
     private String pais;
     private String continente;
+    private Long continenteId;
     private String imagen;
 
     public DestinoDTO() {}
 
     public DestinoDTO(Long id, String nombre, String descripcion, Double precio,
-                      String pais, String continente, String imagen) {
+                      String pais, String continente, Long continenteId, String imagen) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.precio = precio;
         this.pais = pais;
         this.continente = continente;
+        this.continenteId = continenteId;
         this.imagen = imagen;
     }
 
@@ -51,6 +45,9 @@ public class DestinoDTO {
 
     public String getContinente() { return continente; }
     public void setContinente(String continente) { this.continente = continente; }
+
+    public Long getContinenteId() { return continenteId; }
+    public void setContinenteId(Long continenteId) { this.continenteId = continenteId; }
 
     public String getImagen() { return imagen; }
     public void setImagen(String imagen) { this.imagen = imagen; }

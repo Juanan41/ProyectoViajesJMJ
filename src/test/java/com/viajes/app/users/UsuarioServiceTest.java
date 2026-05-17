@@ -1,7 +1,3 @@
-// ProyectoViajesJMJ - com/viajes/app/users/UsuarioServiceTest.java
-// Responsabilidad: pruebas automatizadas que protegen el comportamiento esperado de este modulo.
-// Nota profesional: Define pruebas de regresion para que los cambios futuros mantengan el contrato del modulo.
-
 package com.viajes.app.users;
 
 import org.junit.jupiter.api.Test;

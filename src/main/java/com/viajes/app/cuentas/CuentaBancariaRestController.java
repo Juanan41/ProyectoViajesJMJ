@@ -1,7 +1,3 @@
-// ProyectoViajesJMJ - com/viajes/app/cuentas/CuentaBancariaRestController.java
-// Responsabilidad: gestion de saldo y datos bancarios del usuario.
-// Nota profesional: Agrupa datos bancarios y saldo visible; mantener validaciones alineadas con backend.
-
 package com.viajes.app.cuentas;
 
 import com.viajes.app.cuentas.dto.CuentaBancariaRequestDto;
@@ -9,10 +5,6 @@ import com.viajes.app.cuentas.dto.CuentaBancariaResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-/**
- * Documento profesional: clase principal del archivo.
- * Agrupa datos bancarios y saldo visible; mantener validaciones alineadas con backend.
- */
 
 @RestController
 @RequestMapping("/api/cuentas")

@@ -1,15 +1,8 @@
-// ProyectoViajesJMJ - com/viajes/app/reservas/dto/ReservaRequestDto.java
-// Responsabilidad: flujo de reservas, viajes y estados asociados.
-// Nota profesional: Contiene reglas de reserva, estados de viaje y datos usados por tickets/recibos/perfil.
-
 package com.viajes.app.reservas.dto;
 
 import java.time.LocalDate;
 
-/**
- * Documento profesional: clase principal del archivo.
- * Contiene reglas de reserva, estados de viaje y datos usados por tickets/recibos/perfil.
- */
+
 public class ReservaRequestDto {
 
     private Long habitacionId;

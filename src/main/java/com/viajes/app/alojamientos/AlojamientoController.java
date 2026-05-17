@@ -39,6 +39,8 @@ public class AlojamientoController {
 
     @GetMapping
     public List<Map<String, Object>> listarAlojamientos() {
+        // Devuelve hoteles enriquecidos con rating real de opiniones para que las estrellas
+        // representen la media de reseñas y no un valor fijo.
         List<Alojamiento> alojamientos = alojamientoService.obtenerTodos();
         Map<Long, RatingStats> ratingStats = getRatingStats(alojamientos);
 
@@ -94,6 +96,8 @@ public class AlojamientoController {
     }
 
     private Map<String, Object> convertirADto(Alojamiento alojamiento, RatingStats ratingStats) {
+        // Se construye un mapa plano pensado para Angular: evita ciclos JPA y agrupa campos
+        // equivalentes (`precio`, `precioPorNoche`, `rating`, `estrellas`) que usan varias vistas.
         Map<String, Object> dto = new LinkedHashMap<>();
 
         dto.put("id", alojamiento.getId());
@@ -124,6 +128,8 @@ public class AlojamientoController {
     }
 
     private void agregarComodidades(Map<String, Object> dto, Alojamiento alojamiento) {
+        // Comodidades derivadas para filtros visuales. Son atributos de catalogo, no reglas
+        // de reserva, por lo que se calculan aqui junto con el DTO del hotel.
         TipoAlojamiento tipo = alojamiento.getTipo();
         Long id = alojamiento.getId() == null ? 0L : alojamiento.getId();
 
@@ -140,6 +146,7 @@ public class AlojamientoController {
     }
 
     private Map<Long, RatingStats> getRatingStats(List<Alojamiento> alojamientos) {
+        // Calcula medias de reseñas en bloque para evitar una consulta por hotel.
         List<Long> ids = alojamientos.stream()
                 .map(Alojamiento::getId)
                 .filter(id -> id != null)

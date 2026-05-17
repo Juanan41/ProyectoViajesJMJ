@@ -39,6 +39,8 @@ public class AuthService {
 
     public LoginResponse login(LoginRequest request) {
 
+        // Mensajes concretos para campos vacios; credenciales incorrectas usan mensaje generico
+        // para no revelar si existe o no una cuenta con ese email.
         if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
@@ -72,6 +74,7 @@ public class AuthService {
 
         String token = jwtService.generateToken(usuario.getEmail());
 
+        // La respuesta expone rol y email para inicializar estado de frontend sin otra llamada.
         return new LoginResponse(
                 token,
                 "Bearer",
@@ -82,6 +85,8 @@ public class AuthService {
 
     public RegisterResponse register(RegisterRequest request) {
 
+        // Registro de usuario final: siempre crea USER y saldo cero. Los ADMIN demo se crean
+        // mediante seed controlado, nunca desde este formulario publico.
         if (request.getUsername() == null || request.getUsername().trim().isEmpty()) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,

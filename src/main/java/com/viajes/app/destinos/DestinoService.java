@@ -1,7 +1,3 @@
-// ProyectoViajesJMJ - com/viajes/app/destinos/DestinoService.java
-// Responsabilidad: catalogo de destinos, navegacion geografica y busqueda.
-// Nota profesional: Soporta navegacion por destinos, paises, continentes y busqueda bilingue.
-
 package com.viajes.app.destinos;
 
 import com.viajes.app.api.UnsplashService;
@@ -11,10 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-/**
- * Documento profesional: clase principal del archivo.
- * Soporta navegacion por destinos, paises, continentes y busqueda bilingue.
- */
 
 @Service
 public class DestinoService {
@@ -99,6 +91,7 @@ public class DestinoService {
     }
 
     private void validarDestino(DestinoDTO dto) {
+
         if (dto == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Datos del destino inválidos");
         }
@@ -135,6 +128,7 @@ public class DestinoService {
     }
 
     private DestinoDTO mapToDto(Destino destino) {
+
         String imagen = destino.getImagen();
 
         if (imagen == null || imagen.isEmpty()) {
@@ -148,6 +142,7 @@ public class DestinoService {
                 destino.getPrecio(),
                 destino.getPais(),
                 destino.getContinente() != null ? destino.getContinente().getNombre() : "",
+                destino.getContinente() != null ? destino.getContinente().getId() : null,
                 imagen
         );
     }

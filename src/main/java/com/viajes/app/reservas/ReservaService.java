@@ -1,6 +1,3 @@
-// ProyectoViajesJMJ - com/viajes/app/reservas/ReservaService.java
-// Responsabilidad: flujo de reservas, viajes y estados asociados.
-// Nota profesional: Contiene reglas de reserva, estados de viaje y datos usados por tickets/recibos/perfil.
 
 package com.viajes.app.reservas;
 
@@ -25,10 +22,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
-/**
- * Documento profesional: clase principal del archivo.
- * Contiene reglas de reserva, estados de viaje y datos usados por tickets/recibos/perfil.
- */
 
 @Service
 public class ReservaService {
@@ -53,7 +46,6 @@ public class ReservaService {
     @Transactional
     public ReservaResponseDto crearReserva(ReservaRequestDto dto, String emailUsuario) {
 
-        // La reserva se valida de nuevo en servidor aunque el frontend ya filtre opciones.
         Usuario usuario = usuarioRepository.findByEmail(emailUsuario)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
 
@@ -99,7 +91,6 @@ public class ReservaService {
             );
         }
 
-        // Precio canónico: habitación por noche y huésped, más el coste fijo del transporte elegido.
         double transporteCoste = getTransporteCoste(transporte);
         double precioTotal = (habitacion.getPrecioPorNoche() * noches * huespedes) + transporteCoste;
         BigDecimal precioTotalSaldo = BigDecimal.valueOf(precioTotal);
@@ -121,7 +112,6 @@ public class ReservaService {
 
         Reserva guardada = reservaRepository.save(reserva);
 
-        // El saldo se descuenta dentro de la misma transacción que crea la reserva confirmada.
         usuario.setSaldo(usuario.getSaldo().subtract(precioTotalSaldo));
         usuarioRepository.save(usuario);
 
@@ -154,6 +144,7 @@ public class ReservaService {
     }
 
     public ReservaResponseDto cancelarReserva(Long id, String emailUsuario) {
+
         Reserva reserva = reservaRepository.findByIdAndUsuarioEmail(id, emailUsuario)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reserva no encontrada"));
 
@@ -240,7 +231,6 @@ public class ReservaService {
     }
 
     private String getTransporteHora(Long id) {
-        // Datos deterministas de ticket: evitan guardar campos derivados y mantienen recibos estables.
         String[] horas = {"08:30", "10:15", "12:00", "16:45", "20:30", "22:10"};
         return horas[Math.floorMod(id != null ? id.intValue() : 0, horas.length)];
     }
@@ -271,8 +261,7 @@ public class ReservaService {
     }
 
     private boolean esHabitacionCompatible(Habitacion habitacion, int huespedes) {
-        // Regla de negocio: 1 cualquier capacidad suficiente; 2 doble/estándar-deluxe/suite/grupal;
-        // 3-4 suite o grupal; 5-8 solo grupal. La capacidad real se comprueba antes y aquí.
+
         int capacidad = habitacion.getCapacidad();
         String categoria = getCategoriaHabitacion(habitacion);
 

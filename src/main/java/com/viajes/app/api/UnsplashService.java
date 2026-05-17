@@ -1,6 +1,3 @@
-// ProyectoViajesJMJ - com/viajes/app/api/UnsplashService.java
-// Responsabilidad: integracion entre capas de API, persistencia y logica de negocio.
-// Nota profesional: Capa de negocio o integracion; concentra reglas que no deben duplicarse en la vista.
 
 package com.viajes.app.api;
 
@@ -9,10 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-/**
- * Documento profesional: clase principal del archivo.
- * Capa de negocio o integracion; concentra reglas que no deben duplicarse en la vista.
- */
+
 
 @Service
 public class UnsplashService {
@@ -29,14 +23,12 @@ public class UnsplashService {
     }
 
     public String obtenerImagen(String query) {
-        // 1. Si no hay clave real, devolvemos imagen por defecto directamente sin llamar a la API
         if (accessKey == null || accessKey.equals("TU_CLAVE_LOCAL") || accessKey.isEmpty()) {
             return "https://images.unsplash.com/photo-1436491865332-7a61a109cc05q=80&w=800";
         }
 
         String url = "https://api.unsplash.com/search/photospage=1&query=" + query + "&client_id=" + accessKey;
 
-        // 2. Intentamos buscar la foto, si falla, lo atrapamos sin romper la aplicación
         try {
             String response = restTemplate.getForObject(url, String.class);
             JsonNode root = objectMapper.readTree(response);
@@ -49,7 +41,6 @@ public class UnsplashService {
             System.out.println("Aviso: No se pudo obtener foto de Unsplash para '" + query + "'. Se usará foto por defecto.");
         }
 
-        // 3. Foto por defecto genérica de viaje (landscape)
         return "https://images.unsplash.com/photo-1436491865332-7a61a109cc05q=80&w=800";
     }
 }

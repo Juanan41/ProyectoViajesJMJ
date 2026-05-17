@@ -1,6 +1,3 @@
-// ProyectoViajesJMJ - com/viajes/app/alojamientos/Habitacion.java
-// Responsabilidad: catalogo de alojamientos, habitaciones y detalle hotelero.
-// Nota profesional: Representa el catalogo hotelero, sus habitaciones y las opciones que se pueden reservar.
 
 package com.viajes.app.alojamientos;
 
@@ -8,10 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
-/**
- * Documento profesional: clase principal del archivo.
- * Representa el catalogo hotelero, sus habitaciones y las opciones que se pueden reservar.
- */
 
 @Entity
 public class Habitacion {
@@ -21,7 +14,7 @@ public class Habitacion {
     private Long id;
 
     @NotBlank
-    private String tipo;// individual, doble, suite...
+    private String tipo;
 
     private String imagenUrl;
 
@@ -39,11 +32,9 @@ public class Habitacion {
     @JoinColumn(name = "alojamiento_id")
     private Alojamiento alojamiento;
 
-    // CONSTRUCTOR VACÍO
     public Habitacion() {
     }
 
-    // CONSTRUCTOR COMPLETO
     public Habitacion(String tipo, int capacidad, double precioPorNoche, Regimen regimen, Alojamiento alojamiento) {
         this.tipo = tipo;
         this.capacidad = capacidad;
@@ -52,7 +43,6 @@ public class Habitacion {
         this.alojamiento = alojamiento;
     }
 
-    // GETTERS Y SETTERS
 
     public Long getId() {
         return id;
@@ -106,7 +96,6 @@ public class Habitacion {
         this.alojamiento = alojamiento;
     }
 
-    // toString (debug PRO)
     @Override
     public String toString() {
         return "Habitacion{" +
