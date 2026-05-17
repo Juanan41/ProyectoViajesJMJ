@@ -1,4 +1,4 @@
-ackage com.viajes.app.config;
+package com.viajes.app.config;
 
 import com.viajes.app.auth.JwtFilter;
 import org.springframework.beans.factory.annotation.Value;
@@ -85,3 +85,4 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 }
+
