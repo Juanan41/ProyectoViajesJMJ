@@ -50,6 +50,20 @@ En producción, `src/environments/environment.prod.ts` apunta a:
 
 - `apiUrl: 'https://proyectoviajesjmj.onrender.com/api'`
 
+## Usuarios admin de prueba
+
+Los siguientes usuarios están creados en la base de datos de demo y tienen rol `ADMIN`:
+
+- `pablo@viajes.com`
+- `jordi@viajes.com`
+- `carlos@viajes.com`
+
+Contraseña para cada cuenta:
+
+- `1234`
+
+> Estos usuarios se cargan desde `src/main/resources/data.sql` como usuarios administrativos de prueba.
+
 ## Ejecución local
 
 ### Iniciar el backend con Docker Compose
