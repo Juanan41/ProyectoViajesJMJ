@@ -2,6 +2,8 @@ package com.viajes.app.admin;
 
 import com.viajes.app.alojamientos.Alojamiento;
 import com.viajes.app.alojamientos.AlojamientoRepository;
+import com.viajes.app.alojamientos.Habitacion;
+import com.viajes.app.destinos.ContinenteRepository;
 import com.viajes.app.cuentas.CuentaBancaria;
 import com.viajes.app.cuentas.CuentaBancariaRepository;
 import com.viajes.app.destinos.Destino;
@@ -31,6 +33,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -42,6 +45,9 @@ class AdminControllerTest {
 
     @Mock
     private DestinoRepository destinoRepository;
+
+    @Mock
+    private ContinenteRepository continenteRepository;
 
     @Mock
     private AlojamientoRepository alojamientoRepository;
@@ -163,6 +169,36 @@ class AdminControllerTest {
         verify(opinionRepository).deleteAll(List.of(opinion));
         verify(reservaRepository).deleteAll(List.of(reserva));
         verify(usuarioRepository).delete(usuario);
+    }
+
+    @Test
+    void debeCrearHotelConHabitacionesPorDefecto() {
+        Destino destino = new Destino();
+        ReflectionTestUtils.setField(destino, "id", 12L);
+        destino.setNombre("Berlin");
+        destino.setPais("Alemania");
+
+        when(destinoRepository.findById(12L)).thenReturn(Optional.of(destino));
+        when(alojamientoRepository.save(org.mockito.ArgumentMatchers.any(Alojamiento.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        Map<String, Object> response = adminController.crearHotel(Map.of(
+                "destinoId", 12L,
+                "nombre", "Hotel de prueba",
+                "precioPorNoche", 999
+        ));
+
+        assertEquals("Hotel de prueba", response.get("nombre"));
+        verify(alojamientoRepository).save(argThat(alojamiento -> {
+            List<Habitacion> habitaciones = alojamiento.getHabitaciones();
+
+            return habitaciones.size() == 4
+                    && habitaciones.stream().anyMatch(h -> h.getCapacidad() == 1)
+                    && habitaciones.stream().anyMatch(h -> h.getCapacidad() == 2)
+                    && habitaciones.stream().anyMatch(h -> h.getCapacidad() == 4)
+                    && habitaciones.stream().anyMatch(h -> h.getCapacidad() == 8)
+                    && habitaciones.stream().allMatch(h -> h.getAlojamiento() == alojamiento);
+        }));
     }
 
     @Test

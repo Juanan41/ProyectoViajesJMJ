@@ -4,6 +4,7 @@ package com.viajes.app.admin;
 import com.viajes.app.alojamientos.Alojamiento;
 import com.viajes.app.alojamientos.AlojamientoRepository;
 import com.viajes.app.alojamientos.Habitacion;
+import com.viajes.app.alojamientos.Regimen;
 import com.viajes.app.alojamientos.TipoAlojamiento;
 import com.viajes.app.cuentas.CuentaBancaria;
 import com.viajes.app.cuentas.CuentaBancariaRepository;
@@ -348,6 +349,7 @@ public class AdminController {
     public Map<String, Object> crearAlojamiento(@RequestBody Map<String, Object> request) {
         Alojamiento alojamiento = new Alojamiento();
         rellenarAlojamiento(alojamiento, request);
+        asegurarHabitacionesPorDefecto(alojamiento);
 
         Alojamiento guardado = alojamientoRepository.save(alojamiento);
         return toAlojamientoResponse(guardado);
@@ -366,6 +368,7 @@ public class AdminController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Alojamiento no encontrado"));
 
         rellenarAlojamiento(alojamiento, request);
+        asegurarHabitacionesPorDefecto(alojamiento);
 
         Alojamiento guardado = alojamientoRepository.save(alojamiento);
         return toAlojamientoResponse(guardado);
@@ -495,6 +498,49 @@ public class AdminController {
         alojamiento.setPrecioPorNoche(precioPorNoche);
         alojamiento.setDestino(destino);
         alojamiento.setTipo(TipoAlojamiento.HOTEL);
+    }
+
+    private void asegurarHabitacionesPorDefecto(Alojamiento alojamiento) {
+        if (alojamiento.getHabitaciones() != null && !alojamiento.getHabitaciones().isEmpty()) {
+            return;
+        }
+
+        double precioBase = alojamiento.getPrecioPorNoche().doubleValue();
+
+        alojamiento.addHabitacion(new Habitacion(
+                "Individual",
+                1,
+                precioBase,
+                Regimen.SOLO_ALOJAMIENTO,
+                alojamiento
+        ));
+        alojamiento.addHabitacion(new Habitacion(
+                "Doble",
+                2,
+                redondearPrecio(precioBase + 60),
+                Regimen.DESAYUNO,
+                alojamiento
+        ));
+        alojamiento.addHabitacion(new Habitacion(
+                "Suite",
+                4,
+                redondearPrecio(precioBase + 130),
+                Regimen.TODO_INCLUIDO,
+                alojamiento
+        ));
+        alojamiento.addHabitacion(new Habitacion(
+                "Grupal",
+                8,
+                redondearPrecio(precioBase * 1.45),
+                Regimen.MEDIA_PENSION,
+                alojamiento
+        ));
+    }
+
+    private double redondearPrecio(double precio) {
+        return BigDecimal.valueOf(precio)
+                .setScale(2, RoundingMode.HALF_UP)
+                .doubleValue();
     }
 
     private Map<String, Object> toUsuarioResponse(Usuario usuario) {
